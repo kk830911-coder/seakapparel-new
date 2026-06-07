@@ -1,9 +1,9 @@
 <script setup>
-// 1. 使用 Nuxt 运行时的运行时配置或自动读取我们配置的环境变量
+// 1. 动态获取环境变量或自动回退到 Render 线上后端
 const config = useRuntimeConfig()
 const strapiUrl = config.public.strapiUrl || 'https://seak-backend.onrender.com'
 
-// 2. 动态抓取线上或本地 Strapi 的产品数据（包含多媒体字段 image）
+// 2. 动态抓取产品列表数据，并关联抓取多媒体字段 image
 const { data: productsData } = await useFetch(`${strapiUrl}/api/products`, {
   query: { populate: 'image' }
 })
@@ -19,34 +19,39 @@ useHead({ title: 'All Wholesale Products | SeakApparel' })
       <div 
         v-for="item in (productsData?.data || [])" 
         :key="item.id" 
-        class="bg-white rounded-xl shadow overflow-hidden"
+        class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between"
       >
-        <NuxtLink :to="`/products/${item.id}`" class="aspect-square overflow-hidden block">
+        <NuxtLink :to="`/products/${item.id}`" class="aspect-square overflow-hidden block bg-gray-50">
           <NuxtImg
-            v-if="item.image"
+            v-if="item.image?.url"
             :src="item.image.url.startsWith('http') ? item.image.url : `${strapiUrl}${item.image.url}`"
             class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
             alt="Product Image"
           />
-          <div v-else class="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
+          <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
             No Image Available
           </div>
         </NuxtLink>
 
-        <div class="p-5">
-          <h3 class="font-bold truncate text-lg text-gray-800">{{ item.title }}</h3>
-          
-          <div class="flex justify-between mt-3 text-sm">
-            <span class="text-blue-600 font-bold">${{ item.price }}</span>
-            <span class="text-gray-500">MOQ: {{ item.moq }} pcs</span>
+        <div class="p-5 flex-1 flex flex-col justify-between">
+          <div>
+            <h3 class="font-bold truncate text-lg text-gray-800">{{ item.title }}</h3>
+            <p v-if="item.description" class="text-sm text-gray-500 line-clamp-2 mt-1">{{ item.description }}</p>
           </div>
           
-          <NuxtLink 
-            :to="`/products/${item.id}`" 
-            class="block w-full bg-slate-800 text-white text-center py-2 rounded mt-3 hover:bg-slate-700 transition-colors"
-          >
-            Check Detail & Inquiry
-          </NuxtLink>
+          <div class="mt-4">
+            <div class="flex justify-between text-sm mb-3">
+              <span class="text-blue-600 font-bold text-lg">${{ item.price }}</span>
+              <span class="text-gray-500 self-center">MOQ: {{ item.moq || 10 }} pcs</span>
+            </div>
+            
+            <NuxtLink 
+              :to="`/products/${item.id}`" 
+              class="block w-full bg-slate-800 text-white text-center py-2 rounded hover:bg-slate-700 transition-colors font-medium text-sm"
+            >
+              Check Detail & Inquiry
+            </NuxtLink>
+          </div>
         </div>
       </div>
     </div>
