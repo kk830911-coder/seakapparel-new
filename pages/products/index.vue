@@ -56,7 +56,7 @@ useHead({ title: 'All Wholesale Products | SeakApparel' })
         :key="item.id" 
         class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between border border-gray-100"
       >
-        <NuxtLink :to="`/products/${item.id}`" class="aspect-square overflow-hidden block bg-gray-50 relative">
+        <NuxtLink :to="`/products/${item.documentId || item.id}`" class="aspect-square overflow-hidden block bg-gray-50 relative">
           <NuxtImg
             :src="getImageUrl(item)"
             class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
@@ -83,7 +83,7 @@ useHead({ title: 'All Wholesale Products | SeakApparel' })
             </div>
             
             <NuxtLink 
-              :to="`/products/${item.id}`" 
+              :to="`/products/${item.documentId || item.id}`" 
               class="block w-full bg-slate-800 text-white text-center py-2 rounded hover:bg-slate-700 transition-colors font-medium text-sm"
             >
               Check Detail & Inquiry

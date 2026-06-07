@@ -5,7 +5,6 @@ const route = useRoute()
 const product = ref(null)
 const loading = ref(true)
 
-// 极其安全的图片路径解析函数
 const getImageUrl = (data) => {
   if (!data) return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop'
   if (data.image?.url) return data.image.url
@@ -14,7 +13,6 @@ const getImageUrl = (data) => {
   return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop'
 }
 
-// 极其安全的描述文字解析函数
 const getDescriptionText = (data) => {
   if (!data) return 'No specific description provided.'
   const desc = data.description || data.attributes?.description
@@ -30,15 +28,13 @@ onMounted(async () => {
   const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
   
   try {
+    // 此时路由传过来的 route.params.id 已经是真正的 documentId 了
     const response = await $fetch(`${strapiUrl}/api/products/${route.params.id}?populate=*`)
     console.log('详情页收到的原始数据:', response)
     
     if (response && response.data) {
-      // 暴力兼容：如果是数组取第0项，如果是对象直接赋值，彻底拍平
       product.value = Array.isArray(response.data) ? response.data[0] : response.data
     }
-    
-    console.log('详情页最终绑定的商品数据:', product.value)
   } catch (error) {
     console.error('Fetch product detail failed:', error)
   } finally {
