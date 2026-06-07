@@ -1,17 +1,23 @@
 <script setup>
+import { ref, onMounted } from 'vue'
 const route = useRoute()
 
-// 1. 动态获取环境对应的后端基准地址
-const config = useRuntimeConfig()
-const strapiUrl = config.public.strapiUrl || 'https://seak-backend.onrender.com'
+const product = ref(null)
+const loading = ref(true)
 
-// 2. 根据 URL 传过来的项目 ID，动态精准请求单件服装的数据
-const { data: productResponse } = await useFetch(`${strapiUrl}/api/products/${route.params.id}`, {
-  query: { populate: 'image' }
+onMounted(async () => {
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
+  
+  try {
+    const response = await $fetch(`${strapiUrl}/api/products/${route.params.id}?populate=image`)
+    product.value = response?.data || null
+  } catch (error) {
+    console.error('Fetch product detail failed:', error)
+  } finally {
+    loading.value = false
+  }
 })
-
-// 计算属性：兼容并解构 Strapi 返回的单条核心数据
-const product = computed(() => productResponse.value?.data)
 
 useHead(() => ({
   title: product.value?.title ? `${product.value.title} | SeakApparel Wholesale` : 'Product Detail'
@@ -20,8 +26,12 @@ useHead(() => ({
 
 <template>
   <div class="max-w-7xl mx-auto px-4 py-12">
-    <div v-if="!product" class="text-center py-20 text-gray-500">
+    <div v-if="loading" class="text-center py-20 text-gray-500">
       Loading wholesale product details...
+    </div>
+
+    <div v-else-if="!product" class="text-center py-20 text-red-500 bg-red-50 rounded-xl">
+      Product not found.
     </div>
 
     <div v-else class="grid md:grid-cols-2 gap-12 bg-white p-6 md:p-10 rounded-2xl shadow-sm">
@@ -29,7 +39,7 @@ useHead(() => ({
       <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square">
         <NuxtImg
           v-if="product.image?.url"
-          :src="product.image.url.startsWith('http') ? product.image.url : `${strapiUrl}${product.image.url}`"
+          :src="product.image.url"
           class="w-full h-full object-cover"
           alt="Product Detail Image"
         />
@@ -58,30 +68,23 @@ useHead(() => ({
 
           <div class="py-4">
             <h3 class="font-bold text-gray-800 border-l-4 border-slate-800 pl-2 mb-3">Product Description</h3>
-            <p class="text-gray-600 leading-relaxed whitespace-pre-line bg-slate-50 p-4 rounded-lg text-sm">
-              {{ product.description || 'No specific description provided. Please contact our manager for material, sizing, and color breakdown.' }}
+            <p class="text-gray-600 leading-relaxed text-sm bg-slate-50 p-4 rounded-lg">
+              {{ Array.isArray(product.description) ? product.description[0]?.children[0]?.text : product.description }}
             </p>
           </div>
         </div>
 
-        <div class="mt-8 pt-6 border-t border-gray-100 space-y-3">
+        <div class="mt-8 pt-6 border-t border-gray-100">
           <a 
-            :href="`https://wa.me/+8613800000000?text=Hi, I am interested in your product: ${product.title} (ID: ${product.id}). Please send more wholesale details.`"
+            :href="`https://wa.me/+8613800000000?text=Hi, I am interested in your product: ${product.title}`"
             target="_blank"
             class="block w-full bg-green-600 text-white text-center py-3 rounded-xl font-semibold hover:bg-green-700 transition-colors shadow-sm"
           >
             💬 Inquiry via WhatsApp (Fast Response)
           </a>
-          
-          <NuxtLink 
-            to="/contact" 
-            class="block w-full bg-slate-900 text-white text-center py-3 rounded-xl font-semibold hover:bg-slate-800 transition-colors text-sm"
-          >
-            ✉️ Bulk Order Inquiry / Custom OEM
-          </NuxtLink>
         </div>
-
       </div>
+
     </div>
   </div>
 </template>
