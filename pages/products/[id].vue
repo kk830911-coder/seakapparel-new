@@ -5,29 +5,49 @@ const route = useRoute()
 const product = ref(null)
 const loading = ref(true)
 
-// 智能解构：不管图片藏在多深的结构里，都把它揪出来
+// 极其安全的图片路径解析，全方位封死 null 和 undefined 导致的报错
 const getImageUrl = (data) => {
-  if (!data) return null
+  if (!data) return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop'
+  
+  // 优先从小伙子发回来的真实数据包里拆解：data 直接是对象
   if (data.image?.url) return data.image.url
   if (Array.isArray(data.image) && data.image[0]?.url) return data.image[0].url
+  
+  // 备用：兼容传统 attributes 嵌套结构
   if (data.attributes?.image?.url) return data.attributes.image.url
   if (data.attributes?.image?.data?.attributes?.url) return data.attributes.image.data.attributes.url
+  
+  // 兜底：万一没有图，返回一张好看的时尚女装占位图，确保网站不挂
   return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop'
 }
 
+// 极其安全的描述文字解析，完美剥离 Strapi v5 的 Blocks/Array 富文本大坑
+const getDescriptionText = (data) => {
+  if (!data) return 'No specific description provided.'
+  
+  const desc = data.description || data.attributes?.description
+  if (!desc) return 'No specific description provided.'
+  
+  // 如果是 Strapi v5 的新型数组块结构，精准剥离出第一行文字
+  if (Array.isArray(desc)) {
+    return desc[0]?.children?.[0]?.text || 'No specific description provided.'
+  }
+  
+  return desc
+}
+
 onMounted(async () => {
-  // 核心：动态识别环境！在线上用 Render，在本地用 Localhost，绝不写死！
   const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
   
   try {
     const response = await $fetch(`${strapiUrl}/api/products/${route.params.id}?populate=*`)
     
-    // 兼容 Strapi v4 和 v5 不同的数据包裹外壳
-    if (response?.data) {
+    // 正确提取单条数据对象
+    if (response && response.data) {
       product.value = response.data
     }
-    console.log('详情页拿到的原始数据:', response)
+    console.log('详情页解构成功后的 product 对象:', product.value)
   } catch (error) {
     console.error('获取详情失败:', error)
   } finally {
@@ -36,7 +56,9 @@ onMounted(async () => {
 })
 
 useHead(() => ({
-  title: product.value?.title || product.value?.attributes?.title ? `${product.value?.title || product.value?.attributes?.title} | SeakApparel Wholesale` : 'Product Detail'
+  title: product.value?.title || product.value?.attributes?.title 
+    ? `${product.value?.title || product.value?.attributes?.title} | SeakApparel Wholesale` 
+    : 'Product Detail'
 }))
 </script>
 
@@ -89,11 +111,7 @@ useHead(() => ({
           <div class="py-4">
             <h3 class="font-bold text-gray-800 border-l-4 border-slate-800 pl-2 mb-3">Product Description</h3>
             <p class="text-gray-600 leading-relaxed text-sm bg-slate-50 p-4 rounded-lg whitespace-pre-line">
-              {{ 
-                Array.isArray(product.description || product.attributes?.description) 
-                ? (product.description || product.attributes?.description)[0]?.children[0]?.text 
-                : (product.description || product.attributes?.description || 'No specific description provided.') 
-              }}
+              {{ getDescriptionText(product) }}
             </p>
           </div>
         </div>
