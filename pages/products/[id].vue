@@ -4,7 +4,6 @@ import { ref, onMounted } from 'vue'
 const route = useRoute()
 const product = ref(null)
 const loading = ref(true)
-const fetchError = ref(false)
 
 // 极其安全的图片路径解析函数
 const getImageUrl = (data) => {
@@ -32,24 +31,16 @@ onMounted(async () => {
   
   try {
     const response = await $fetch(`${strapiUrl}/api/products/${route.params.id}?populate=*`)
-    console.log('详情页拿到的原始响应数据:', response)
+    console.log('详情页收到的原始数据:', response)
     
     if (response && response.data) {
-      // 核心修复：如果是数组包着的，自动拔出来取第 0 项！如果是对象直接用！
-      if (Array.isArray(response.data)) {
-        product.value = response.data[0] || null
-      } else {
-        product.value = response.data
-      }
+      // 暴力兼容：如果是数组取第0项，如果是对象直接赋值，彻底拍平
+      product.value = Array.isArray(response.data) ? response.data[0] : response.data
     }
     
-    if (!product.value) {
-      fetchError.value = true
-    }
-    console.log('详情页最终解析后的标准 product 对象:', product.value)
+    console.log('详情页最终绑定的商品数据:', product.value)
   } catch (error) {
-    console.error('Fetch product detail failed directly from client:', error)
-    fetchError.value = true
+    console.error('Fetch product detail failed:', error)
   } finally {
     loading.value = false
   }
@@ -70,8 +61,8 @@ useHead(() => {
       <p>Loading wholesale product details...</p>
     </div>
 
-    <div v-else-if="fetchError || !product" class="text-center py-20 text-red-500 bg-red-50 rounded-xl">
-      Product detail not found. Please ensure the backend data is correct.
+    <div v-else-if="!product" class="text-center py-20 text-red-500 bg-red-50 rounded-xl">
+      Product detail not found. Please refresh the page or back to list.
     </div>
 
     <div v-else class="grid md:grid-cols-2 gap-12 bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
