@@ -8,55 +8,78 @@ const loading = ref(true)
 // 当前选中的主图索引
 const activeImageIndex = ref(0)
 
-// 极其安全的图片列表解析函数（将后台单图或多图统一转换为标准的数组结构）
+// 极其安全的图片列表解析函数（将后台单图或多图统一转换为纯 url 字符串数组）
 const imagesList = computed(() => {
   const data = product.value
   if (!data) return []
   
   let list = []
   
-  // 1. 检查标准的直接 image 字段
+  // 1. 检查直接的 image 字段
   if (data.image) {
     if (Array.isArray(data.image)) {
       list = [...data.image]
-    } else if (data.image.url) {
+    } else {
       list.push(data.image)
     }
   }
   
-  // 2. 检查多图的 images 数组字段（防备你以后在 Strapi 建立了多图媒体字段）
+  // 2. 检查多图的 images 数组字段
   if (data.images && Array.isArray(data.images)) {
     list = [...list, ...data.images]
   }
   
-  // 3. 兼容旧版 attributes 嵌套结构
+  // 3. 兼容传统 attributes.image.data 嵌套结构
   if (data.attributes?.image?.data) {
     const imgData = data.attributes.image.data
     if (Array.isArray(imgData)) {
-      imgData.forEach(item => {
-        if (item.attributes) list.push(item.attributes)
-      })
-    } else if (imgData.attributes) {
-      list.push(imgData.attributes)
+      imgData.forEach(item => list.push(item))
+    } else {
+      list.push(imgData)
     }
   }
-  
-  // 过滤确保每一项都有有效的 url
-  const sortedList = list.filter(img => img && (img.url || typeof img === 'string'))
+
+  // 核心清洗：把各种奇葩多层嵌套的 Strapi 图片对象全部拍平，只提取出绝对安全的 url 字符串数组
+  const processedUrls = list.map(img => {
+    if (!img) return null
+    if (typeof img === 'string') return img
+    if (img.url) return img.url
+    if (img.attributes?.url) return img.attributes.url
+    return null
+  }).filter(url => url !== null)
   
   // 兜底保护：如果没有解析出任何图片，塞入一张好看的时尚女装占位图
-  if (sortedList.length === 0) {
-    return [{ url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop' }]
+  if (processedUrls.length === 0) {
+    return ['https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop']
   }
   
-  return sortedList.map(img => typeof img === 'string' ? { url: img } : img)
+  return processedUrls
 })
 
 // 获取当前展示的主图 URL
 const currentMainImageUrl = computed(() => {
-  const currentImg = imagesList.value[activeImageIndex.value]
-  return currentImg?.url || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop'
+  return imagesList.value[activeImageIndex.value] || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop'
 })
+
+// 下一张图片（循环切换）
+const nextImage = () => {
+  if (imagesList.value.length <= 1) return
+  if (activeImageIndex.value === imagesList.value.length - 1) {
+    activeImageIndex.value = 0 // 点到最后一张，回到第一张
+  } else {
+    activeImageIndex.value++
+  }
+}
+
+// 上一张图片（循环切换）
+const prevImage = () => {
+  if (imagesList.value.length <= 1) return
+  if (activeImageIndex.value === 0) {
+    activeImageIndex.value = imagesList.value.length - 1 // 在第一张点左，跳到最后一张
+  } else {
+    activeImageIndex.value--
+  }
+}
 
 const getDescriptionText = (data) => {
   if (!data) return 'No specific description provided.'
@@ -113,23 +136,49 @@ useHead(() => {
       <div class="grid md:grid-cols-2 gap-12 bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
         
         <div class="space-y-4">
-          <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative">
+          <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group">
             <NuxtImg
               :src="currentMainImageUrl"
               class="w-full h-full object-cover transition-all duration-300"
               alt="Product Main Detail Image"
             />
+            
+            <button 
+              v-if="imagesList.length > 1"
+              @click="prevImage"
+              class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:outline-none z-10 shadow-md"
+              aria-label="Previous Image"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+            </button>
+
+            <button 
+              v-if="imagesList.length > 1"
+              @click="nextImage"
+              class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:outline-none z-10 shadow-md"
+              aria-label="Next Image"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+            </button>
+
+            <div v-if="imagesList.length > 1" class="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-xs font-medium tracking-wider z-10">
+              {{ activeImageIndex + 1 }} / {{ imagesList.length }}
+            </div>
           </div>
           
           <div v-if="imagesList.length > 1" class="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
             <button
-              v-for="(img, index) in imagesList"
+              v-for="(url, index) in imagesList"
               :key="index"
               @click="activeImageIndex = index"
               class="w-20 h-20 rounded-lg overflow-hidden border-2 bg-gray-50 flex-shrink-0 transition-all"
               :class="activeImageIndex === index ? 'border-blue-600 ring-2 ring-blue-100 scale-95' : 'border-gray-200 opacity-70 hover:opacity-100'"
             >
-              <img :src="img.url" class="w-full h-full object-cover" alt="Thumbnail" />
+              <img :src="url" class="w-full h-full object-cover" alt="Thumbnail" />
             </button>
           </div>
         </div>
