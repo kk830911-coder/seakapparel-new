@@ -28,11 +28,12 @@ onMounted(async () => {
   const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
   
   try {
-    // 此时路由传过来的 route.params.id 已经是真正的 documentId 了
+    // 此时从列表页传过来的 route.params.id 已经是真正的 documentId 字符串了
     const response = await $fetch(`${strapiUrl}/api/products/${route.params.id}?populate=*`)
     console.log('详情页收到的原始数据:', response)
     
     if (response && response.data) {
+      // 兼容某些后端直接返回对象或返回包裹数组的情况
       product.value = Array.isArray(response.data) ? response.data[0] : response.data
     }
   } catch (error) {
