@@ -5,10 +5,8 @@ const responseData = ref(null)
 const loading = ref(true)
 const fetchError = ref(false)
 
-// 自动安全提取商品数组
 const products = computed(() => responseData.value?.data || [])
 
-// 智能图片路径防御解析
 const getImageUrl = (item) => {
   if (!item) return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
   if (item.image?.url) return item.image.url
@@ -18,7 +16,6 @@ const getImageUrl = (item) => {
 }
 
 onMounted(async () => {
-  // 纯客户端动态识别：本地用 1337 端口，线上用 Render
   const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
   

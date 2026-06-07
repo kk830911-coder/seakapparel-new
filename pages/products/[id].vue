@@ -27,17 +27,26 @@ const getDescriptionText = (data) => {
 }
 
 onMounted(async () => {
-  // 纯客户端动态识别：完美抹除 SSR 500 回环跨域大坑
   const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
   
   try {
     const response = await $fetch(`${strapiUrl}/api/products/${route.params.id}?populate=*`)
+    console.log('详情页拿到的原始响应数据:', response)
+    
     if (response && response.data) {
-      product.value = response.data
-    } else {
+      // 核心修复：如果是数组包着的，自动拔出来取第 0 项！如果是对象直接用！
+      if (Array.isArray(response.data)) {
+        product.value = response.data[0] || null
+      } else {
+        product.value = response.data
+      }
+    }
+    
+    if (!product.value) {
       fetchError.value = true
     }
+    console.log('详情页最终解析后的标准 product 对象:', product.value)
   } catch (error) {
     console.error('Fetch product detail failed directly from client:', error)
     fetchError.value = true
@@ -46,11 +55,12 @@ onMounted(async () => {
   }
 })
 
-useHead(() => ({
-  title: product.value?.title || product.value?.attributes?.title 
-    ? `${product.value?.title || product.value?.attributes?.title} | SeakApparel Wholesale` 
-    : 'Product Detail'
-}))
+useHead(() => {
+  const titleText = product.value?.title || product.value?.attributes?.title || 'Product Detail'
+  return {
+    title: `${titleText} | SeakApparel Wholesale`
+  }
+})
 </script>
 
 <template>
@@ -61,7 +71,7 @@ useHead(() => ({
     </div>
 
     <div v-else-if="fetchError || !product" class="text-center py-20 text-red-500 bg-red-50 rounded-xl">
-      Product detail not found. Please ensure the backend is running.
+      Product detail not found. Please ensure the backend data is correct.
     </div>
 
     <div v-else class="grid md:grid-cols-2 gap-12 bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
