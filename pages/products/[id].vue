@@ -5,12 +5,21 @@ const route = useRoute()
 const product = ref(null)
 const loading = ref(true)
 
+const getImageUrl = (item) => {
+  if (!item) return null
+  if (item.image?.url) return item.image.url
+  if (Array.isArray(item.image) && item.image[0]?.url) return item.image[0].url
+  if (item.attributes?.image?.data?.attributes?.url) return item.attributes.image.data.attributes.url
+  if (item.image_url) return item.image_url
+  return null
+}
+
 onMounted(async () => {
   const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
   
   try {
-    const response = await $fetch(`${strapiUrl}/api/products/${route.params.id}?populate=image`)
+    const response = await $fetch(`${strapiUrl}/api/products/${route.params.id}?populate=*`)
     product.value = response?.data || null
   } catch (error) {
     console.error('Fetch product detail failed:', error)
@@ -35,17 +44,12 @@ useHead(() => ({
     </div>
 
     <div v-else class="grid md:grid-cols-2 gap-12 bg-white p-6 md:p-10 rounded-2xl shadow-sm">
-      
       <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square">
         <NuxtImg
-          v-if="product.image?.url"
-          :src="product.image.url"
+          :src="getImageUrl(product) || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop'"
           class="w-full h-full object-cover"
           alt="Product Detail Image"
         />
-        <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
-          No Image Available
-        </div>
       </div>
 
       <div class="flex flex-col justify-between">
@@ -84,7 +88,6 @@ useHead(() => ({
           </a>
         </div>
       </div>
-
     </div>
   </div>
 </template>
