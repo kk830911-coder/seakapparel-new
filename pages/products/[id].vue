@@ -1,48 +1,36 @@
 <template>
   <div class="container mx-auto px-4 py-8 min-h-screen">
-    <!-- 加载状态 -->
     <div v-if="pending" class="text-center text-xl py-20">
       Loading product details...
     </div>
-
-    <!-- 错误状态 -->
     <div v-else-if="error" class="text-center text-red-500 text-xl py-20">
       Failed to load product, please try again later
     </div>
+    <div v-else-if="!targetDocId" class="text-center text-gray-500 py-20">
+      Product not found
+    </div>
 
-    <!-- 产品详情 -->
     <div v-else-if="product" class="grid md:grid-cols-2 gap-10 items-start">
       <div class="rounded-lg overflow-hidden shadow-lg">
         <NuxtImg
           :src="getImageUrl(product.image)"
-          :alt="`${product.title} image`"
+          alt="Product Image"
           class="w-full h-auto object-cover"
           loading="lazy"
         />
       </div>
-
       <div class="space-y-6">
         <h1 class="text-3xl font-bold text-slate-900">{{ product.title }}</h1>
-
-        <div class="text-2xl text-red-600 font-semibold">
-          ${{ product.price }}
-        </div>
-
+        <div class="text-2xl text-red-600 font-semibold">${{ product.price }}</div>
         <div class="text-gray-700">
           <p><strong>MOQ (Minimum Order Quantity):</strong> {{ product.moq }} pcs</p>
         </div>
-
         <div class="border-t pt-6">
           <h3 class="text-xl font-medium mb-3">Product Description</h3>
           <p class="text-gray-600 leading-relaxed">
-            {{ 
-              Array.isArray(product.description) 
-              ? (product.description[0]?.children?.[0]?.text || 'No description available') 
-              : (product.description || 'No description available') 
-            }}
+            {{ product.description || 'No description available' }}
           </p>
         </div>
-
         <div class="pt-4">
           <NuxtLink
             to="/products"
@@ -53,69 +41,48 @@
         </div>
       </div>
     </div>
-
-    <!-- 产品不存在 -->
-    <div v-else class="text-center text-gray-500 py-20">
-      Product not found
-    </div>
   </div>
 </template>
 
 <script setup>
+import { computed } from 'vue'
 const route = useRoute()
+const strapiUrl = process.dev ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
-// 统一环境判断
-const strapiUrl = process.dev 
-  ? 'http://localhost:1337' 
-  : 'https://seak-backend.onrender.com'
+// 1. 获取全局商品列表（来自列表页）
+const allProducts = useState('allProducts')
+// 当前路由的 数字ID
+const numId = route.params.id
 
-// 请求产品详情
+// 2. 根据数字ID 匹配出真实 documentId
+const targetDocId = computed(() => {
+  const item = allProducts.value.find(p => p.id == numId)
+  return item ? item.documentId : null
+})
+
+// 3. 用 documentId 请求详情接口
 const { data, pending, error } = await useFetch(
-  () => `${strapiUrl}/api/products/${route.params.id}?populate=*`,
-  {
-    timeout: 10000,
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  }
+  () => targetDocId.value ? `${strapiUrl}/api/products/${targetDocId.value}?populate=*` : null,
+  { timeout: 10000 }
 )
 
-// 统一数据解析（兼容Strapi v4/v5）
+// 4. 解析数据
 const product = computed(() => {
   if (!data.value?.data) return null
-  
-  const rawData = data.value.data
-  // 提取核心字段，统一数据结构
+  const d = data.value.data
   return {
-    id: rawData.id,
-    title: rawData.title || rawData.attributes?.title || 'Untitled Product',
-    price: rawData.price || rawData.attributes?.price || 0,
-    moq: rawData.moq || rawData.attributes?.moq || 10,
-    description: rawData.description || rawData.attributes?.description || '',
-    image: rawData.image || rawData.attributes?.image || null
+    title: d.attributes?.title || '',
+    price: d.attributes?.price || 0,
+    moq: d.attributes?.moq || 0,
+    description: d.attributes?.description || '',
+    image: d.attributes?.image
   }
 })
 
-// 统一的图片URL处理函数
+// 图片处理
 const getImageUrl = (img) => {
-  if (!img) return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
-  
-  let imgUrl = ''
-  // 兼容不同的图片数据结构
-  if (img?.url) imgUrl = img.url
-  if (Array.isArray(img) && img[0]?.url) imgUrl = img[0].url
-  if (img?.data?.attributes?.url) imgUrl = img.data.attributes.url
-  
-  // 处理相对路径
-  if (imgUrl && !imgUrl.startsWith('http')) {
-    imgUrl = `${strapiUrl}${imgUrl}`
-  }
-  
-  return imgUrl || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
+  if (!img?.data?.attributes?.url) return 'https://via.placeholder.com/600'
+  let url = img.data.attributes.url
+  return url.startsWith('http') ? url : `${strapiUrl}${url}`
 }
-
-// 设置页面标题
-useHead({ 
-  title: computed(() => product.value ? `${product.value.title} | SeakApparel` : 'Product Not Found | SeakApparel') 
-})
 </script>
