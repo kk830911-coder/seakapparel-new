@@ -1,15 +1,21 @@
 <template>
   <div class="container mx-auto px-4 py-8 min-h-screen">
-    <div v-if="pending" class="text-center text-xl py-20">
+    <!-- 全局加载 -->
+    <div v-if="globalLoading" class="text-center text-xl py-20">
       Loading product details...
     </div>
-    <div v-else-if="error" class="text-center text-red-500 text-xl py-20">
+
+    <!-- 接口报错 -->
+    <div v-else-if="globalError" class="text-center text-red-500 text-xl py-20">
       Failed to load product, please try again later
     </div>
+
+    <!-- 未匹配到商品 -->
     <div v-else-if="!targetDocId" class="text-center text-gray-500 py-20">
       Product not found
     </div>
 
+    <!-- 商品详情 -->
     <div v-else-if="product" class="grid md:grid-cols-2 gap-10 items-start">
       <div class="rounded-lg overflow-hidden shadow-lg">
         <NuxtImg
@@ -45,31 +51,34 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
 const route = useRoute()
 const strapiUrl = process.dev ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
+// 当前路由的数字ID
+const currentNumId = route.params.id
 
-// 1. 获取全局商品列表（来自列表页）
-const allProducts = useState('allProducts')
-// 当前路由的 数字ID
-const numId = route.params.id
+// 第一步：请求全量商品列表（用于匹配documentId）
+const { data: listData, pending: globalLoading, error: globalError } = await useFetch(
+  `${strapiUrl}/api/products?populate=*`,
+  { timeout: 10000 }
+)
 
-// 2. 根据数字ID 匹配出真实 documentId
+// 第二步：根据数字ID 匹配对应的 documentId
 const targetDocId = computed(() => {
-  const item = allProducts.value.find(p => p.id == numId)
-  return item ? item.documentId : null
+  if (!listData.value?.data) return null
+  const matchItem = listData.value.data.find(item => item.id == currentNumId)
+  return matchItem ? matchItem.documentId : null
 })
 
-// 3. 用 documentId 请求详情接口
-const { data, pending, error } = await useFetch(
+// 第三步：使用 documentId 请求商品详情
+const { data: detailData } = await useFetch(
   () => targetDocId.value ? `${strapiUrl}/api/products/${targetDocId.value}?populate=*` : null,
   { timeout: 10000 }
 )
 
-// 4. 解析数据
+// 格式化详情数据
 const product = computed(() => {
-  if (!data.value?.data) return null
-  const d = data.value.data
+  if (!detailData.value?.data) return null
+  const d = detailData.value.data
   return {
     title: d.attributes?.title || '',
     price: d.attributes?.price || 0,
@@ -79,10 +88,10 @@ const product = computed(() => {
   }
 })
 
-// 图片处理
+// 统一图片处理
 const getImageUrl = (img) => {
   if (!img?.data?.attributes?.url) return 'https://via.placeholder.com/600'
-  let url = img.data.attributes.url
+  const url = img.data.attributes.url
   return url.startsWith('http') ? url : `${strapiUrl}${url}`
 }
 </script>

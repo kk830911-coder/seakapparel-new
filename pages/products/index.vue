@@ -14,7 +14,7 @@
 
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
       <div v-for="item in products" :key="item.id" class="bg-white rounded-xl shadow overflow-hidden border border-gray-100">
-        <!-- 路由依然使用 数字 id，不改变原有链接 -->
+        <!-- 路由保留 数字ID，符合你的要求 -->
         <NuxtLink :to="`/products/${item.id}`" class="aspect-square overflow-hidden block bg-gray-50">
           <NuxtImg
             :src="getImageUrl(item.image)"
@@ -23,7 +23,6 @@
             loading="lazy"
           />
         </NuxtLink>
-
         <div class="p-5">
           <h3 class="font-bold text-lg text-gray-800 line-clamp-1">{{ item.title }}</h3>
           <p class="text-sm text-gray-500 line-clamp-2 mt-2">
@@ -46,20 +45,18 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
 const strapiUrl = process.dev ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
-// 拉取全量商品列表（用于匹配 ID）
+// 请求商品列表
 const { data: res, error, pending } = await useFetch(`${strapiUrl}/api/products?populate=*`, {
   timeout: 10000
 })
 
-// 整理数据：同时保留 数字id 和 documentId
-const productList = computed(() => {
+// 格式化列表数据
+const products = computed(() => {
   if (!res.value?.data) return []
   return res.value.data.map(item => ({
-    id: item.id, // 数字ID（用于路由）
-    documentId: item.documentId, // 真实查询ID
+    id: item.id,
     title: item.attributes?.title || '',
     description: item.attributes?.description || '',
     price: item.attributes?.price || 0,
@@ -68,12 +65,10 @@ const productList = computed(() => {
   }))
 })
 
+// 图片地址处理
 const getImageUrl = (img) => {
   if (!img?.data?.attributes?.url) return 'https://via.placeholder.com/600'
-  let url = img.data.attributes.url
+  const url = img.data.attributes.url
   return url.startsWith('http') ? url : `${strapiUrl}${url}`
 }
-
-// 全局挂载列表，给详情页使用
-useState('allProducts', () => productList.value)
 </script>
