@@ -5,12 +5,12 @@ const products = ref([])
 const loading = ref(true)
 
 onMounted(async () => {
-  // 1. 自动判断：在线上就用 Render 安全地址，在本地就用 localhost
+  // 自动识别环境：线上请求 Render 后端，本地请求 Localhost
   const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
   
   try {
-    // 2. 直接带上 populate=image 去抓数据
+    // 强制带上 populate=image
     const response = await $fetch(`${strapiUrl}/api/products?populate=image`)
     products.value = response?.data || []
   } catch (error) {
