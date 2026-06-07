@@ -1,5 +1,4 @@
 <template>
-  <!-- 页面容器 -->
   <div class="container mx-auto px-4 py-8 min-h-screen">
     <!-- 加载中状态 -->
     <div v-if="pending" class="text-center text-xl py-20">
@@ -65,27 +64,25 @@
 <script setup>
 // 1. 获取路由参数（当前产品 ID）
 const route = useRoute()
-// 2. 获取全局后端接口地址
+
+// 2. 获取 Strapi 基础地址（只包含域名，不含 /api）
 const runtimeConfig = useRuntimeConfig()
 const baseUrl = runtimeConfig.public.strapiUrl
 
-// 3. 请求 Strapi 单条产品数据
-// populate=* 必须加：Strapi 默认不返回图片等关联资源
+// 3. 拼接正确的详情接口地址，包含 populate=*
 const { data, pending, error } = await useFetch(
   () => `${baseUrl}/api/products/${route.params.id}?populate=*`
 )
 
-// 4. 格式化数据（Strapi 标准返回结构：data -> attributes）
+// 4. 格式化 Strapi 返回的数据
 const product = computed(() => {
   if (!data.value?.data) return null
   return data.value.data.attributes
 })
 
-// 5. 工具函数：拼接图片完整地址（解决图片不显示）
+// 5. 处理图片地址，适配线上/本地 Strapi
 const getImageUrl = (img) => {
-  // 无图片时返回占位图
   if (!img?.url) return '/placeholder.png'
-  // Strapi 图片分相对路径/绝对路径，统一处理
   return img.url.startsWith('http') ? img.url : `${baseUrl}${img.url}`
 }
 </script>
