@@ -1,74 +1,90 @@
+<script setup>
+// 1. 自动判断环境（本地用 localhost，线上用 Render）
+const strapiUrl = process.dev 
+  ? 'http://localhost:1337' 
+  : 'https://seak-backend.onrender.com'
+
+// 2. 使用 Nuxt 3 标准的 useFetch，同时解决服务端和客户端的加载问题
+const { data: response, error } = await useFetch(`${strapiUrl}/api/products`, {
+  query: { populate: '*' }
+})
+
+// 3. 安全获取产品列表
+const products = computed(() => response.value?.data || [])
+
+// 4. 智能提取图片 URL 的安全函数
+const getImageUrl = (item) => {
+  if (!item) return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
+  
+  // 兼容 Strapi v5 扁平结构
+  if (item.image?.url) return item.image.url
+  if (Array.isArray(item.image) && item.image[0]?.url) return item.image[0].url
+  
+  // 兼容旧版嵌套结构
+  if (item.attributes?.image?.data?.attributes?.url) return item.attributes.image.data.attributes.url
+  
+  return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
+}
+
+useHead({ title: 'All Wholesale Products | SeakApparel' })
+</script>
+
 <template>
   <div class="max-w-7xl mx-auto px-4 py-12">
     <h1 class="text-3xl font-bold mb-10 border-l-4 border-blue-600 pl-3">All Wholesale Products</h1>
-
-    <div v-if="pending" class="text-center py-10 text-gray-500 bg-gray-50 rounded-xl">
-      Loading products...
-    </div>
-    <div v-else-if="error" class="text-center py-10 text-red-500 bg-red-50 rounded-xl">
+    
+    <div v-if="error" class="text-center py-10 text-red-500 bg-red-50 rounded-xl">
       Failed to connect backend server. Please refresh.
     </div>
+
     <div v-else-if="products.length === 0" class="text-center py-20 text-gray-500 bg-gray-50 rounded-xl">
       No products found.
     </div>
 
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-      <div v-for="item in products" :key="item.id" class="bg-white rounded-xl shadow overflow-hidden border border-gray-100">
-        <!-- 路由保留 数字ID，符合你的要求 -->
-        <NuxtLink :to="`/products/${item.id}`" class="aspect-square overflow-hidden block bg-gray-50">
+      <div 
+        v-for="item in products" 
+        :key="item.id" 
+        class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between border border-gray-100"
+      >
+        <NuxtLink :to="`/products/${item.id}`" class="aspect-square overflow-hidden block bg-gray-50 relative">
           <NuxtImg
-            :src="getImageUrl(item.image)"
-            class="w-full h-full object-cover hover:scale-110 transition duration-500"
-            alt="Product"
-            loading="lazy"
+            :src="getImageUrl(item)"
+            class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+            alt="Product Image"
           />
-        </NuxtLink>
-        <div class="p-5">
-          <h3 class="font-bold text-lg text-gray-800 line-clamp-1">{{ item.title }}</h3>
-          <p class="text-sm text-gray-500 line-clamp-2 mt-2">
-            {{ item.description || 'No description' }}
-          </p>
-          <div class="flex justify-between text-sm my-3">
-            <span class="text-blue-600 font-bold text-lg">${{ item.price }}</span>
-            <span class="text-gray-500">MOQ: {{ item.moq }} pcs</span>
+          <div v-if="!item.image" class="absolute top-2 right-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded">
+            Sample Image
           </div>
-          <NuxtLink
-            :to="`/products/${item.id}`"
-            class="block w-full bg-slate-800 text-white text-center py-2 rounded hover:bg-slate-700"
-          >
-            Check Detail & Inquiry
-          </NuxtLink>
+        </NuxtLink>
+
+        <div class="p-5 flex-1 flex flex-col justify-between">
+          <div>
+            <h3 class="font-bold text-lg text-gray-800 line-clamp-1">{{ item.title || item.attributes?.title }}</h3>
+            <p class="text-sm text-gray-500 line-clamp-2 mt-1">
+              {{ 
+                Array.isArray(item.description || item.attributes?.description) 
+                ? (item.description || item.attributes?.description)[0]?.children?.[0]?.text 
+                : (item.description || item.attributes?.description || '') 
+              }}
+            </p>
+          </div>
+          
+          <div class="mt-4">
+            <div class="flex justify-between text-sm mb-3">
+              <span class="text-blue-600 font-bold text-lg">${{ item.price || item.attributes?.price }}</span>
+              <span class="text-gray-500 self-center">MOQ: {{ item.moq || item.attributes?.moq || 10 }} pcs</span>
+            </div>
+            
+            <NuxtLink 
+              :to="`/products/${item.id}`" 
+              class="block w-full bg-slate-800 text-white text-center py-2 rounded hover:bg-slate-700 transition-colors font-medium text-sm"
+            >
+              Check Detail & Inquiry
+            </NuxtLink>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<script setup>
-const strapiUrl = process.dev ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
-
-// 请求商品列表
-const { data: res, error, pending } = await useFetch(`${strapiUrl}/api/products?populate=*`, {
-  timeout: 10000
-})
-
-// 格式化列表数据
-const products = computed(() => {
-  if (!res.value?.data) return []
-  return res.value.data.map(item => ({
-    id: item.id,
-    title: item.attributes?.title || '',
-    description: item.attributes?.description || '',
-    price: item.attributes?.price || 0,
-    moq: item.attributes?.moq || 0,
-    image: item.attributes?.image
-  }))
-})
-
-// 图片地址处理
-const getImageUrl = (img) => {
-  if (!img?.data?.attributes?.url) return 'https://via.placeholder.com/600'
-  const url = img.data.attributes.url
-  return url.startsWith('http') ? url : `${strapiUrl}${url}`
-}
-</script>
