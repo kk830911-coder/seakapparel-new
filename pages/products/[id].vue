@@ -58,14 +58,21 @@ const route = useRoute()
 const runtimeConfig = useRuntimeConfig()
 const baseUrl = runtimeConfig.public.strapiUrl
 
-// 关键：用 route.params.id 也就是 documentId 来请求
 const { data, pending, error } = await useFetch(
   () => `${baseUrl}/api/products/${route.params.id}?populate=*`
 )
 
 const product = computed(() => {
   if (!data.value?.data) return null
-  return data.value.data.attributes
+  const attr = data.value.data.attributes
+  return {
+    id: data.value.data.id,
+    title: attr.title,
+    price: attr.price,
+    moq: attr.moq,
+    description: attr.description,
+    image: attr.image?.data?.attributes || attr.image?.[0]?.attributes
+  }
 })
 
 const getImageUrl = (img) => {

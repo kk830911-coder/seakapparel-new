@@ -1,34 +1,3 @@
-<script setup>
-// 1. 自动判断环境（本地用 localhost，线上用 Render）
-const strapiUrl = process.dev 
-  ? 'http://localhost:1337' 
-  : 'https://seak-backend.onrender.com'
-
-// 2. 使用 Nuxt 3 标准的 useFetch，同时解决服务端和客户端的加载问题
-const { data: response, error } = await useFetch(`${strapiUrl}/api/products`, {
-  query: { populate: '*' }
-})
-
-// 3. 安全获取产品列表
-const products = computed(() => response.value?.data || [])
-
-// 4. 智能提取图片 URL 的安全函数
-const getImageUrl = (item) => {
-  if (!item) return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
-  
-  // 兼容 Strapi v5 扁平结构
-  if (item.image?.url) return item.image.url
-  if (Array.isArray(item.image) && item.image[0]?.url) return item.image[0].url
-  
-  // 兼容旧版嵌套结构
-  if (item.attributes?.image?.data?.attributes?.url) return item.attributes.image.data.attributes.url
-  
-  return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
-}
-
-useHead({ title: 'All Wholesale Products | SeakApparel' })
-</script>
-
 <template>
   <div class="max-w-7xl mx-auto px-4 py-12">
     <h1 class="text-3xl font-bold mb-10 border-l-4 border-blue-600 pl-3">All Wholesale Products</h1>
@@ -44,10 +13,10 @@ useHead({ title: 'All Wholesale Products | SeakApparel' })
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
       <div 
         v-for="item in products" 
-        :key="item.id" 
+        :key="item.id || item._id" 
         class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between border border-gray-100"
       >
-        <NuxtLink :to="`/products/${item.id}`" class="aspect-square overflow-hidden block bg-gray-50 relative">
+        <NuxtLink :to="`/products/${item.id || item._id}`" class="aspect-square overflow-hidden block bg-gray-50 relative">
           <NuxtImg
             :src="getImageUrl(item)"
             class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
@@ -77,7 +46,7 @@ useHead({ title: 'All Wholesale Products | SeakApparel' })
             </div>
             
             <NuxtLink 
-              :to="`/products/${item.id}`" 
+              :to="`/products/${item.id || item._id}`" 
               class="block w-full bg-slate-800 text-white text-center py-2 rounded hover:bg-slate-700 transition-colors font-medium text-sm"
             >
               Check Detail & Inquiry
@@ -88,3 +57,27 @@ useHead({ title: 'All Wholesale Products | SeakApparel' })
     </div>
   </div>
 </template>
+
+<script setup>
+const strapiUrl = process.dev 
+  ? 'http://localhost:1337' 
+  : 'https://seak-backend.onrender.com'
+
+const { data: response, error } = await useFetch(`${strapiUrl}/api/products`, {
+  query: { populate: '*' }
+})
+
+const products = computed(() => response.value?.data || [])
+
+const getImageUrl = (item) => {
+  if (!item) return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
+  
+  if (item.image?.url) return item.image.url
+  if (Array.isArray(item.image) && item.image[0]?.url) return item.image[0].url
+  if (item.attributes?.image?.data?.attributes?.url) return item.attributes.image.data.attributes.url
+
+  return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
+}
+
+useHead({ title: 'All Wholesale Products | SeakApparel' })
+</script>
