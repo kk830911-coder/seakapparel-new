@@ -1,8 +1,51 @@
+<script setup>
+import { ref, onMounted, computed } from 'vue'
+
+const responseData = ref(null)
+const loading = ref(true)
+const fetchError = ref(false)
+
+// 自动安全提取商品数组
+const products = computed(() => responseData.value?.data || [])
+
+// 智能图片路径防御解析
+const getImageUrl = (item) => {
+  if (!item) return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
+  if (item.image?.url) return item.image.url
+  if (Array.isArray(item.image) && item.image[0]?.url) return item.image[0].url
+  if (item.attributes?.image?.data?.attributes?.url) return item.attributes.image.data.attributes.url
+  return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
+}
+
+onMounted(async () => {
+  // 纯客户端动态识别：本地用 1337 端口，线上用 Render
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
+  
+  try {
+    const res = await $fetch(`${strapiUrl}/api/products?populate=*`)
+    responseData.value = res
+  } catch (err) {
+    console.error('Client fetch products failed:', err)
+    fetchError.value = true
+  } finally {
+    loading.value = false
+  }
+})
+
+useHead({ title: 'All Wholesale Products | SeakApparel' })
+</script>
+
 <template>
   <div class="max-w-7xl mx-auto px-4 py-12">
     <h1 class="text-3xl font-bold mb-10 border-l-4 border-blue-600 pl-3">All Wholesale Products</h1>
     
-    <div v-if="error" class="text-center py-10 text-red-500 bg-red-50 rounded-xl">
+    <div v-if="loading" class="text-center py-20 text-gray-500">
+      <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mb-4"></div>
+      <p>Loading wholesale products...</p>
+    </div>
+
+    <div v-else-if="fetchError" class="text-center py-10 text-red-500 bg-red-50 rounded-xl">
       Failed to connect backend server. Please refresh.
     </div>
 
@@ -13,18 +56,15 @@
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
       <div 
         v-for="item in products" 
-        :key="item.id || item._id" 
+        :key="item.id" 
         class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between border border-gray-100"
       >
-        <NuxtLink :to="`/products/${item.id || item._id}`" class="aspect-square overflow-hidden block bg-gray-50 relative">
+        <NuxtLink :to="`/products/${item.id}`" class="aspect-square overflow-hidden block bg-gray-50 relative">
           <NuxtImg
             :src="getImageUrl(item)"
             class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
             alt="Product Image"
           />
-          <div v-if="!item.image" class="absolute top-2 right-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded">
-            Sample Image
-          </div>
         </NuxtLink>
 
         <div class="p-5 flex-1 flex flex-col justify-between">
@@ -46,7 +86,7 @@
             </div>
             
             <NuxtLink 
-              :to="`/products/${item.id || item._id}`" 
+              :to="`/products/${item.id}`" 
               class="block w-full bg-slate-800 text-white text-center py-2 rounded hover:bg-slate-700 transition-colors font-medium text-sm"
             >
               Check Detail & Inquiry
@@ -57,27 +97,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-const strapiUrl = process.dev 
-  ? 'http://localhost:1337' 
-  : 'https://seak-backend.onrender.com'
-
-const { data: response, error } = await useFetch(`${strapiUrl}/api/products`, {
-  query: { populate: '*' }
-})
-
-const products = computed(() => response.value?.data || [])
-
-const getImageUrl = (item) => {
-  if (!item) return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
-  
-  if (item.image?.url) return item.image.url
-  if (Array.isArray(item.image) && item.image[0]?.url) return item.image[0].url
-  if (item.attributes?.image?.data?.attributes?.url) return item.attributes.image.data.attributes.url
-
-  return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
-}
-
-useHead({ title: 'All Wholesale Products | SeakApparel' })
-</script>
