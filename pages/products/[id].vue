@@ -1,17 +1,41 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 
 const route = useRoute()
 const product = ref(null)
 const loading = ref(true)
 
-const getImageUrl = (data) => {
-  if (!data) return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop'
-  if (data.image?.url) return data.image.url
-  if (Array.isArray(data.image) && data.image[0]?.url) return data.image[0].url
-  if (data.attributes?.image?.data?.attributes?.url) return data.attributes.image.data.attributes.url
-  return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop'
-}
+// 用来记录当前用户选中的大图索引（默认显示第一张 0）
+const activeImageIndex = ref(0)
+
+// 核心优化：提取所有的图片并转化为数组
+const getAllImages = computed(() => {
+  const fallback = ['https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop']
+  if (!product.value) return fallback
+
+  // 1. 尝试直接读取数组（Strapi 5 标准多图结构）
+  const imgData = product.value.image || product.value.attributes?.image
+  
+  if (Array.isArray(imgData)) {
+    return imgData.map(img => img.url).filter(Boolean)
+  }
+  
+  // 2. 兼容 Strapi 4 格式的多图关联：image.data 是数组
+  if (imgData?.data && Array.isArray(imgData.data)) {
+    return imgData.data.map(item => item.attributes?.url || item.url).filter(Boolean)
+  }
+
+  // 3. 如果只是单图单媒体对象
+  if (imgData?.url) return [imgData.url]
+  if (imgData?.data?.attributes?.url) return [imgData.data.attributes.url]
+
+  return fallback
+})
+
+// 当前展示的大图 URL
+const currentImageUrl = computed(() => {
+  return getAllImages.value[activeImageIndex.value] || getAllImages.value[0]
+})
 
 const getDescriptionText = (data) => {
   if (!data) return 'No specific description provided.'
@@ -28,12 +52,10 @@ onMounted(async () => {
   const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
   
   try {
-    // 此时从列表页传过来的 route.params.id 已经是真正的 documentId 字符串了
     const response = await $fetch(`${strapiUrl}/api/products/${route.params.id}?populate=*`)
-    console.log('详情页收到的原始数据:', response)
+    console.log('详情页收到的多图原始数据:', response)
     
     if (response && response.data) {
-      // 兼容某些后端直接返回对象或返回包裹数组的情况
       product.value = Array.isArray(response.data) ? response.data[0] : response.data
     }
   } catch (error) {
@@ -64,12 +86,30 @@ useHead(() => {
 
     <div v-else class="grid md:grid-cols-2 gap-12 bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
       
-      <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square">
-        <NuxtImg
-          :src="getImageUrl(product)"
-          class="w-full h-full object-cover"
-          alt="Product Detail Image"
-        />
+      <div class="space-y-4">
+        <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100">
+          <NuxtImg
+            :src="currentImageUrl"
+            class="w-full h-full object-cover transition-all duration-300"
+            alt="Product Detail Image"
+          />
+        </div>
+
+        <div v-if="getAllImages.length > 1" class="grid grid-cols-4 gap-3">
+          <button
+            v-for="(imgUrl, index) in getAllImages"
+            :key="index"
+            @click="activeImageIndex = index"
+            class="aspect-square rounded-lg overflow-hidden border-2 bg-gray-50 transition-all focus:outline-none"
+            :class="activeImageIndex === index ? 'border-blue-600 ring-2 ring-blue-100' : 'border-gray-200 hover:border-gray-400'"
+          >
+            <NuxtImg
+              :src="imgUrl"
+              class="w-full h-full object-cover"
+              alt="Thumbnail"
+            />
+          </button>
+        </div>
       </div>
 
       <div class="flex flex-col justify-between">
