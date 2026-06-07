@@ -1,43 +1,30 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+// 1. 自动判断环境（本地用 localhost，线上用 Render）
+const strapiUrl = process.dev 
+  ? 'http://localhost:1337' 
+  : 'https://seak-backend.onrender.com'
 
-const products = ref([])
-const loading = ref(true)
+// 2. 使用 Nuxt 3 标准的 useFetch，同时解决服务端和客户端的加载问题
+const { data: response, error } = await useFetch(`${strapiUrl}/api/products`, {
+  query: { populate: '*' }
+})
 
-// 智能提取 Strapi 各种奇葩结构图片 URL 的函数
+// 3. 安全获取产品列表
+const products = computed(() => response.value?.data || [])
+
+// 4. 智能提取图片 URL 的安全函数
 const getImageUrl = (item) => {
-  if (!item) return null
+  if (!item) return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
   
-  // 1. 如果直接有 image.url
+  // 兼容 Strapi v5 扁平结构
   if (item.image?.url) return item.image.url
-  
-  // 2. 如果 image 是一个数组（Strapi 多图情况）
   if (Array.isArray(item.image) && item.image[0]?.url) return item.image[0].url
   
-  // 3. 兼容 Strapi 旧版 data.attributes 结构
+  // 兼容旧版嵌套结构
   if (item.attributes?.image?.data?.attributes?.url) return item.attributes.image.data.attributes.url
   
-  // 4. 尝试寻找隐藏的直连字段
-  if (item.image_url) return item.image_url
-  
-  return null
+  return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
 }
-
-onMounted(async () => {
-  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
-  
-  try {
-    // 强制带上全部相关的媒体解析参数
-    const response = await $fetch(`${strapiUrl}/api/products?populate=*`)
-    products.value = response?.data || []
-    console.log('Frontend received products:', products.value)
-  } catch (error) {
-    console.error('Fetch products failed:', error)
-  } finally {
-    loading.value = false
-  }
-})
 
 useHead({ title: 'All Wholesale Products | SeakApparel' })
 </script>
@@ -46,8 +33,8 @@ useHead({ title: 'All Wholesale Products | SeakApparel' })
   <div class="max-w-7xl mx-auto px-4 py-12">
     <h1 class="text-3xl font-bold mb-10 border-l-4 border-blue-600 pl-3">All Wholesale Products</h1>
     
-    <div v-if="loading" class="text-center py-20 text-gray-500">
-      Loading wholesale products...
+    <div v-if="error" class="text-center py-10 text-red-500 bg-red-50 rounded-xl">
+      Failed to connect backend server. Please refresh.
     </div>
 
     <div v-else-if="products.length === 0" class="text-center py-20 text-gray-500 bg-gray-50 rounded-xl">
@@ -58,31 +45,35 @@ useHead({ title: 'All Wholesale Products | SeakApparel' })
       <div 
         v-for="item in products" 
         :key="item.id" 
-        class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between"
+        class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between border border-gray-100"
       >
-        <NuxtLink :to="`/products/${item.id}`" class="aspect-square overflow-hidden block bg-gray-100 relative">
+        <NuxtLink :to="`/products/${item.id}`" class="aspect-square overflow-hidden block bg-gray-50 relative">
           <NuxtImg
-            :src="getImageUrl(item) || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'"
+            :src="getImageUrl(item)"
             class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
             alt="Product Image"
           />
-          <div v-if="!getImageUrl(item)" class="absolute top-2 right-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded">
+          <div v-if="!item.image" class="absolute top-2 right-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded">
             Sample Image
           </div>
         </NuxtLink>
 
         <div class="p-5 flex-1 flex flex-col justify-between">
           <div>
-            <h3 class="font-bold truncate text-lg text-gray-800">{{ item.title }}</h3>
-            <p v-if="item.description" class="text-sm text-gray-500 line-clamp-2 mt-1">
-              {{ Array.isArray(item.description) ? item.description[0]?.children[0]?.text : item.description }}
+            <h3 class="font-bold text-lg text-gray-800 line-clamp-1">{{ item.title || item.attributes?.title }}</h3>
+            <p class="text-sm text-gray-500 line-clamp-2 mt-1">
+              {{ 
+                Array.isArray(item.description || item.attributes?.description) 
+                ? (item.description || item.attributes?.description)[0]?.children?.[0]?.text 
+                : (item.description || item.attributes?.description || '') 
+              }}
             </p>
           </div>
           
           <div class="mt-4">
             <div class="flex justify-between text-sm mb-3">
-              <span class="text-blue-600 font-bold text-lg">${{ item.price }}</span>
-              <span class="text-gray-500 self-center">MOQ: {{ item.moq || 10 }} pcs</span>
+              <span class="text-blue-600 font-bold text-lg">${{ item.price || item.attributes?.price }}</span>
+              <span class="text-gray-500 self-center">MOQ: {{ item.moq || item.attributes?.moq || 10 }} pcs</span>
             </div>
             
             <NuxtLink 
