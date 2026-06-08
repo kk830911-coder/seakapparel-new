@@ -2,20 +2,28 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   
-  // 1. 正确修复了 modules 内部的逗号问题
   modules: [
     '@nuxt/image',
-    '@nuxtjs/tailwindcss', // <-- 这里之前漏掉了逗号，已帮你补上！
+    '@nuxtjs/tailwindcss',
     '@nuxtjs/sitemap'
   ],
 
-  // 2. 站点地图基础配置（必须提供你的独立站网址，sitemap 模块才能正确生成链接）
   site: {
     url: 'https://www.seakapparel.com',
     name: 'SeakApparel'
   },
 
-  // 3. 你的图片安全域名配置
+  // 扩展 sitemap，让它包含你的动态产品和博客路径
+  sitemap: {
+    // 方式 A：如果产品不多，可以直接在这里手动先写死几个核心款的动态路径，确保谷歌能爬到：
+    urls: [
+      '/products',
+      '/blog',
+      // '/products/这里放你的具体产品ID或Slug', 
+      // '/blog/这里放你的具体文章ID或Slug'
+    ]
+  },
+
   image: {
     domains: [
       'localhost:1337',
@@ -23,7 +31,6 @@ export default defineNuxtConfig({
     ]
   },
 
-  // 4. 静态预渲染配置
   nitro: {
     prerender: {
       routes: ['/']
