@@ -1,5 +1,4 @@
 <template>
-  <!-- 外层 px-4 改为 px-2，屏幕两侧边距减半 -->
   <div class="max-w-7xl mx-auto px-2 py-12">
     <h1 class="text-3xl font-bold mb-10 border-l-4 border-blue-600 pl-3">All Wholesale Products</h1>
 
@@ -16,14 +15,12 @@
       No products found.
     </div>
 
-    <!-- gap-2 商品之间间隙极小 -->
     <div v-else class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2">
       <div
         v-for="item in pageProducts"
         :key="item.id"
         class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between border border-gray-100"
       >
-        <!-- 图片：新窗口打开 -->
         <NuxtLink
           :to="`/products/${item.documentId || item.attributes?.documentId || item.id}`"
           target="_blank"
@@ -36,22 +33,22 @@
           />
         </NuxtLink>
 
-        <!-- p-0.5 = 2px 卡片四周内边距 -->
         <div class="p-0.5 flex-1 flex flex-col justify-between">
           <div>
-            <!-- 标题链接：新窗口打开 -->
             <NuxtLink
               :to="`/products/${item.documentId || item.attributes?.documentId || item.id}`"
               target="_blank"
               class="block"
             >
-              <h3 class="font-bold text-lg text-gray-800 line-clamp-2">{{ item.title || item.attributes?.title }}</h3>
+              <!-- 移除 font-bold 取消标题加粗 -->
+              <h3 class="text-lg text-gray-800 line-clamp-2">{{ item.title || item.attributes?.title }}</h3>
             </NuxtLink>
           </div>
 
           <div class="mt-4">
             <div class="flex justify-between text-sm mb-3">
-              <span class="text-blue-600 font-bold text-lg">${{ item.price || item.attributes?.price }}</span>
+              <!-- 改为人民币符号 ¥，保留红色字体 -->
+              <span class="text-red-600 text-lg">¥{{ item.price || item.attributes?.price }}</span>
               <span class="text-gray-500 self-center">MOQ: {{ item.moq || item.attributes?.moq || 10 }} pcs</span>
             </div>
 
@@ -66,7 +63,6 @@
       </div>
     </div>
 
-    <!-- 分页 -->
     <div v-if="totalPage > 1" class="flex justify-center items-center gap-3 mt-12">
       <button
         @click="currentPage--"
@@ -102,7 +98,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 
-// 分页配置
 const pageSize = 12
 const currentPage = ref(1)
 
@@ -110,20 +105,17 @@ const responseData = ref(null)
 const loading = ref(true)
 const fetchError = ref(false)
 
-// 安全兜底：为空时返回空数组，杜绝 length 报错
 const allProducts = computed(() => {
   if (!responseData.value?.data) return []
   return responseData.value.data
 })
 
-// 总页数安全计算
 const totalPage = computed(() => {
   const list = allProducts.value
   if (!Array.isArray(list) || list.length === 0) return 0
   return Math.ceil(list.length / pageSize)
 })
 
-// 当前页商品切片
 const pageProducts = computed(() => {
   const list = allProducts.value
   const start = (currentPage.value - 1) * pageSize
