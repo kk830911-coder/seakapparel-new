@@ -10,7 +10,7 @@ const route = useRoute()
 const isLocal = process.dev 
 const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
-// 2. 网络请求：使用 dynamic arrow function，关闭 initialCache 防止 Vercel 锁死旧缓存
+// 2. 网络请求：使用动态箭头函数，并关闭 initialCache 缓存，防止 Vercel 锁死空数据
 const { data: responseData } = await useFetch(() => `${strapiUrl}/api/products/${route.params.id}`, {
   query: { populate: '*' },
   initialCache: false
@@ -89,18 +89,14 @@ const getDescriptionText = (data) => {
   return desc
 }
 
-// 【完美修复核心】：利用计算属性，自动处理换行冲突，将 Markdown 编译为真正的网页 HTML
+// 【核心优化】：利用计算属性，专门将 Markdown 纯文本实时翻译编译为网页真正的 HTML 标签
 const renderedDescriptionHtml = computed(() => {
   const rawText = getDescriptionText(product.value)
   if (rawText === 'No specific description provided.') {
     return `<p class="text-gray-400">${rawText}</p>`
   }
-  
-  // 💡 一劳永逸：在解析前，自动把后台输入的所有普通换行符 \n 转换成网页标准的换行标签 <br />
-  const formattedText = rawText.replace(/\n/g, '<br />')
-  
-  // 用 snarkdown 编译为包含 <h3>, <strong>, <ul> 的标准网页结构
-  return snarkdown(formattedText)
+  // 用 snarkdown 库把后台带 ### 和 ** 的字符串变成真正网页认识的 <h3> <ul> <strong> 标签
+  return snarkdown(rawText)
 })
 
 // 4. 【动态 SEO】
@@ -275,7 +271,6 @@ useHead({
   color: #1e293b;
   margin-top: 1.25rem;
   margin-bottom: 0.5rem;
-  display: block;
 }
 .markdown-body :deep(h3):first-child {
   margin-top: 0;
