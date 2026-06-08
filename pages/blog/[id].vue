@@ -8,15 +8,17 @@ const route = useRoute()
 const isLocal = process.dev 
 const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
-// ⚡【Strapi v5 核心适配】：直接将路由绑定的 documentId 传递给 Restful 接口，让谷歌蜘蛛能落地直接抓到完整 HTML
+/**
+ * ⚡【SEO 修复】：移除 useFetch 的第一个参数的箭头函数，改用字符串模板直接触发 SSR 阻塞式渲染。
+ * 这样可以确保 Nuxt 在服务端 100% 拿到数据后再输出 HTML 给谷歌爬虫。
+ */
 const { data: responseData, error: fetchError } = await useFetch(
-  () => `${strapiUrl}/api/blogs/${route.params.id}`,
+  `${strapiUrl}/api/blogs/${route.params.id}`,
   {
     query: { 
       populate: '*',
       status: 'published'
-    },
-    initialCache: false
+    }
   }
 )
 
@@ -38,11 +40,16 @@ const postTitle = computed(() => {
   return rawPost.title || rawPost.attributes?.title || 'Fashion Wholesale Insights'
 })
 
-// 安全格式化发布更新时间
-const formattedDate = computed(() => {
+// ISO 标准时间格式（专门给搜索引擎爬虫读取）
+const isoDateStr = computed(() => {
   const rawPost = post.value
-  if (!rawPost) return 'June 2026'
-  const dateStr = rawPost.updatedAt || rawPost.attributes?.updatedAt || rawPost.createdAt
+  if (!rawPost) return ''
+  return rawPost.updatedAt || rawPost.attributes?.updatedAt || rawPost.createdAt || ''
+})
+
+// 人类友好阅读时间格式
+const formattedDate = computed(() => {
+  const dateStr = isoDateStr.value
   if (!dateStr) return 'June 2026'
   return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
 })
@@ -77,7 +84,7 @@ const coverImageInfo = computed(() => {
 })
 
 /**
- * 💡 SEO 编译器：将富文本安全转换为原生语义化 HTML（完美解决图片空 alt 隐患）
+ * 💡 SEO 编译器：将富文本安全转换为原生语义化 HTML
  */
 const renderBlogRichText = (nodes) => {
   if (!nodes) return ''
@@ -95,7 +102,7 @@ const renderBlogRichText = (nodes) => {
         imgUrl = `${strapiUrl}${imgUrl}`
       }
 
-      // 🔍【Alt 保底绝招】：如果运营漏填，自动用“文章名 + 标签”顶上
+      // 🔍【Alt 保底绝招】
       const rawAlt = imgObj.alternativeText || imgObj.caption || imgObj.name || ''
       const safeAlt = rawAlt.trim() ? rawAlt : `${postTitle.value} - Apparel Vendor Spotlight`
       
@@ -121,7 +128,7 @@ const renderBlogRichText = (nodes) => {
     // 3. 递归编译子节点
     const childrenHtml = node.children ? renderBlogRichText(node.children) : ''
 
-    // 4. 标准语义标签映射（让谷歌爬虫更易读懂长文章结构）
+    // 4. 标准语义标签映射
     switch (node.type) {
       case 'heading':
         const level = node.level || 2
@@ -161,136 +168,11 @@ const renderedContentHtml = computed(() => {
   return renderBlogRichText(contentData)
 })
 
-// 4. 📈【全套动态 SEO Meta 配置】拒绝全站统一，实现一文一元标签
-useHead({
-  title: computed(() => `${postTitle.value} | SeakApparel Blog`),
-  meta: [
-    {
-      name: 'description',
-      content: computed(() => {
-        const rawPost = post.value
-        if (!rawPost) return 'Discover the latest Southeast Asia clothing wholesale market trends.'
-        const customDesc = rawPost.description || rawPost.attributes?.description
-        if (customDesc) return customDesc
-        
-        const rawContent = rawPost.content || rawPost.attributes?.content
-        const pureText = getPureContentText(rawContent)
-        return pureText ? `${pureText.slice(0, 150)}...` : 'Discover the latest Southeast Asia clothing wholesale market trends and boutique fashion insights.'
-      })
-    },
-    {
-      name: 'keywords',
-      content: computed(() => {
-        const rawPost = post.value
-        const category = rawPost?.blog_category || rawPost?.attributes?.blog_category?.data
-        const cateName = category?.name || category?.attributes?.name || 'Women Clothing Wholesale'
-        return `${postTitle.value}, ${cateName}, apparel supplier trend, Southeast Asia clothing vendor`
-      })
-    },
-    // Open Graph 海外社媒卡片标准
-    { property: 'og:title', content: computed(() => `${postTitle.value} | SeakApparel`) },
-    { property: 'og:type', content: 'article' },
-    { property: 'og:image', content: computed(() => coverImageInfo.value.url) },
-    { property: 'og:url', content: computed(() => `https://www.seakapparel.com/blog/${route.params.id}`) },
-    { name: 'twitter:card', content: 'summary_large_image' }
-  ]
-})
-</script>
-
-<template>
-  <div class="max-w-4xl mx-auto px-4 py-12">
-    <NuxtLink to="/blog" class="inline-flex items-center text-sm text-gray-500 hover:text-blue-600 gap-1 mb-8 transition-colors">
-      ← Back to Blogs
-    </NuxtLink>
-
-    <div v-if="fetchError || !post" class="text-center py-12 text-red-500 bg-red-50 rounded-xl">
-      Article not found or server error. Please return to the blog list.
-    </div>
-
-    <article v-else class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden p-6 md:p-10">
-      
-      <div class="flex items-center gap-4 text-sm text-gray-400 mb-4">
-        <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-medium text-xs">
-          {{ post.blog_category?.name || post.attributes?.blog_category?.data?.attributes?.name || 'Trends' }}
-        </span>
-        <span>📅 Updated: {{ formattedDate }}</span>
-      </div>
-
-      <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 leading-tight">
-        {{ postTitle }}
-      </h1>
-
-      <p v-if="post.description || post.attributes?.description" class="text-gray-600 italic border-l-4 border-gray-200 pl-4 py-1 mb-8 bg-gray-50 text-base rounded-r">
-        {{ post.description || post.attributes?.description }}
-      </p>
-
-      <div v-if="coverImageInfo.url" class="w-full aspect-[21/9] rounded-xl overflow-hidden mb-10 bg-gray-100">
-        <img 
-          :src="coverImageInfo.url" 
-          :alt="coverImageInfo.alt"
-          class="w-full h-full object-cover"
-          loading="eager" 
-        />
-      </div>
-
-      <div 
-        class="prose blog-rich-body max-w-none text-gray-700 leading-relaxed text-lg"
-        v-html="renderedContentHtml"
-      />
-
-    </article>
-  </div>
-</template>
-
-<style scoped>
-/* ==========================================================================
-   🎨 博客深度排版控制样式
-   ========================================================================== */
-.blog-rich-body :deep(p) {
-  margin-bottom: 1.5rem;
-  line-height: 1.8;
-  color: #374151;
-}
-
-.blog-rich-body :deep(h2) {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #111827;
-  margin-top: 2.25rem;
-  margin-bottom: 1rem;
-  display: block;
-}
-
-.blog-rich-body :deep(h3) {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-top: 1.75rem;
-  margin-bottom: 0.75rem;
-  display: block;
-}
-
-.blog-rich-body :deep(ul) {
-  list-style-type: disc !important;
-  padding-left: 1.75rem !important;
-  margin-bottom: 1.5rem;
-  margin-top: 0.5rem;
-}
-
-.blog-rich-body :deep(ol) {
-  list-style-type: decimal !important;
-  padding-left: 1.75rem !important;
-  margin-bottom: 1.5rem;
-  margin-top: 0.5rem;
-}
-
-.blog-rich-body :deep(li) {
-  margin-bottom: 0.5rem;
-  line-height: 1.7;
-}
-
-.blog-rich-body :deep(strong) {
-  color: #030712;
-  font-weight: 700;
-}
-</style>
+/**
+ * 4. 📈【全套动态 SEO Meta 配置】
+ * 修复原 computed 内部判断逻辑，确保响应式数据变化时，Meta 标签能被正确刷新并写入 SSR 页面
+ */
+const pageTitle = computed(() => `${postTitle.value} | SeakApparel Blog`)
+const pageDesc = computed(() => {
+  const rawPost = post.value
+  if (!rawPost) return 'Discover
