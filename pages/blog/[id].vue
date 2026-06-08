@@ -4,15 +4,14 @@ import { useRoute, useHead, useFetch } from '#imports'
 
 const route = useRoute()
 
-// 1. 区分本地与线上环境的后端基准 URL
+// 1. 定义后端 URL 基础基准
 const isLocal = process.dev 
 const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
-// ⚡【Strapi v5 核心适配】：直接将路由绑定的 documentId 传递给 Restful 接口
+// ⚡【Strapi v5 核心适配】：直接将路由绑定的 documentId 传递给 Restful 接口，让谷歌蜘蛛能落地直接抓到完整 HTML
 const { data: responseData, error: fetchError } = await useFetch(
   () => `${strapiUrl}/api/blogs/${route.params.id}`,
   {
-    // 强制指明通过 documentId 查询，并 populate 展开分类及图片媒体库
     query: { 
       populate: '*',
       status: 'published'
@@ -26,7 +25,6 @@ const post = computed(() => {
   const res = responseData.value
   if (!res) return null
   
-  // 兼容直接返回对象或返回 data 数组/对象的各种蜜汁情况
   if (res.data) {
     return Array.isArray(res.data) ? res.data[0] : res.data
   }
@@ -37,7 +35,6 @@ const post = computed(() => {
 const postTitle = computed(() => {
   const rawPost = post.value
   if (!rawPost) return 'Fashion Wholesale Insights'
-  // 同时向下兼容 v4 attributes 和 v5 直接扁平化属性
   return rawPost.title || rawPost.attributes?.title || 'Fashion Wholesale Insights'
 })
 
@@ -61,7 +58,6 @@ const coverImageInfo = computed(() => {
   let rawUrl = ''
   let rawAlt = ''
   
-  // 深度解析封面属性
   if (coverData.attributes) {
     rawUrl = coverData.attributes.url || ''
     rawAlt = coverData.attributes.alternativeText || coverData.attributes.name || ''
@@ -244,11 +240,11 @@ useHead({
 
     </article>
   </div>
-</script>
+</template>
 
 <style scoped>
 /* ==========================================================================
-   🎨 博客深度排版控制样式（确保排版高级、高留存率）
+   🎨 博客深度排版控制样式
    ========================================================================== */
 .blog-rich-body :deep(p) {
   margin-bottom: 1.5rem;
