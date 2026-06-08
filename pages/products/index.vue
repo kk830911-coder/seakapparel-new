@@ -1,87 +1,83 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 
-const products = ref([])
+const responseData = ref(null)
 const loading = ref(true)
+const fetchError = ref(false)
 const currentPage = ref(1)
-const pageSize = 12
-const pageCount = ref(1)
+const pageSize = 12 // 每页 12 个
 
-// 获取产品列表
+// 从 responseData 中解构出 products 和分页信息
+const products = computed(() => responseData.value?.data || [])
+const pagination = computed(() => responseData.value?.meta?.pagination)
+
 const fetchProducts = async (page) => {
   loading.value = true
-  const baseUrl = 'https://seak-backend.onrender.com'
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
   
   try {
-    const res = await $fetch(`${baseUrl}/api/products`, {
+    // 增加分页参数
+    const res = await $fetch(`${strapiUrl}/api/products`, {
       query: {
         populate: '*',
         'pagination[page]': page,
         'pagination[pageSize]': pageSize
       }
     })
-    
-    products.value = res.data || []
-    pageCount.value = res.meta?.pagination?.pageCount || 1
+    responseData.value = res
   } catch (err) {
-    console.error('API请求失败:', err)
+    console.error('Fetch failed:', err)
+    fetchError.value = true
   } finally {
     loading.value = false
   }
 }
 
-// 图片路径处理函数 (适配 Strapi 常见结构)
+// 修改后的图片获取逻辑，确保补全域名
 const getImageUrl = (item) => {
-  const backendDomain = 'https://seak-backend.onrender.com'
-  // 查找 image 字段的多种可能位置
-  const imgData = item.image?.data || item.attributes?.image?.data
+  const backendUrl = 'https://seak-backend.onrender.com'
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
   
-  if (imgData) {
-    // 处理数组（多图）或对象（单图）
-    const url = Array.isArray(imgData) ? imgData[0]?.attributes?.url : imgData.attributes?.url
-    if (url) {
-      return url.startsWith('http') ? url : `${backendDomain}${url}`
-    }
+  // 提取可能的图片路径
+  const imgData = item.attributes?.image?.data || item.image?.data
+  const url = imgData?.attributes?.url || imgData?.url
+  
+  if (url) {
+    // 如果 url 不包含 http，则拼接域名
+    return url.startsWith('http') ? url : `${backendUrl}${url}`
   }
-  return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
+  return fallback
 }
 
 onMounted(() => fetchProducts(currentPage.value))
+
+// 监听页码切换
 watch(currentPage, (newPage) => fetchProducts(newPage))
+
+useHead({ title: 'All Wholesale Products | SeakApparel' })
 </script>
 
 <template>
   <div class="max-w-7xl mx-auto px-4 py-12">
     <h1 class="text-3xl font-bold mb-10 border-l-4 border-blue-600 pl-3">All Wholesale Products</h1>
 
-    <div v-if="loading" class="text-center py-20 text-gray-500">Loading products...</div>
-
-    <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div v-for="item in products" :key="item.id" class="bg-white shadow rounded-lg overflow-hidden border border-gray-100 flex flex-col">
-        <div class="aspect-square overflow-hidden bg-gray-50">
-          <img :src="getImageUrl(item)" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" alt="product image" />
-        </div>
-        <div class="p-4 flex flex-col flex-1">
-          <h3 class="font-bold text-gray-800 text-sm mb-2">{{ item.title || item.attributes?.title || 'Untitled Product' }}</h3>
-          <p class="text-blue-600 font-bold mt-auto">${{ item.price || item.attributes?.price || '0.00' }}</p>
+    <div v-if="!loading && products.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div v-for="item in products" :key="item.id" class="bg-white rounded-xl shadow overflow-hidden border border-gray-100 flex flex-col">
+        <NuxtLink :to="`/products/${item.documentId || item.id}`" class="aspect-square overflow-hidden block relative">
+          <img :src="getImageUrl(item)" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
+        </NuxtLink>
+        <div class="p-4">
+          <h3 class="font-bold text-gray-800 truncate">{{ item.attributes?.title || item.title }}</h3>
+          <p class="text-blue-600 font-bold mt-2">${{ item.attributes?.price || item.price }}</p>
         </div>
       </div>
     </div>
 
-    <div class="mt-12 flex justify-center items-center gap-4">
-      <button 
-        @click="currentPage--" 
-        :disabled="currentPage === 1" 
-        class="px-4 py-2 border rounded hover:bg-gray-50 disabled:opacity-50"
-      >Previous</button>
-      
-      <span class="text-gray-600">Page {{ currentPage }} of {{ pageCount }}</span>
-      
-      <button 
-        @click="currentPage++" 
-        :disabled="currentPage >= pageCount" 
-        class="px-4 py-2 border rounded hover:bg-gray-50 disabled:opacity-50"
-      >Next</button>
+    <div v-if="pagination" class="mt-12 flex justify-center items-center gap-4">
+      <button :disabled="currentPage === 1" @click="currentPage--" class="px-4 py-2 bg-gray-200 rounded disabled:opacity-50">Previous</button>
+      <span>Page {{ currentPage }} / {{ pagination.pageCount }}</span>
+      <button :disabled="currentPage === pagination.pageCount" @click="currentPage++" class="px-4 py-2 bg-gray-200 rounded disabled:opacity-50">Next</button>
     </div>
   </div>
 </template>
