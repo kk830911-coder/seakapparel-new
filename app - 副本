@@ -1,47 +1,34 @@
 <script setup>
 import { ref } from 'vue'
+import { useHead } from '#imports'
 
-// 1. 进阶 SEO 配置
-useSeoMeta({
-  title: "Southeast Asia Women's Apparel Wholesale | SeakApparel",
-  description: "SeakApparel is a leading women clothing wholesale supplier for Southeast Asia. Factory direct supply, low MOQ, and professional OEM/ODM custom services for boutique owners in Malaysia, Singapore, Thailand, and Vietnam.",
-  keywords: "women clothing wholesale, apparel supplier southeast asia, clothing factory, clothing vendor Malaysia, custom clothing manufacturing",
-  ogTitle: "Southeast Asia Women's Apparel Wholesale | SeakApparel",
-  ogDescription: "Factory direct supply, low MOQ, and professional OEM/ODM services for Southeast Asia fashion buyers.",
-  ogImage: "https://www.seakapparel.com/og-image.jpg",
-  ogUrl: "https://www.seakapparel.com",
-  twitterCard: "summary_large_image"
-})
-
-// 植入企业结构化数据 (JSON-LD) 提升谷歌专业权重
+// 1. 全局 SEO 头信息设置（提升谷歌收录和社交卡片分享）
 useHead({
-  link: [{ rel: 'canonical', href: 'https://www.seakapparel.com' }],
-  script: [
-    {
-      type: 'application/ld+json',
-      children: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "WholesaleStore",
-        "name": "SeakApparel",
-        "url": "https://www.seakapparel.com",
-        "description": "Professional women's clothing wholesale supplier for Southeast Asia.",
-        "address": { "@type": "PostalAddress", "addressRegion": "Southeast Asia" }
-      })
-    }
+  title: "Southeast Asia Women's Apparel Wholesale | SeakApparel",
+  meta: [
+    { 
+      name: 'description', 
+      content: 'SeakApparel is a leading women clothing wholesale supplier for Southeast Asia. Factory direct supply, low MOQ, and professional OEM/ODM custom services for boutique owners in Malaysia, Singapore, Thailand, and Vietnam.' 
+    },
+    { 
+      name: 'keywords', 
+      content: 'women clothing wholesale, apparel supplier southeast asia, clothing factory, clothing vendor Malaysia, custom clothing manufacturing' 
+    },
+    // Open Graph (用于 WhatsApp, Facebook 等社交软件分享时显示漂亮卡片)
+    { property: 'og:title', content: "Southeast Asia Women's Apparel Wholesale | SeakApparel" },
+    { property: 'og:description', content: 'Factory direct supply, low MOQ, and professional OEM/ODM services for Southeast Asia fashion buyers.' },
+    { property: 'og:image', content: 'https://www.seakapparel.com/og-image.jpg' } // 品牌宣传图路径
+  ],
+  link: [
+    { rel: 'canonical', href: 'https://www.seakapparel.com' } // 锁定正版主页，防止 SEO 权重分散
   ]
 })
 
-// 2. 菜单状态与滚动锁定
+// 2. 移动端移动导航菜单状态控制
 const isMenuOpen = ref(false)
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value
-  // 手机菜单打开时禁止背景滚动，关闭时恢复
-  if (isMenuOpen.value) {
-    document.body.style.overflow = 'hidden'
-  } else {
-    document.body.style.overflow = ''
-  }
 }
 </script>
 
@@ -62,7 +49,7 @@ const toggleMenu = () => {
 
         <button 
           @click="toggleMenu" 
-          class="md:hidden p-2 rounded-md text-gray-600 hover:text-blue-600 hover:bg-gray-100 transition-colors"
+          class="md:hidden p-2 rounded-md text-gray-600 hover:text-blue-600 hover:bg-gray-100 focus:outline-none transition-colors"
           aria-label="Toggle Menu"
         >
           <svg v-if="!isMenuOpen" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -85,12 +72,12 @@ const toggleMenu = () => {
             v-if="isMenuOpen" 
             class="absolute top-16 left-0 w-full bg-white border-b border-gray-200 shadow-lg py-4 px-6 flex flex-col gap-4 md:hidden z-50 font-medium text-gray-700"
           >
-            <NuxtLink to="/" active-class="text-blue-600" @click="toggleMenu">Home</NuxtLink>
-            <NuxtLink to="/products" active-class="text-blue-600" @click="toggleMenu">Products</NuxtLink>
-            <NuxtLink to="/blog" active-class="text-blue-600" @click="toggleMenu">Blog</NuxtLink>
-            <NuxtLink to="/faq" active-class="text-blue-600" @click="toggleMenu">FAQ</NuxtLink>
-            <NuxtLink to="/about" active-class="text-blue-600" @click="toggleMenu">About Us</NuxtLink>
-            <NuxtLink to="/contact" active-class="text-blue-600" @click="toggleMenu">Contact</NuxtLink>
+            <NuxtLink to="/" active-class="text-blue-600" @click="isMenuOpen = false">Home</NuxtLink>
+            <NuxtLink to="/products" active-class="text-blue-600" @click="isMenuOpen = false">Products</NuxtLink>
+            <NuxtLink to="/blog" active-class="text-blue-600" @click="isMenuOpen = false">Blog</NuxtLink>
+            <NuxtLink to="/faq" active-class="text-blue-600" @click="isMenuOpen = false">FAQ</NuxtLink>
+            <NuxtLink to="/about" active-class="text-blue-600" @click="isMenuOpen = false">About Us</NuxtLink>
+            <NuxtLink to="/contact" active-class="text-blue-600" @click="isMenuOpen = false">Contact</NuxtLink>
           </nav>
         </transition>
       </div>
@@ -109,6 +96,12 @@ const toggleMenu = () => {
 </template>
 
 <style>
-html { scroll-behavior: smooth; }
-body { margin: 0; padding: 0; }
+/* 保证页面平滑滚动与基础样式一致性 */
+html {
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  padding: 0;
+}
 </style>
