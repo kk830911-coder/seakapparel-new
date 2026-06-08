@@ -11,11 +11,11 @@
       Failed to connect backend server. Please refresh.
     </div>
 
-    <div v-else-if="products.length === 0" class="text-center py-20 text-gray-500 bg-gray-50 rounded-xl">
+    <div v-else-if="allProducts.length === 0" class="text-center py-20 text-gray-500 bg-gray-50 rounded-xl">
       No products found.
     </div>
 
-    <!-- 商品网格：桌面一行4个 lg:grid-cols-4 -->
+    <!-- 桌面一行4个 -->
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
       <div
         v-for="item in pageProducts"
@@ -62,7 +62,7 @@
       </div>
     </div>
 
-    <!-- 分页控件 -->
+    <!-- 分页 -->
     <div v-if="totalPage > 1" class="flex justify-center items-center gap-3 mt-12">
       <button
         @click="currentPage--"
@@ -98,7 +98,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 
-// 分页配置：每页12条
+// 分页配置
 const pageSize = 12
 const currentPage = ref(1)
 
@@ -106,14 +106,25 @@ const responseData = ref(null)
 const loading = ref(true)
 const fetchError = ref(false)
 
-const allProducts = computed(() => responseData.value?.data || [])
-// 总页数
-const totalPage = computed(() => Math.ceil(allProducts.value.length / pageSize))
-// 当前页展示商品
+// 安全兜底：为空时返回空数组，杜绝 length 报错
+const allProducts = computed(() => {
+  if (!responseData.value?.data) return []
+  return responseData.value.data
+})
+
+// 总页数安全计算
+const totalPage = computed(() => {
+  const list = allProducts.value
+  if (!Array.isArray(list) || list.length === 0) return 0
+  return Math.ceil(list.length / pageSize)
+})
+
+// 当前页商品切片
 const pageProducts = computed(() => {
+  const list = allProducts.value
   const start = (currentPage.value - 1) * pageSize
   const end = start + pageSize
-  return allProducts.value.slice(start, end)
+  return list.slice(start, end)
 })
 
 const getImageUrl = (item) => {
