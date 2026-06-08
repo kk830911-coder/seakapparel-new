@@ -15,8 +15,8 @@
       No products found.
     </div>
 
-    <!-- 布局修改：xs/手机端 grid-cols-2 一行2个，平板2个，大屏4个 -->
-    <div v-else class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+    <!-- gap-2 商品之间间隙极小 -->
+    <div v-else class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2">
       <div
         v-for="item in pageProducts"
         :key="item.id"
@@ -35,7 +35,8 @@
           />
         </NuxtLink>
 
-        <div class="p-5 flex-1 flex flex-col justify-between">
+        <!-- p-0.5 = 2px 卡片四周内边距 -->
+        <div class="p-0.5 flex-1 flex flex-col justify-between">
           <div>
             <!-- 标题链接：新窗口打开 -->
             <NuxtLink
