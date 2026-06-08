@@ -1,69 +1,184 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed } from 'vue'
+import { useRoute, useHead, useFetch } from '#imports'
 
 const route = useRoute()
-const responseData = ref(null)
-const loading = ref(true)
-const fetchError = ref(false)
 
-// 获取路由中的动态参数 ID (可能是 id 或 documentId)
-const postId = route.params.id
+// 1. 定义后端 URL 基础基准
+const isLocal = process.dev 
+const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
-// 拿到单篇博客的完整数据对象
-const post = computed(() => responseData.value?.data || null)
-
-// 适配 Strapi 的主封面图获取逻辑
-const getImageUrl = (postItem) => {
-  if (!postItem) return ''
-  const coverData = postItem.cover || postItem.attributes?.cover
-  if (!coverData) return ''
-  if (coverData.url) return coverData.url
-  if (coverData.data?.attributes?.url) return coverData.data.attributes.url
-  return ''
-}
-
-// 针对 Strapi Rich Text (Blocks) 富文本的处理函数
-// 如果你后续安装了 @strapi/blocks-react-renderer 的 vue 版本可以替换，这里用原生方法安全解析
-const renderBlocks = (content) => {
-  if (!content) return ''
-  if (typeof content === 'string') return content // 如果是普通字符串直接返回
-  
-  // 如果是 Strapi 的 Blocks 数组结构，将其安全组合为文本
-  if (Array.isArray(content)) {
-    return content.map(block => {
-      if (block.type === 'paragraph') {
-        return block.children?.map(child => child.text).join('') || ''
-      }
-      if (block.type === 'heading') {
-        return block.children?.map(child => child.text).join('') || ''
-      }
-      return ''
-    }).filter(Boolean)
+// ⚡ 核心 SEO 修正【重要】：摒弃 onMounted，改用 SSR 服务端预渲染请求，让谷歌蜘蛛能直接抓到 HTML
+const { data: responseData, error: fetchError } = await useFetch(
+  () => `${strapiUrl}/api/blogs/${route.params.id}`,
+  {
+    query: { populate: '*' },
+    initialCache: false
   }
-  return ''
-}
+)
 
-onMounted(async () => {
-  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
+// 2. 响应式计算出博客主体对象
+const post = computed(() => {
+  const res = responseData.value
+  if (res && res.data) {
+    return Array.isArray(res.data) ? res.data[0] : res.data
+  }
+  return null
+})
+
+// 提取当前文章的干净标题（用于兜底 alt 标签和标题拼接）
+const postTitle = computed(() => {
+  return post.value?.title || post.value?.attributes?.title || 'Fashion Wholesale Insights'
+})
+
+// 3. 【SEO 强化】安全的封面图 URL 与 Alt 动态匹配
+const coverImageInfo = computed(() => {
+  const data = post.value
+  if (!data) return { url: '', alt: 'SeakApparel Blog Cover' }
+
+  const coverData = data.cover || data.attributes?.cover?.data
+  if (!coverData) return { url: '', alt: `${postTitle.value} - SeakApparel Cover` }
+
+  // 兼容不同的 Strapi API 结构返回
+  let rawUrl = ''
+  let rawAlt = ''
   
-  try {
-    // 根据单篇文档的唯一 ID 请求 Strapi 详情接口，并填充媒体和分类
-    const res = await $fetch(`${strapiUrl}/api/blogs/${postId}?populate=*`)
-    console.log('详情页收到的原始数据:', res)
-    responseData.value = res
-  } catch (err) {
-    console.error('Client fetch blog detail failed:', err)
-    fetchError.value = true
-  } finally {
-    loading.value = false
+  if (coverData.attributes) {
+    rawUrl = coverData.attributes.url || ''
+    rawAlt = coverData.attributes.alternativeText || coverData.attributes.name || ''
+  } else {
+    rawUrl = coverData.url || ''
+    rawAlt = coverData.alternativeText || coverData.name || ''
+  }
+
+  // 拼接完整的绝对路径
+  if (rawUrl && rawUrl.startsWith('/')) {
+    rawUrl = `${strapiUrl}${rawUrl}`
+  }
+
+  return {
+    url: rawUrl || 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1200&auto=format&fit=crop',
+    alt: rawAlt.trim() ? rawAlt : `${postTitle.value} - Southeast Asia Clothing Wholesale`
   }
 })
 
-// 动态设置页面 SEO 标题
+/**
+ * 💡 核心改造：富文本组件模块化语义生成（支持多行排版、列表、加粗以及带动态 Alt 的图片渲染）
+ */
+const renderBlogRichText = (nodes) => {
+  if (!nodes) return ''
+  if (typeof nodes === 'string') return nodes
+  if (!Array.isArray(nodes)) return ''
+
+  return nodes.map(node => {
+    // 📷 1. 拦截富文本中插入的图片节点
+    if (node.type === 'image') {
+      const imgObj = node.image
+      if (!imgObj) return ''
+      
+      let imgUrl = imgObj.url || ''
+      if (!imgUrl) return ''
+
+      if (imgUrl.startsWith('/')) {
+        imgUrl = `${strapiUrl}${imgUrl}`
+      }
+
+      // 🔍 【SEO 黄金点】：如果小编在后台没填 Alt，自动用“博客文章名+批发/穿搭”补齐，拒绝让谷歌摸黑！
+      const rawAlt = imgObj.alternativeText || imgObj.name || ''
+      const safeAlt = rawAlt.trim() ? rawAlt : `${postTitle.value} - Apparel Vendor Spotlight`
+      
+      return `<div class="my-8 flex flex-col items-center">
+        <img 
+          src="${imgUrl}" 
+          alt="${safeAlt}" 
+          class="rounded-xl max-w-full h-auto shadow-md border border-gray-100"
+          loading="lazy"
+        />
+        ${rawAlt ? `<span class="text-xs text-gray-400 mt-2 text-center">${rawAlt}</span>` : ''}
+      </div>`
+    }
+
+    // 2. 渲染行内纯文本与修饰标记（粗体等）
+    if (node.type === 'text') {
+      let text = node.text || ''
+      if (node.bold) text = `<strong>${text}</strong>`
+      if (node.italic) text = `<em>${text}</em>`
+      return text
+    }
+
+    // 3. 递归编译子级块内容
+    const childrenHtml = node.children ? renderBlogRichText(node.children) : ''
+
+    // 4. 标准语义化标签层级转化（用原生的语义标签让蜘蛛更易读）
+    switch (node.type) {
+      case 'heading':
+        const level = node.level || 2
+        return `<h${level}>${childrenHtml}</h${level}>`
+      case 'list':
+        const listTag = node.format === 'ordered' ? 'ol' : 'ul'
+        return `<${listTag}>${childrenHtml}</${listTag}>`
+      case 'list-item':
+        return `<li>${childrenHtml}</li>`
+      case 'paragraph':
+      default:
+        if (!childrenHtml || childrenHtml.trim() === '') {
+          return '<p><br /></p>'
+        }
+        return `<p>${childrenHtml}</p>`
+    }
+  }).join('')
+}
+
+// 提取文章的纯文本，用来自动填补谷歌 Meta 描述
+const getPureContentText = (nodes) => {
+  if (!nodes || !Array.isArray(nodes)) return ''
+  return nodes
+    .map(node => {
+      if (node.type === 'image') return ''
+      return node.children?.map(c => c.text || '').join('') || ''
+    })
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+// 编译输出供前端 v-html 灌入的排版字串
+const renderedContentHtml = computed(() => {
+  const contentData = post.value?.content || post.value?.attributes?.content
+  if (!contentData) return '<p class="text-gray-400">Writing in progress...</p>'
+  return renderBlogRichText(contentData)
+})
+
+// 4. 📈 【完美版动态 SEO 配置】完全适配谷歌抓取与海外社交媒体（Facebook/WhatsApp）分享卡片
 useHead({
-  title: computed(() => `${post.value?.title || post.value?.attributes?.title || 'Blog Detail'} | SeakApparel`)
+  title: computed(() => `${postTitle.value} | SeakApparel Blog`),
+  meta: [
+    {
+      name: 'description',
+      content: computed(() => {
+        const customDesc = post.value?.description || post.value?.attributes?.description
+        if (customDesc) return customDesc
+        
+        // 自动用文章内容前 150 字进行智能截取补足
+        const rawContent = post.value?.content || post.value?.attributes?.content
+        const pureText = getPureContentText(rawContent)
+        return pureText ? `${pureText.slice(0, 150)}...` : 'Discover the latest Southeast Asia clothing wholesale market trends and boutique fashion tips.'
+      })
+    },
+    {
+      name: 'keywords',
+      content: computed(() => {
+        const cateName = post.value?.blog_category?.name || 'Women Clothing Wholesale'
+        return `${postTitle.value}, ${cateName}, apparel supplier trend, Southeast Asia clothing vendor`
+      })
+    },
+    // Open Graph 规范 (社交媒体与跨平台引流)
+    { property: 'og:title', content: computed(() => `${postTitle.value} | SeakApparel`) },
+    { property: 'og:type', content: 'article' },
+    { property: 'og:image', content: computed(() => coverImageInfo.value.url) },
+    { property: 'og:url', content: computed(() => `https://www.seakapparel.com/blog/${route.params.id}`) },
+    { name: 'twitter:card', content: 'summary_large_image' }
+  ]
 })
 </script>
 
@@ -73,58 +188,23 @@ useHead({
       ← Back to Blogs
     </NuxtLink>
 
-    <div v-if="loading" class="text-center py-20 text-gray-500">
-      <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mb-4"></div>
-      <p>Loading article content...</p>
-    </div>
-
-    <div v-else-if="fetchError || !post" class="text-center py-12 text-red-500 bg-red-50 rounded-xl">
+    <div v-if="fetchError || !post" class="text-center py-12 text-red-500 bg-red-50 rounded-xl">
       Article not found or server error. Please return to the blog list.
     </div>
 
     <article v-else class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden p-6 md:p-10">
+      
       <div class="flex items-center gap-4 text-sm text-gray-400 mb-4">
         <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-medium text-xs">
           {{ post.blog_category?.name || post.attributes?.blog_category?.data?.attributes?.name || 'Trends' }}
         </span>
-        <span>June 2026</span>
+        <span>📅 Updated: {{ new Date(post.updatedAt || post.attributes?.updatedAt || '2026-06').toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) }}</span>
       </div>
 
-      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
-        {{ post.title || post.attributes?.title }}
+      <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 leading-tight">
+        {{ postTitle }}
       </h1>
 
-      <p class="text-gray-600 italic border-l-4 border-gray-200 pl-4 py-1 mb-8 bg-gray-50 text-base rounded-r">
+      <p v-if="post.description || post.attributes?.description" class="text-gray-600 italic border-l-4 border-gray-200 pl-4 py-1 mb-8 bg-gray-50 text-base rounded-r">
         {{ post.description || post.attributes?.description }}
       </p>
-
-      <div v-if="getImageUrl(post)" class="w-full aspect-[21/9] rounded-xl overflow-hidden mb-10 bg-gray-100">
-        <NuxtImg 
-          :src="getImageUrl(post)" 
-          class="w-full h-full object-cover"
-          alt="Blog Detail Cover"
-        />
-      </div>
-
-      <div class="prose max-w-none text-gray-700 leading-relaxed text-lg space-y-6">
-        <template v-if="Array.isArray(post.content || post.attributes?.content)">
-          <p v-for="(paragraph, index) in renderBlocks(post.content || post.attributes?.content)" :key="index">
-            {{ paragraph }}
-          </p>
-        </template>
-        
-        <template v-else>
-          <p>{{ post.content || post.attributes?.content || 'No content available.' }}</p>
-        </template>
-      </div>
-    </article>
-  </div>
-</template>
-
-<style scoped>
-/* 自定义富文本的一些间距和样式排版优化 */
-.prose p {
-  margin-bottom: 1.5rem;
-  color: #374151;
-}
-</style>
