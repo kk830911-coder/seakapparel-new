@@ -40,15 +40,15 @@
               target="_blank"
               class="block"
             >
-              <!-- 移除 font-bold 取消标题加粗 -->
-              <h3 class="text-lg text-gray-800 line-clamp-2">{{ item.title || item.attributes?.title }}</h3>
+              <!-- 字号缩小：text-lg 改为 text-base -->
+              <h3 class="text-base text-gray-800 line-clamp-2">{{ item.title || item.attributes?.title }}</h3>
             </NuxtLink>
           </div>
 
           <div class="mt-4">
             <div class="flex justify-between text-sm mb-3">
-              <!-- 改为人民币符号 ¥，保留红色字体 -->
-              <span class="text-red-600 text-lg">¥{{ item.price || item.attributes?.price }}</span>
+              <!-- 价格增加 font-bold 加粗 -->
+              <span class="text-red-600 text-lg font-bold">¥{{ item.price || item.attributes?.price }}</span>
               <span class="text-gray-500 self-center">MOQ: {{ item.moq || item.attributes?.moq || 10 }} pcs</span>
             </div>
 
