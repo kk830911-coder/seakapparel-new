@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { useRoute, useHead } from '#imports' // 确保在 Nuxt3 环境中安全导入
 
 const route = useRoute()
 const product = ref(null)
@@ -112,11 +113,44 @@ onMounted(async () => {
   }
 })
 
-useHead(() => {
-  const titleText = product.value?.title || product.value?.attributes?.title || 'Product Detail'
-  return {
-    title: `${titleText} | SeakApparel Wholesale`
-  }
+// ====== 步骤2：重写后的动态 SEO 核心逻辑 ======
+useHead({
+  title: computed(() => {
+    const titleText = product.value?.title || product.value?.attributes?.title || 'Product Detail'
+    return `${titleText} | Southeast Asia Apparel Wholesale - SeakApparel`
+  }),
+  meta: [
+    {
+      name: 'description',
+      content: computed(() => {
+        const rawDesc = getDescriptionText(product.value)
+        // 清洗默认提示词，防止无描述时拖累整体权重
+        const cleanDesc = rawDesc === 'No specific description provided.' ? '' : rawDesc
+        // 智能获取价格和起订量，填充在描述里增加吸引力
+        const price = product.value?.price || product.value?.attributes?.price || ''
+        const moq = product.value?.moq || product.value?.attributes?.moq || 10
+        
+        return `Wholesale ${product.value?.title || 'Women Clothing'}. ${cleanDesc.slice(0, 120)}... Factory direct price${price ? ': $' + price : ''}, Low MOQ: ${moq}pcs. Supplier for Southeast Asia fashion boutiques.`
+      })
+    },
+    // 为每个单品加上语义化关键字
+    {
+      name: 'keywords',
+      content: computed(() => {
+        const titleText = product.value?.title || 'Women Clothing'
+        return `${titleText} wholesale, bulk clothing supplier, Southeast Asia apparel vendor, custom dress factory`
+      })
+    },
+    // Open Graph 社交网络支持 (Facebook / WhatsApp 预览卡片)
+    {
+      property: 'og:title',
+      content: computed(() => `${product.value?.title || 'Product'} | SeakApparel Wholesale`)
+    },
+    {
+      property: 'og:image',
+      content: computed(() => currentMainImageUrl.value)
+    }
+  ]
 })
 </script>
 
@@ -140,7 +174,7 @@ useHead(() => {
             <NuxtImg
               :src="currentMainImageUrl"
               class="w-full h-full object-cover transition-all duration-300"
-              alt="Product Main Detail Image"
+              :alt="`${product.title || product.attributes?.title || 'Wholesale Women Apparel'} - SeakApparel Image`"
             />
             
             <button 
@@ -178,7 +212,7 @@ useHead(() => {
               class="w-20 h-20 rounded-lg overflow-hidden border-2 bg-gray-50 flex-shrink-0 transition-all"
               :class="activeImageIndex === index ? 'border-blue-600 ring-2 ring-blue-100 scale-95' : 'border-gray-200 opacity-70 hover:opacity-100'"
             >
-              <img :src="url" class="w-full h-full object-cover" alt="Thumbnail" />
+              <img :src="url" class="w-full h-full object-cover" :alt="`Thumbnail ${index + 1}`" />
             </button>
           </div>
         </div>
@@ -236,7 +270,6 @@ useHead(() => {
 </template>
 
 <style scoped>
-/* 优化缩略图滚动的横向滚动条样式 */
 .scrollbar-thin::-webkit-scrollbar {
   height: 5px;
 }

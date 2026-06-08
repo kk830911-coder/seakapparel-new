@@ -1,3 +1,23 @@
+// 在 app.vue 的 <script setup> 中添加
+useHead({
+  title: 'Southeast Asia Women\'s Apparel Wholesale | SeakApparel',
+  meta: [
+    { 
+      name: 'description', 
+      content: 'SeakApparel is a leading women clothing wholesale supplier for Southeast Asia. Factory direct supply, low MOQ, and professional OEM/ODM custom services for boutique owners in Malaysia, Singapore, Thailand, and Vietnam.' 
+    },
+    { name: 'keywords', content: 'women clothing wholesale, apparel supplier southeast asia, clothing factory, clothing vendor Malaysia, custom clothing manufacturing' },
+    // Open Graph (用于 WhatsApp, Facebook 等社交软件分享时显示漂亮卡片)
+    { property: 'og:title', content: 'Southeast Asia Women\'s Apparel Wholesale | SeakApparel' },
+    { property: 'og:description', content: 'Factory direct supply, low MOQ, and professional OEM/ODM services for Southeast Asia fashion buyers.' },
+    { property: 'og:image', content: 'https://www.seakapparel.com/og-image.jpg' } // 放一张你的品牌宣传图
+  ],
+  link: [
+    { rel: 'canonical', href: 'https://www.seakapparel.com' } // 告诉谷歌这是唯一正版主页，防止权重分散
+  ]
+})
+
+
 <template>
   <div class="bg-gray-50 min-h-screen flex flex-col font-sans">
     <header class="bg-white shadow-sm sticky top-0 z-50">
@@ -60,6 +80,9 @@
     </footer>
   </div>
 </template>
+
+
+
 
 <script setup>
 import { ref } from 'vue'
