@@ -1,22 +1,36 @@
-// 在 app.vue 的 <script setup> 中添加
+<script setup>
+import { ref } from 'vue'
+import { useHead } from '#imports'
+
+// 1. 全局 SEO 头信息设置（提升谷歌收录和社交卡片分享）
 useHead({
-  title: 'Southeast Asia Women\'s Apparel Wholesale | SeakApparel',
+  title: "Southeast Asia Women's Apparel Wholesale | SeakApparel",
   meta: [
     { 
       name: 'description', 
       content: 'SeakApparel is a leading women clothing wholesale supplier for Southeast Asia. Factory direct supply, low MOQ, and professional OEM/ODM custom services for boutique owners in Malaysia, Singapore, Thailand, and Vietnam.' 
     },
-    { name: 'keywords', content: 'women clothing wholesale, apparel supplier southeast asia, clothing factory, clothing vendor Malaysia, custom clothing manufacturing' },
+    { 
+      name: 'keywords', 
+      content: 'women clothing wholesale, apparel supplier southeast asia, clothing factory, clothing vendor Malaysia, custom clothing manufacturing' 
+    },
     // Open Graph (用于 WhatsApp, Facebook 等社交软件分享时显示漂亮卡片)
-    { property: 'og:title', content: 'Southeast Asia Women\'s Apparel Wholesale | SeakApparel' },
+    { property: 'og:title', content: "Southeast Asia Women's Apparel Wholesale | SeakApparel" },
     { property: 'og:description', content: 'Factory direct supply, low MOQ, and professional OEM/ODM services for Southeast Asia fashion buyers.' },
-    { property: 'og:image', content: 'https://www.seakapparel.com/og-image.jpg' } // 放一张你的品牌宣传图
+    { property: 'og:image', content: 'https://www.seakapparel.com/og-image.jpg' } // 品牌宣传图路径
   ],
   link: [
-    { rel: 'canonical', href: 'https://www.seakapparel.com' } // 告诉谷歌这是唯一正版主页，防止权重分散
+    { rel: 'canonical', href: 'https://www.seakapparel.com' } // 锁定正版主页，防止 SEO 权重分散
   ]
 })
 
+// 2. 移动端移动导航菜单状态控制
+const isMenuOpen = ref(false)
+
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value
+}
+</script>
 
 <template>
   <div class="bg-gray-50 min-h-screen flex flex-col font-sans">
@@ -81,16 +95,13 @@ useHead({
   </div>
 </template>
 
-
-
-
-<script setup>
-import { ref } from 'vue'
-
-// 控制手机端菜单打开/关闭的状态变量
-const isMenuOpen = ref(false)
-
-const toggleMenu = () => {
-  isMenuOpen.value = !isMenuOpen.value
+<style>
+/* 保证页面平滑滚动与基础样式一致性 */
+html {
+  scroll-behavior: smooth;
 }
-</script>
+body {
+  margin: 0;
+  padding: 0;
+}
+</style>
