@@ -148,7 +148,7 @@ const prevImage = () => {
 
   if (imagesList.value.length <= 1) return
 
-  if (activeImageIndex.value === 0) { imagesList.value.length - 1 } else { activeImageIndex.value-- }
+  if (activeImageIndex.value === 0) { activeImageIndex.value = imagesList.value.length - 1 } else { activeImageIndex.value-- }
 
 }
 
@@ -270,7 +270,7 @@ useHead({
 
           <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group">
 
-            <img
+            <NuxtImg
 
               :src="currentMainImageUrl"
 
@@ -495,3 +495,6 @@ useHead({
   background: #94a3b8;
 
 }
+
+</style>
+
