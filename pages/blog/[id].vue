@@ -8,7 +8,7 @@ const route = useRoute()
 const isLocal = process.dev 
 const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
-// ⚡ 核心 SEO 修正：SSR 服务端预渲染请求，让谷歌蜘蛛能直接抓到 HTML
+// ⚡ 核心 SEO 基石：SSR 服务端预渲染请求，让谷歌蜘蛛能落地直接抓到完整 HTML 报文
 const { data: responseData, error: fetchError } = await useFetch(
   () => `${strapiUrl}/api/blogs/${route.params.id}`,
   {
@@ -17,7 +17,7 @@ const { data: responseData, error: fetchError } = await useFetch(
   }
 )
 
-// 2. 响应式计算出博客主体对象
+// 2. 响应式计算出博客主体数据对象
 const post = computed(() => {
   const res = responseData.value
   if (res && res.data) {
@@ -26,12 +26,23 @@ const post = computed(() => {
   return null
 })
 
-// 提取当前文章的干净标题（用于兜底 alt 标签和标题拼接）
+// 提取当前文章的干净标题（用于 Meta 拼接及图片 alt 兜底）
 const postTitle = computed(() => {
-  return post.value?.title || post.value?.attributes?.title || 'Fashion Wholesale Insights'
+  const rawPost = post.value
+  if (!rawPost) return 'Fashion Wholesale Insights'
+  return rawPost.title || rawPost.attributes?.title || 'Fashion Wholesale Insights'
 })
 
-// 3. 【SEO 强化】安全的封面图 URL 与 Alt 动态匹配
+// 安全格式化发布更新时间，避免 SSR 渲染时对 null 报错
+const formattedDate = computed(() => {
+  const rawPost = post.value
+  if (!rawPost) return 'June 2026'
+  const dateStr = rawPost.updatedAt || rawPost.attributes?.updatedAt || rawPost.createdAt || rawPost.attributes?.createdAt
+  if (!dateStr) return 'June 2026'
+  return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
+})
+
+// 3. 【SEO 强化】大封面图 URL 与 Alt 动态匹配防御
 const coverImageInfo = computed(() => {
   const data = post.value
   if (!data) return { url: '', alt: 'SeakApparel Blog Cover' }
@@ -39,7 +50,6 @@ const coverImageInfo = computed(() => {
   const coverData = data.cover || data.attributes?.cover?.data
   if (!coverData) return { url: '', alt: `${postTitle.value} - SeakApparel Cover` }
 
-  // 兼容不同的 Strapi API 结构返回
   let rawUrl = ''
   let rawAlt = ''
   
@@ -51,7 +61,7 @@ const coverImageInfo = computed(() => {
     rawAlt = coverData.alternativeText || coverData.name || ''
   }
 
-  // 拼接完整的绝对路径
+  // 补全相对路径
   if (rawUrl && rawUrl.startsWith('/')) {
     rawUrl = `${strapiUrl}${rawUrl}`
   }
@@ -63,7 +73,7 @@ const coverImageInfo = computed(() => {
 })
 
 /**
- * 💡 核心改造：富文本组件模块化语义生成（支持多行排版、列表、加粗以及带动态 Alt 的图片渲染）
+ * 💡 SEO 核心：富文本树安全转换为语义化 HTML（支持多层级、列表、加粗以及带防御机制的 img alt）
  */
 const renderBlogRichText = (nodes) => {
   if (!nodes) return ''
@@ -71,20 +81,19 @@ const renderBlogRichText = (nodes) => {
   if (!Array.isArray(nodes)) return ''
 
   return nodes.map(node => {
-    // 📷 1. 拦截富文本中插入的图片节点
+    // 📷 1. 深度拦截并处理富文本中嵌入的图片节点
     if (node.type === 'image') {
-      const imgObj = node.image
-      if (!imgObj) return ''
-      
-      let imgUrl = imgObj.url || ''
+      // 兼顾 Strapi Blocks 渲染器中各种多变的数据嵌套格式
+      const imgObj = node.image || node.file || node
+      let imgUrl = imgObj?.url || ''
       if (!imgUrl) return ''
 
       if (imgUrl.startsWith('/')) {
         imgUrl = `${strapiUrl}${imgUrl}`
       }
 
-      // 🔍 【SEO 黄金点】：如果小编在后台没填 Alt，自动用“博客文章名+批发/穿搭”补齐，拒绝让谷歌摸黑！
-      const rawAlt = imgObj.alternativeText || imgObj.name || ''
+      // 🔍 【SEO 灵魂操作】：即便运营漏填 Alt，也拿“文章标题 + 穿搭批发”补齐，拒绝留空！
+      const rawAlt = imgObj.alternativeText || imgObj.caption || imgObj.name || ''
       const safeAlt = rawAlt.trim() ? rawAlt : `${postTitle.value} - Apparel Vendor Spotlight`
       
       return `<div class="my-8 flex flex-col items-center">
@@ -94,11 +103,11 @@ const renderBlogRichText = (nodes) => {
           class="rounded-xl max-w-full h-auto shadow-md border border-gray-100"
           loading="lazy"
         />
-        ${rawAlt ? `<span class="text-xs text-gray-400 mt-2 text-center">${rawAlt}</span>` : ''}
+        ${rawAlt ? `<span class="text-xs text-gray-400 mt-2 text-center tracking-wide">${rawAlt}</span>` : ''}
       </div>`
     }
 
-    // 2. 渲染行内纯文本与修饰标记（粗体等）
+    // 2. 渲染行内文本和样式
     if (node.type === 'text') {
       let text = node.text || ''
       if (node.bold) text = `<strong>${text}</strong>`
@@ -106,10 +115,10 @@ const renderBlogRichText = (nodes) => {
       return text
     }
 
-    // 3. 递归编译子级块内容
+    // 3. 递归编译子节点
     const childrenHtml = node.children ? renderBlogRichText(node.children) : ''
 
-    // 4. 标准语义化标签层级转化（用原生的语义标签让蜘蛛更易读）
+    // 4. 标准 W3C 语义标签映射（让谷歌爬虫更懂文章结构）
     switch (node.type) {
       case 'heading':
         const level = node.level || 2
@@ -129,7 +138,7 @@ const renderBlogRichText = (nodes) => {
   }).join('')
 }
 
-// 提取文章的纯文本，用来自动填补谷歌 Meta 描述
+// 辅助提取纯文本，用来自动填充谷歌搜索结果的描述摘要
 const getPureContentText = (nodes) => {
   if (!nodes || !Array.isArray(nodes)) return ''
   return nodes
@@ -142,25 +151,27 @@ const getPureContentText = (nodes) => {
     .trim()
 }
 
-// 编译输出供前端 v-html 灌入的排版字串
+// 编译输出供前端 v-html 挂载的富文本排版
 const renderedContentHtml = computed(() => {
   const contentData = post.value?.content || post.value?.attributes?.content
   if (!contentData) return '<p class="text-gray-400">Writing in progress...</p>'
   return renderBlogRichText(contentData)
 })
 
-// 4. 📈 【完美版动态 SEO 配置】完全适配谷歌抓取与海外社交媒体（Facebook/WhatsApp）分享卡片
+// 4. 📈 【终极动态 SEO Meta 标签配置】适配谷歌顶级排名抓取与海外社交媒体（Facebook/WhatsApp）卡片分享
 useHead({
   title: computed(() => `${postTitle.value} | SeakApparel Blog`),
   meta: [
     {
       name: 'description',
       content: computed(() => {
-        const customDesc = post.value?.description || post.value?.attributes?.description
+        const rawPost = post.value
+        if (!rawPost) return 'Discover the latest Southeast Asia clothing wholesale market trends.'
+        const customDesc = rawPost.description || rawPost.attributes?.description
         if (customDesc) return customDesc
         
-        // 自动用文章内容前 150 字进行智能截取补足
-        const rawContent = post.value?.content || post.value?.attributes?.content
+        // 如果后台没填描述，自动截取正文前 150 字进行智能兜底
+        const rawContent = rawPost.content || rawPost.attributes?.content
         const pureText = getPureContentText(rawContent)
         return pureText ? `${pureText.slice(0, 150)}...` : 'Discover the latest Southeast Asia clothing wholesale market trends and boutique fashion tips.'
       })
@@ -168,11 +179,12 @@ useHead({
     {
       name: 'keywords',
       content: computed(() => {
-        const cateName = post.value?.blog_category?.name || 'Women Clothing Wholesale'
+        const rawPost = post.value
+        const cateName = rawPost?.blog_category?.name || rawPost?.attributes?.blog_category?.data?.attributes?.name || 'Women Clothing Wholesale'
         return `${postTitle.value}, ${cateName}, apparel supplier trend, Southeast Asia clothing vendor`
       })
     },
-    // Open Graph 规范 (社交媒体与跨平台引流)
+    // Open Graph 规范 (海外社交媒体引流神器)
     { property: 'og:title', content: computed(() => `${postTitle.value} | SeakApparel`) },
     { property: 'og:type', content: 'article' },
     { property: 'og:image', content: computed(() => coverImageInfo.value.url) },
@@ -198,7 +210,7 @@ useHead({
         <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-medium text-xs">
           {{ post.blog_category?.name || post.attributes?.blog_category?.data?.attributes?.name || 'Trends' }}
         </span>
-        <span>📅 Updated: {{ new Date(post.updatedAt || post.attributes?.updatedAt || '2026-06').toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) }}</span>
+        <span>📅 Updated: {{ formattedDate }}</span>
       </div>
 
       <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 leading-tight">
@@ -229,7 +241,7 @@ useHead({
 
 <style scoped>
 /* ==========================================================================
-   🎨 博客深度 SEO 排版控制
+   🎨 博客深度 SEO 排版样式控制（解决 v-html 内原生标签的美化问题）
    ========================================================================== */
 .blog-rich-body :deep(p) {
   margin-bottom: 1.5rem;
