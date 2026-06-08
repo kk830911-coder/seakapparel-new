@@ -22,10 +22,15 @@ export default defineNuxtConfig({
   },
 
   image: {
+    // 保持你原有的 domains 配置
     domains: [
       'localhost:1337',
       'res.cloudinary.com'
-    ]
+    ],
+    // 添加 cloudinary 配置
+    cloudinary: {
+      baseURL: 'https://res.cloudinary.com/daybgtfi3/image/upload/'
+    }
   },
 
   nitro: {

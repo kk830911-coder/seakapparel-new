@@ -13,14 +13,11 @@ export default defineNuxtConfig({
     name: 'SeakApparel'
   },
 
-  // 扩展 sitemap，让它包含你的动态产品和博客路径
+  // 👇 全自动动态路由配置
   sitemap: {
-    // 方式 A：如果产品不多，可以直接在这里手动先写死几个核心款的动态路径，确保谷歌能爬到：
-    urls: [
-      '/products',
-      '/blog',
-      // '/products/这里放你的具体产品ID或Slug', 
-      // '/blog/这里放你的具体文章ID或Slug'
+    sources: [
+      // 这里的路径可以随便命名，它会作为一个单独的动态源引入
+      '/api/sitemap-dynamic-routes'
     ]
   },
 
