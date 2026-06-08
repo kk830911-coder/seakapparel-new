@@ -3,40 +3,39 @@ export default defineEventHandler(async () => {
   const STRAPI_BASE_URL = 'https://seak-backend.onrender.com'
   
   try {
+    // 💡 1. 调整请求，明确拉取 documentId
     const [productsResponse, blogsResponse] = await Promise.all([
-      $fetch(`${STRAPI_BASE_URL}/api/products`),
-      $fetch(`${STRAPI_BASE_URL}/api/blogs`)
+      $fetch(`${STRAPI_BASE_URL}/api/products?fields[0]=documentId`),
+      $fetch(`${STRAPI_BASE_URL}/api/blogs?fields[0]=documentId`)
     ])
 
     const routes = []
 
-    // 1. 处理产品：用最原始、最粗暴的方式提取 ID
+    // 💡 2. 解析产品数据：统一使用 documentId
     const products = (productsResponse as any)?.data || []
     products.forEach((item: any) => {
-      // 检查所有可能的字段名，强制转为字符串
-      const id = item.documentId || item.attributes?.documentId || item.id || ''
-      if (id) {
-        routes.push(`/products/${String(id)}`)
+      const prodId = item.documentId || item.attributes?.documentId || item.id
+      if (prodId) {
+        routes.push(`/products/${prodId}`)
       }
     })
 
-    // 2. 处理博客
+    // 💡 3. 解析博客数据：【强制】仅使用 documentId
     const blogs = (blogsResponse as any)?.data || []
     blogs.forEach((item: any) => {
-      const slug = item.slug || item.attributes?.slug
-      const docId = item.documentId || item.attributes?.documentId || item.id
+      // 直接提取 documentId，摒弃 slug 逻辑
+      const blogId = item.documentId || item.attributes?.documentId || item.id
       
-      if (slug) {
-        routes.push(`/blog/${String(slug)}`)
-      } else if (docId) {
-        routes.push(`/blog/${String(docId)}`)
+      if (blogId) {
+        routes.push(`/blog/${blogId}`)
       }
     })
 
+    console.log('成功全自动生成以下动态 SEO 路由:', routes)
     return routes
 
   } catch (error) {
-    console.error('站点地图生成失败:', error)
+    console.error('动态站点地图生成失败，可能是后端正在休眠或字段错乱:', error)
     return []
   }
 })
