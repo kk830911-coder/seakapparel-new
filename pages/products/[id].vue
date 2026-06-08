@@ -1,295 +1,499 @@
 <script setup>
+
 import { ref, computed } from 'vue'
+
 import { useRoute, useHead, useFetch } from '#imports'
-// 核心引入：Markdown 轻量级解析器
-import snarkdown from 'snarkdown'
+
+
 
 const route = useRoute()
 
+
+
 // 1. 获取后端 URL
+
 const isLocal = process.dev 
+
 const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
-// 2. 改用 useFetch 并指定 key 强制进行服务端同步数据锁定
+
+
+// 2. 【核心优化】改用 useFetch 并指定 key 强制进行服务端同步数据锁定
+
 const { data: responseData } = await useFetch(`${strapiUrl}/api/products/${route.params.id}`, {
+
   query: { populate: '*' },
+
   key: `product-detail-${route.params.id}` // 唯一Key，防止水合闪烁
+
 })
+
+
 
 // 3. 直接解析出产品数据
+
 const product = computed(() => {
+
   const res = responseData.value
+
   if (res && res.data) {
+
     return Array.isArray(res.data) ? res.data[0] : res.data
+
   }
+
   return null
+
 })
+
+
 
 // 当前选中的主图索引
+
 const activeImageIndex = ref(0)
 
+
+
 // 安全的图片列表解析
+
 const imagesList = computed(() => {
+
   const data = product.value
+
   if (!data) return []
+
   
+
   let list = []
+
   if (data.image) {
+
     if (Array.isArray(data.image)) { list = [...data.image] } else { list.push(data.image) }
+
   }
+
   if (data.images && Array.isArray(data.images)) {
+
     list = [...list, ...data.images]
+
   }
+
   if (data.attributes?.image?.data) {
+
     const imgData = data.attributes.image.data
+
     if (Array.isArray(imgData)) {
+
       imgData.forEach(item => list.push(item))
+
     } else {
+
       list.push(imgData)
+
     }
+
   }
+
+
 
   const processedUrls = list.map(img => {
+
     if (!img) return null
+
     if (typeof img === 'string') return img
+
     if (img.url) return img.url
+
     if (img.attributes?.url) return img.attributes.url
+
     return null
+
   }).filter(url => url !== null)
+
   
+
   if (processedUrls.length === 0) {
+
     return ['https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop']
+
   }
+
   return processedUrls
+
 })
+
+
 
 // 获取当前展示的主图 URL
+
 const currentMainImageUrl = computed(() => {
+
   return imagesList.value[activeImageIndex.value] || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop'
+
 })
+
+
 
 const nextImage = () => {
+
   if (imagesList.value.length <= 1) return
+
   if (activeImageIndex.value === imagesList.value.length - 1) { activeImageIndex.value = 0 } else { activeImageIndex.value++ }
+
 }
+
+
 
 const prevImage = () => {
+
   if (imagesList.value.length <= 1) return
-  if (activeImageIndex.value === 0) { activeImageIndex.value = imagesList.value.length - 1 } else { activeImageIndex.value-- }
+
+  if (activeImageIndex.value === 0) { imagesList.value.length - 1 } else { activeImageIndex.value-- }
+
 }
 
-// 提取纯文本（专门用于 SEO Meta 标签，不含 HTML 符号）
+
+
 const getDescriptionText = (data) => {
+
   if (!data) return 'No specific description provided.'
+
   const desc = data.description || data.attributes?.description
+
   if (!desc) return 'No specific description provided.'
+
   if (Array.isArray(desc)) {
+
     return desc[0]?.children?.[0]?.text || 'No specific description provided.'
+
   }
+
   return desc
+
 }
 
-// 核心优化：专门用于页面 HTML 渲染的 Markdown 转换属性
-const renderedDescriptionHtml = computed(() => {
-  const rawText = getDescriptionText(product.value)
-  if (rawText === 'No specific description provided.') {
-    return `<p class="text-gray-400">${rawText}</p>`
-  }
-  // 将 Markdown 文本直接编译为带 <h3>, <ul>, <li>, <strong> 的 HTML 标签
-  return snarkdown(rawText)
-})
+
 
 // 4. 【动态 SEO】
+
 useHead({
+
   title: computed(() => {
+
     const titleText = product.value?.title || product.value?.attributes?.title || 'Product Detail'
+
     return `${titleText} | Southeast Asia Apparel Wholesale - SeakApparel`
+
   }),
+
   meta: [
+
     {
+
       name: 'description',
+
       content: computed(() => {
+
         const rawDesc = getDescriptionText(product.value)
+
         const cleanDesc = rawDesc === 'No specific description provided.' ? '' : rawDesc
+
         const price = product.value?.price || product.value?.attributes?.price || ''
+
         const moq = product.value?.moq || product.value?.attributes?.moq || 10
+
         return `Wholesale ${product.value?.title || 'Women Clothing'}. ${cleanDesc.slice(0, 120)}... Factory direct price${price ? ': $' + price : ''}, Low MOQ: ${moq}pcs. Supplier for Southeast Asia fashion boutiques.`
+
       })
+
     },
+
     {
+
       name: 'keywords',
+
       content: computed(() => {
+
         const titleText = product.value?.title || 'Women Clothing'
+
         return `${titleText} wholesale, bulk clothing supplier, Southeast Asia apparel vendor`
+
       })
+
     },
+
     {
+
       property: 'og:title',
+
       content: computed(() => `${product.value?.title || 'Product'} | SeakApparel Wholesale`)
+
     },
+
     {
+
       property: 'og:image',
+
       content: computed(() => currentMainImageUrl.value)
+
     }
+
   ]
+
 })
+
 </script>
 
+
+
 <template>
+
   <div class="max-w-7xl mx-auto px-4 py-12">
+
     
+
     <div v-if="!product" class="text-center py-20 text-red-500 bg-red-50 rounded-xl">
+
       Product detail not found. Please refresh the page or back to list.
+
     </div>
+
+
 
     <div v-else class="space-y-12">
+
       <div class="grid md:grid-cols-2 gap-12 bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
+
         
+
         <div class="space-y-4">
+
           <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group">
+
             <img
+
               :src="currentMainImageUrl"
+
               class="w-full h-full object-cover transition-all duration-300"
+
               :alt="`${product.title || product.attributes?.title || 'Wholesale Women Apparel'} - SeakApparel Image`"
+
             />
+
             
-            <button 
-              v-if="imagesList.length > 1"
-              @click="prevImage"
-              class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:outline-none z-10 shadow-md"
-              aria-label="Previous Image"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-              </svg>
-            </button>
 
             <button 
+
               v-if="imagesList.length > 1"
-              @click="nextImage"
-              class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:outline-none z-10 shadow-md"
-              aria-label="Next Image"
+
+              @click="prevImage"
+
+              class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:outline-none z-10 shadow-md"
+
+              aria-label="Previous Image"
+
             >
+
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+
               </svg>
+
             </button>
+
+
+
+            <button 
+
+              v-if="imagesList.length > 1"
+
+              @click="nextImage"
+
+              class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:outline-none z-10 shadow-md"
+
+              aria-label="Next Image"
+
+            >
+
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+
+              </svg>
+
+            </button>
+
+
 
             <div v-if="imagesList.length > 1" class="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-xs font-medium tracking-wider z-10">
+
               {{ activeImageIndex + 1 }} / {{ imagesList.length }}
+
             </div>
+
           </div>
+
           
+
           <div v-if="imagesList.length > 1" class="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
+
             <button
+
               v-for="(url, index) in imagesList"
+
               :key="index"
+
               @click="activeImageIndex = index"
+
               class="w-20 h-20 rounded-lg overflow-hidden border-2 bg-gray-50 flex-shrink-0 transition-all"
+
               :class="activeImageIndex === index ? 'border-blue-600 ring-2 ring-blue-100 scale-95' : 'border-gray-200 opacity-70 hover:opacity-100'"
+
             >
+
               <img :src="url" class="w-full h-full object-cover" :alt="`${product.title || product.attributes?.title || 'Apparel'} Thumbnail ${index + 1}`" />
+
             </button>
+
           </div>
+
         </div>
+
+
 
         <div class="flex flex-col justify-between">
+
           <div>
+
             <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase">
+
               Southeast Asia Wholesale
+
             </span>
+
             
+
             <h1 class="text-3xl font-bold text-gray-900 mt-3 mb-4 leading-tight">
+
               {{ product.title || product.attributes?.title }}
+
             </h1>
+
             
+
             <div class="bg-gray-50 p-4 rounded-xl space-y-3 my-6">
+
               <div class="flex justify-between items-center border-b border-gray-200 pb-2">
+
                 <span class="text-gray-500 text-sm">Wholesale Price</span>
+
                 <span class="text-2xl font-extrabold text-blue-600">
+
                   ${{ product.price || product.attributes?.price }}
+
                 </span>
+
               </div>
+
               <div class="flex justify-between items-center pt-1">
+
                 <span class="text-gray-500 text-sm">Minimum Order Quantity</span>
+
                 <span class="text-gray-800 font-semibold">
+
                   {{ product.moq || product.attributes?.moq || 10 }} pcs
+
                 </span>
+
               </div>
+
             </div>
+
           </div>
+
+
 
           <div class="mt-4 pt-4 border-t border-gray-100">
+
             <a 
+
               :href="`https://wa.me/+8613800000000?text=Hi, I am interested in your product: ${product.title || product.attributes?.title}`"
+
               target="_blank"
+
               class="block w-full bg-green-600 text-white text-center py-4 rounded-xl font-bold hover:bg-green-700 transition-colors shadow-sm text-base tracking-wide"
+
             >
+
               💬 Inquiry via WhatsApp (Fast Response)
+
             </a>
+
           </div>
+
         </div>
 
+
+
       </div>
+
+
 
       <div class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
+
         <h3 class="text-lg font-bold text-gray-800 border-l-4 border-blue-600 pl-3 mb-4">
+
           Product Description
+
         </h3>
-        <div 
-          class="text-gray-600 leading-relaxed text-sm bg-slate-50 p-6 rounded-xl min-h-[150px] markdown-body"
-          v-html="renderedDescriptionHtml"
-        />
+
+        <p class="text-gray-600 leading-relaxed text-sm bg-slate-50 p-6 rounded-xl whitespace-pre-line min-h-[150px]">
+
+          {{ getDescriptionText(product) }}
+
+        </p>
+
       </div>
 
+
+
     </div>
+
   </div>
+
 </template>
 
+
+
 <style scoped>
+
 .scrollbar-thin::-webkit-scrollbar {
+
   height: 5px;
-}
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-.scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+
 }
 
-/* ==========================================================================
-   🎨 Markdown 样式自定义微调（确保后台输入的标题、列表和粗体完美展现）
-   ========================================================================== */
-.markdown-body :deep(h3) {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin-top: 1.25rem;
-  margin-bottom: 0.5rem;
+.scrollbar-thin::-webkit-scrollbar-track {
+
+  background: #f1f1f1;
+
+  border-radius: 4px;
+
 }
-.markdown-body :deep(h3):first-child {
-  margin-top: 0;
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+
+  background: #cbd5e1;
+
+  border-radius: 4px;
+
 }
-.markdown-body :deep(ul) {
-  list-style-type: disc !important;
-  padding-left: 1.25rem !important;
-  margin-top: 0.5rem;
-  margin-bottom: 1rem;
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+
+  background: #94a3b8;
+
 }
-.markdown-body :deep(li) {
-  margin-bottom: 0.4rem;
-  line-height: 1.6;
-}
-.markdown-body :deep(strong) {
-  color: #0f172a;
-  font-weight: 600;
-}
-.markdown-body :deep(p) {
-  margin-bottom: 0.75rem;
-}
-</style>
+
+</style> 
