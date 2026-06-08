@@ -1,6 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute, useHead, useFetch } from '#imports'
+// 核心引入：Markdown 轻量级解析器
+import snarkdown from 'snarkdown'
 
 const route = useRoute()
 
@@ -8,7 +10,7 @@ const route = useRoute()
 const isLocal = process.dev 
 const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
-// 2. 【核心优化】改用 useFetch 并指定 key 强制进行服务端同步数据锁定
+// 2. 改用 useFetch 并指定 key 强制进行服务端同步数据锁定
 const { data: responseData } = await useFetch(`${strapiUrl}/api/products/${route.params.id}`, {
   query: { populate: '*' },
   key: `product-detail-${route.params.id}` // 唯一Key，防止水合闪烁
@@ -73,9 +75,10 @@ const nextImage = () => {
 
 const prevImage = () => {
   if (imagesList.value.length <= 1) return
-  if (activeImageIndex.value === 0) { imagesList.value.length - 1 } else { activeImageIndex.value-- }
+  if (activeImageIndex.value === 0) { activeImageIndex.value = imagesList.value.length - 1 } else { activeImageIndex.value-- }
 }
 
+// 提取纯文本（专门用于 SEO Meta 标签，不含 HTML 符号）
 const getDescriptionText = (data) => {
   if (!data) return 'No specific description provided.'
   const desc = data.description || data.attributes?.description
@@ -85,6 +88,16 @@ const getDescriptionText = (data) => {
   }
   return desc
 }
+
+// 核心优化：专门用于页面 HTML 渲染的 Markdown 转换属性
+const renderedDescriptionHtml = computed(() => {
+  const rawText = getDescriptionText(product.value)
+  if (rawText === 'No specific description provided.') {
+    return `<p class="text-gray-400">${rawText}</p>`
+  }
+  // 将 Markdown 文本直接编译为带 <h3>, <ul>, <li>, <strong> 的 HTML 标签
+  return snarkdown(rawText)
+})
 
 // 4. 【动态 SEO】
 useHead({
@@ -223,9 +236,10 @@ useHead({
         <h3 class="text-lg font-bold text-gray-800 border-l-4 border-blue-600 pl-3 mb-4">
           Product Description
         </h3>
-        <p class="text-gray-600 leading-relaxed text-sm bg-slate-50 p-6 rounded-xl whitespace-pre-line min-h-[150px]">
-          {{ getDescriptionText(product) }}
-        </p>
+        <div 
+          class="text-gray-600 leading-relaxed text-sm bg-slate-50 p-6 rounded-xl min-h-[150px] markdown-body"
+          v-html="renderedDescriptionHtml"
+        />
       </div>
 
     </div>
@@ -246,5 +260,36 @@ useHead({
 }
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* ==========================================================================
+   🎨 Markdown 样式自定义微调（确保后台输入的标题、列表和粗体完美展现）
+   ========================================================================== */
+.markdown-body :deep(h3) {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+.markdown-body :deep(h3):first-child {
+  margin-top: 0;
+}
+.markdown-body :deep(ul) {
+  list-style-type: disc !important;
+  padding-left: 1.25rem !important;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+.markdown-body :deep(li) {
+  margin-bottom: 0.4rem;
+  line-height: 1.6;
+}
+.markdown-body :deep(strong) {
+  color: #0f172a;
+  font-weight: 600;
+}
+.markdown-body :deep(p) {
+  margin-bottom: 0.75rem;
 }
 </style>
