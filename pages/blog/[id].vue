@@ -8,7 +8,7 @@ const route = useRoute()
 const isLocal = process.dev 
 const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
-// ⚡ 核心 SEO 修正【重要】：摒弃 onMounted，改用 SSR 服务端预渲染请求，让谷歌蜘蛛能直接抓到 HTML
+// ⚡ 核心 SEO 修正：SSR 服务端预渲染请求，让谷歌蜘蛛能直接抓到 HTML
 const { data: responseData, error: fetchError } = await useFetch(
   () => `${strapiUrl}/api/blogs/${route.params.id}`,
   {
@@ -208,3 +208,74 @@ useHead({
       <p v-if="post.description || post.attributes?.description" class="text-gray-600 italic border-l-4 border-gray-200 pl-4 py-1 mb-8 bg-gray-50 text-base rounded-r">
         {{ post.description || post.attributes?.description }}
       </p>
+
+      <div v-if="coverImageInfo.url" class="w-full aspect-[21/9] rounded-xl overflow-hidden mb-10 bg-gray-100">
+        <img 
+          :src="coverImageInfo.url" 
+          :alt="coverImageInfo.alt"
+          class="w-full h-full object-cover"
+          loading="eager" 
+        />
+      </div>
+
+      <div 
+        class="prose blog-rich-body max-w-none text-gray-700 leading-relaxed text-lg"
+        v-html="renderedContentHtml"
+      />
+
+    </article>
+  </div>
+</template>
+
+<style scoped>
+/* ==========================================================================
+   🎨 博客深度 SEO 排版控制
+   ========================================================================== */
+.blog-rich-body :deep(p) {
+  margin-bottom: 1.5rem;
+  line-height: 1.8;
+  color: #374151;
+}
+
+.blog-rich-body :deep(h2) {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-top: 2.25rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.blog-rich-body :deep(h3) {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.blog-rich-body :deep(ul) {
+  list-style-type: disc !important;
+  padding-left: 1.75rem !important;
+  margin-bottom: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.blog-rich-body :deep(ol) {
+  list-style-type: decimal !important;
+  padding-left: 1.75rem !important;
+  margin-bottom: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.blog-rich-body :deep(li) {
+  margin-bottom: 0.5rem;
+  line-height: 1.7;
+}
+
+.blog-rich-body :deep(strong) {
+  color: #030712;
+  font-weight: 700;
+}
+</style>
