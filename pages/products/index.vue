@@ -22,8 +22,10 @@
         :key="item.id"
         class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between border border-gray-100"
       >
+        <!-- 图片：新窗口打开 -->
         <NuxtLink
           :to="`/products/${item.documentId || item.attributes?.documentId || item.id}`"
+          target="_blank"
           class="aspect-square overflow-hidden block bg-gray-50 relative"
         >
           <NuxtImg
@@ -35,9 +37,15 @@
 
         <div class="p-5 flex-1 flex flex-col justify-between">
           <div>
-            <!-- 标题限制2行，超出省略 -->
-            <h3 class="font-bold text-lg text-gray-800 line-clamp-2">{{ item.title || item.attributes?.title }}</h3>
-            <!-- 已移除产品描述，卡片不再展示介绍文字 -->
+            <!-- 标题链接：新窗口打开 -->
+            <NuxtLink
+              :to="`/products/${item.documentId || item.attributes?.documentId || item.id}`"
+              target="_blank"
+              class="block"
+            >
+              <h3 class="font-bold text-lg text-gray-800 line-clamp-2">{{ item.title || item.attributes?.title }}</h3>
+            </NuxtLink>
+            <!-- 已移除产品描述 -->
           </div>
 
           <div class="mt-4">
