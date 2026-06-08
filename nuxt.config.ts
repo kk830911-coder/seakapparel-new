@@ -1,3 +1,4 @@
+
 // nuxt.config.ts
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -5,6 +6,7 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/image',
     '@nuxtjs/tailwindcss'
+    '@nuxtjs/sitemap'
   ],
 
   image: {
