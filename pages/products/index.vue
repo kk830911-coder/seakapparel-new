@@ -31,7 +31,20 @@ onMounted(async () => {
   }
 })
 
-useHead({ title: 'All Wholesale Products | SeakApparel' })
+// ====== 优化后的首页 / 产品页 SEO 核心设置 ======
+useHead({
+  title: 'All Wholesale Products | Southeast Asia Women\'s Apparel Supplier - SeakApparel',
+  meta: [
+    {
+      name: 'description',
+      content: 'Browse our latest collection of wholesale women\'s apparel. SeakApparel offers high-quality fashion, factory direct pricing, low MOQ, and reliable shipping for clothing vendors and boutique owners across Southeast Asia.'
+    },
+    {
+      name: 'keywords',
+      content: 'women clothing wholesale, southeast asia apparel supplier, bulk clothing vendor, wholesale dresses, boutique clothing supplier'
+    }
+  ]
+})
 </script>
 
 <template>
@@ -64,7 +77,7 @@ useHead({ title: 'All Wholesale Products | SeakApparel' })
           <NuxtImg
             :src="getImageUrl(item)"
             class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-            alt="Product Image"
+            :alt="`${item.title || item.attributes?.title || 'Wholesale Women Clothing'} - SeakApparel`"
           />
         </NuxtLink>
 
