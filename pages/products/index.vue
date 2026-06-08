@@ -1,5 +1,6 @@
 <template>
-  <div class="max-w-7xl mx-auto px-4 py-12">
+  <!-- 外层 px-4 改为 px-2，屏幕两侧边距减半 -->
+  <div class="max-w-7xl mx-auto px-2 py-12">
     <h1 class="text-3xl font-bold mb-10 border-l-4 border-blue-600 pl-3">All Wholesale Products</h1>
 
     <div v-if="loading" class="text-center py-20 text-gray-500">
