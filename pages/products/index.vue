@@ -15,8 +15,8 @@
       No products found.
     </div>
 
-    <!-- 桌面一行4个 -->
-    <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+    <!-- 布局修改：xs/手机端 grid-cols-2 一行2个，平板2个，大屏4个 -->
+    <div v-else class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8">
       <div
         v-for="item in pageProducts"
         :key="item.id"
@@ -45,7 +45,6 @@
             >
               <h3 class="font-bold text-lg text-gray-800 line-clamp-2">{{ item.title || item.attributes?.title }}</h3>
             </NuxtLink>
-            <!-- 已移除产品描述 -->
           </div>
 
           <div class="mt-4">
