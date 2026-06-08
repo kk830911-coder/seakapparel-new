@@ -35,14 +35,9 @@
 
         <div class="p-5 flex-1 flex flex-col justify-between">
           <div>
-            <h3 class="font-bold text-lg text-gray-800 line-clamp-1">{{ item.title || item.attributes?.title }}</h3>
-            <p class="text-sm text-gray-500 line-clamp-2 mt-1">
-              {{
-                Array.isArray(item.description || item.attributes?.description)
-                  ? (item.description || item.attributes?.description)[0]?.children?.[0]?.text
-                  : (item.description || item.attributes?.description || '')
-              }}
-            </p>
+            <!-- 标题限制2行，超出省略 -->
+            <h3 class="font-bold text-lg text-gray-800 line-clamp-2">{{ item.title || item.attributes?.title }}</h3>
+            <!-- 已移除产品描述，卡片不再展示介绍文字 -->
           </div>
 
           <div class="mt-4">
