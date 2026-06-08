@@ -2,7 +2,7 @@
   <div class="bg-gray-50 min-h-screen flex flex-col font-sans">
     <header class="bg-white shadow-sm sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between relative">
-        <NuxtLink to="/" class="text-2xl font-bold tracking-wide text-slate-800">seakapparel</NuxtLink>
+        <NuxtLink to="/" class="text-2xl font-bold tracking-wide text-slate-800">Seak-Apparel</NuxtLink>
         
         <nav class="hidden md:flex gap-8 font-medium text-gray-600">
           <NuxtLink to="/" active-class="text-blue-600">Home</NuxtLink>
