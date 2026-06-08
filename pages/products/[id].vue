@@ -73,12 +73,11 @@ const nextImage = () => {
 
 const prevImage = () => {
   if (imagesList.value.length <= 1) return
-  if (activeImageIndex.value === 0) { imagesList.value.length - 1 } else { activeImageIndex.value-- }
+  if (activeImageIndex.value === 0) { activeImageIndex.value = imagesList.value.length - 1 } else { activeImageIndex.value-- }
 }
 
 /**
- * 💡 核心改造一：全面支持 Strapi 复杂富文本组件节点的渲染函数
- * 完美的将后台传过来的富文本块数组（Paragraph, Heading, List）递归编译为标准的网页 HTML 标签
+ * 💡 完美支持 Strapi 复杂富文本组件节点的渲染函数（升级版：支持图片解析）
  */
 const renderStrapiRichText = (nodes) => {
   if (!nodes) return 'No specific description provided.'
@@ -86,7 +85,33 @@ const renderStrapiRichText = (nodes) => {
   if (!Array.isArray(nodes)) return 'No specific description provided.'
 
   return nodes.map(node => {
-    // 渲染文本节点和文本样式（如加粗）
+    // ⭐ 新增核心逻辑：处理富文本中的图片节点
+    if (node.type === 'image') {
+      const imgObj = node.image
+      if (!imgObj) return ''
+      
+      let imgUrl = imgObj.url || ''
+      if (!imgUrl) return ''
+
+      // 自动拼接后端基础 URL 域名路径，防止生产环境图片碎图
+      if (imgUrl.startsWith('/')) {
+        imgUrl = `${strapiUrl}${imgUrl}`
+      }
+
+      const altText = imgObj.alternativeText || 'Product Description Image'
+      
+      // 返回带有优雅自适应样式的图片标签
+      return `<div class="my-6 flex justify-center">
+        <img 
+          src="${imgUrl}" 
+          alt="${altText}" 
+          class="rounded-xl max-w-full h-auto shadow-sm border border-gray-100 object-cover"
+          style="max-height: 600px;"
+        />
+      </div>`
+    }
+
+    // 渲染文本节点和文本样式（如加粗、斜体）
     if (node.type === 'text') {
       let text = node.text || ''
       if (node.bold) text = `<strong>${text}</strong>`
@@ -118,19 +143,25 @@ const renderStrapiRichText = (nodes) => {
   }).join('')
 }
 
-// 提取纯文本（专门用于页面 SEO 标题和 Meta 数据抓取，过滤掉结构节点）
+// 提取纯文本（专门用于页面 SEO 标题和 Meta 数据抓取，过滤掉图片等结构节点）
 const getDescriptionText = (data) => {
   if (!data) return 'No specific description provided.'
   const desc = data.description || data.attributes?.description
   if (!desc) return 'No specific description provided.'
   if (Array.isArray(desc)) {
-    // 串联前几行的纯文本提供给 SEO 爬虫
-    return desc.map(node => node.children?.map(c => c.text).join('') || '').join(' ').trim()
+    return desc
+      .map(node => {
+        if (node.type === 'image') return '' // 过滤掉图片节点，避免 SEO 抓取乱码
+        return node.children?.map(c => c.text || '').join('') || ''
+      })
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim()
   }
   return desc
 }
 
-// 💡 核心改造二：直接计算输出由 Strapi 结构化解析出来的完整排版 HTML
+// 💡 直接计算输出由 Strapi 结构化解析出来的完整排版 HTML
 const renderedDescriptionHtml = computed(() => {
   const descData = product.value?.description || product.value?.attributes?.description
   if (!descData) {

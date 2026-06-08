@@ -1,8 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute, useHead, useFetch } from '#imports'
-// 【核心引入】：引入刚安装的 Markdown 轻量级解析器
-import snarkdown from 'snarkdown'
 
 const route = useRoute()
 
@@ -78,29 +76,67 @@ const prevImage = () => {
   if (activeImageIndex.value === 0) { imagesList.value.length - 1 } else { activeImageIndex.value-- }
 }
 
-// 提取纯文本（专门用于 SEO 标签，不含任何 HTML 标签符号）
+/**
+ * 💡 核心改造一：全面支持 Strapi 复杂富文本组件节点的渲染函数
+ * 完美的将后台传过来的富文本块数组（Paragraph, Heading, List）递归编译为标准的网页 HTML 标签
+ */
+const renderStrapiRichText = (nodes) => {
+  if (!nodes) return 'No specific description provided.'
+  if (typeof nodes === 'string') return nodes
+  if (!Array.isArray(nodes)) return 'No specific description provided.'
+
+  return nodes.map(node => {
+    // 渲染文本节点和文本样式（如加粗）
+    if (node.type === 'text') {
+      let text = node.text || ''
+      if (node.bold) text = `<strong>${text}</strong>`
+      if (node.italic) text = `<em>${text}</em>`
+      return text
+    }
+
+    // 编译子文本节点内容
+    const childrenHtml = node.children ? renderStrapiRichText(node.children) : ''
+
+    // 根据节点类型输出对应的网页元素标签
+    switch (node.type) {
+      case 'heading':
+        const level = node.level || 3
+        return `<h${level}>${childrenHtml}</h${level}>`
+      case 'list':
+        const listTag = node.format === 'ordered' ? 'ol' : 'ul'
+        return `<${listTag}>${childrenHtml}</${listTag}>`
+      case 'list-item':
+        return `<li>${childrenHtml}</li>`
+      case 'paragraph':
+      default:
+        // 如果段落完全没有内容，把它当做一个空行处理换行
+        if (!childrenHtml || childrenHtml.trim() === '') {
+          return '<p><br /></p>'
+        }
+        return `<p>${childrenHtml}</p>`
+    }
+  }).join('')
+}
+
+// 提取纯文本（专门用于页面 SEO 标题和 Meta 数据抓取，过滤掉结构节点）
 const getDescriptionText = (data) => {
   if (!data) return 'No specific description provided.'
   const desc = data.description || data.attributes?.description
   if (!desc) return 'No specific description provided.'
   if (Array.isArray(desc)) {
-    return desc[0]?.children?.[0]?.text || 'No specific description provided.'
+    // 串联前几行的纯文本提供给 SEO 爬虫
+    return desc.map(node => node.children?.map(c => c.text).join('') || '').join(' ').trim()
   }
   return desc
 }
 
-// 【完美修复核心】：利用计算属性，自动处理换行冲突，将 Markdown 编译为真正的网页 HTML
+// 💡 核心改造二：直接计算输出由 Strapi 结构化解析出来的完整排版 HTML
 const renderedDescriptionHtml = computed(() => {
-  const rawText = getDescriptionText(product.value)
-  if (rawText === 'No specific description provided.') {
-    return `<p class="text-gray-400">${rawText}</p>`
+  const descData = product.value?.description || product.value?.attributes?.description
+  if (!descData) {
+    return `<p class="text-gray-400">No specific description provided.</p>`
   }
-  
-  // 💡 一劳永逸：在解析前，自动把后台输入的所有普通换行符 \n 转换成网页标准的换行标签 <br />
-  const formattedText = rawText.replace(/\n/g, '<br />')
-  
-  // 用 snarkdown 编译为包含 <h3>, <strong>, <ul> 的标准网页结构
-  return snarkdown(formattedText)
+  return renderStrapiRichText(descData)
 })
 
 // 4. 【动态 SEO】
@@ -267,34 +303,45 @@ useHead({
 }
 
 /* ==========================================================================
-   🎨 Markdown 样式自定义微调（确保前端生成的列表点、加粗和标题有明显的层次和间距）
+   🎨 针对富文本输出的 HTML 样式层级微调
    ========================================================================== */
+.markdown-body :deep(h1),
+.markdown-body :deep(h2),
 .markdown-body :deep(h3) {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: #1e293b;
-  margin-top: 1.25rem;
-  margin-bottom: 0.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
   display: block;
 }
+.markdown-body :deep(h1):first-child,
+.markdown-body :deep(h2):first-child,
 .markdown-body :deep(h3):first-child {
   margin-top: 0;
 }
 .markdown-body :deep(ul) {
   list-style-type: disc !important;
-  padding-left: 1.25rem !important;
+  padding-left: 1.5rem !important;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+.markdown-body :deep(ol) {
+  list-style-type: decimal !important;
+  padding-left: 1.5rem !important;
   margin-top: 0.5rem;
   margin-bottom: 1rem;
 }
 .markdown-body :deep(li) {
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.5rem;
   line-height: 1.6;
 }
 .markdown-body :deep(strong) {
   color: #0f172a;
-  font-weight: 600;
+  font-weight: 700;
 }
 .markdown-body :deep(p) {
   margin-bottom: 0.75rem;
+  line-height: 1.6;
 }
 </style>
