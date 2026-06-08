@@ -3,42 +3,38 @@ export default defineEventHandler(async () => {
   const STRAPI_BASE_URL = 'https://seak-backend.onrender.com'
   
   try {
-    // 💡 1. 同时请求产品和博客，显式指定我们要拉取新版 Strapi 的唯一标识符 documentId 和 slug
+    // 💡 显式拉取 documentId，确保前台路由匹配准确
     const [productsResponse, blogsResponse] = await Promise.all([
-      $fetch(`${STRAPI_BASE_URL}/api/products?fields[0]=documentId&fields[1]=id`),
-      $fetch(`${STRAPI_BASE_URL}/api/blogs?fields[0]=documentId&fields[1]=slug&fields[2]=id`)
+      $fetch(`${STRAPI_BASE_URL}/api/products?fields[0]=documentId`),
+      $fetch(`${STRAPI_BASE_URL}/api/blogs?fields[0]=documentId&fields[1]=slug`)
     ])
 
     const routes = []
 
-    // 💡 2. 解析产品数据：优先取 documentId，防止新版 Strapi v5 报 404
+    // 1. 处理产品
     const products = (productsResponse as any)?.data || []
     products.forEach((item: any) => {
-      // 兼容 Strapi v5 直接在根部，以及 v4 在 attributes 里的情况
-      const prodId = item.documentId || item.attributes?.documentId || item.id
-      if (prodId) {
-        routes.push(`/products/${prodId}`)
-      }
+      const docId = item.documentId || item.id
+      if (docId) routes.push(`/products/${docId}`)
     })
 
-    // 💡 3. 解析博客数据：优先使用 slug，没有就用 documentId 保底
+    // 2. 处理博客：如果有 slug 就用 slug，没有就用 documentId 保底
     const blogs = (blogsResponse as any)?.data || []
     blogs.forEach((item: any) => {
       const slug = item.slug || item.attributes?.slug
-      const blogId = item.documentId || item.attributes?.documentId || item.id
+      const docId = item.documentId || item.id
       
       if (slug) {
         routes.push(`/blog/${slug}`)
-      } else if (blogId) {
-        routes.push(`/blog/${blogId}`)
+      } else if (docId) {
+        routes.push(`/blog/${docId}`) // 这里的 docId 确保了即使没有 slug 也能访问
       }
     })
 
-    console.log('成功全自动生成以下动态 SEO 路由:', routes)
     return routes
 
   } catch (error) {
-    console.error('动态站点地图生成失败，可能是后端正在休眠或字段错乱:', error)
+    console.error('动态站点地图生成异常:', error)
     return []
   }
 })
