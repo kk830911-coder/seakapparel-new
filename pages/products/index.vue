@@ -34,7 +34,7 @@
         </NuxtLink>
 
         <div class="p-1 flex-1 flex flex-col justify-between">
-          <!-- 单独给标题设置左右 5px 内边距 -->
+          <!-- 标题左右5px间距 -->
           <div class="px-[5px]">
             <NuxtLink
               :to="`/products/${item.documentId || item.attributes?.documentId || item.id}`"
@@ -46,9 +46,10 @@
           </div>
 
           <div class="mt-4">
+            <!-- 价格左5px / 起批量右5px -->
             <div class="flex justify-between text-sm mb-3">
-              <span class="text-red-600 text-lg font-bold">¥{{ item.price || item.attributes?.price }}</span>
-              <span class="text-gray-500 self-center">MOQ: {{ item.moq || item.attributes?.moq || 10 }} pcs</span>
+              <span class="text-red-600 text-lg font-bold pl-[5px]">¥{{ item.price || item.attributes?.price }}</span>
+              <span class="text-gray-500 self-center pr-[5px]">MOQ: {{ item.moq || item.attributes?.moq || 10 }} pcs</span>
             </div>
 
             <NuxtLink
