@@ -67,16 +67,22 @@ onUnmounted(() => stopPlay())
         </div>
       </div>
 
-      <!-- 左右切换箭头 -->
+      <!-- 左右切换箭头：背景改为半透明紫色 -->
       <button 
         @click="prevSlide"
-        class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/30 hover:bg-white/60 flex items-center justify-center text-white text-xl"
+        class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-white text-xl transition-colors"
+        style="background-color: rgba(157, 37, 218, 0.4);"
+        @mouseover="$event.target.style.backgroundColor='rgba(157, 37, 218, 0.7)'"
+        @mouseout="$event.target.style.backgroundColor='rgba(157, 37, 218, 0.4)'"
       >
         ‹
       </button>
       <button 
         @click="nextSlide"
-        class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/30 hover:bg-white/60 flex items-center justify-center text-white text-xl"
+        class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-white text-xl transition-colors"
+        style="background-color: rgba(157, 37, 218, 0.4);"
+        @mouseover="$event.target.style.backgroundColor='rgba(157, 37, 218, 0.7)'"
+        @mouseout="$event.target.style.backgroundColor='rgba(157, 37, 218, 0.4)'"
       >
         ›
       </button>
@@ -93,8 +99,8 @@ onUnmounted(() => stopPlay())
       </div>
     </section>
 
-    <!-- 轮播下方文字按钮区块，样式完全沿用原来首屏横幅样式 -->
-    <section class="bg-slate-900 text-white py-20 px-6 text-center">
+    <!-- 轮播下方文字按钮区块，背景色改为 #9d25da -->
+    <section class="text-white py-20 px-6 text-center" style="background-color: #9d25da;">
       <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold mb-4">Southeast Asia Women's Apparel Wholesale</h1>
       <p class="text-gray-300 max-w-2xl mx-auto mb-8 text-lg">Factory Direct Supply | Low MOQ | OEM & ODM Custom Service</p>
       <NuxtLink 
