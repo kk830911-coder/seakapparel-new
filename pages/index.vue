@@ -141,8 +141,26 @@ onUnmounted(() => stopPlay())
       </NuxtLink>
     </section>
 
-    <!-- 工厂介绍板块 卡片容器 -->
+    <!-- 三大优势区块 移到工厂介绍上方，宽度和工厂版块统一max-w-[1400px] -->
     <section class="max-w-[1400px] mx-auto px-4 py-16">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow">
+          <h3 class="text-xl font-bold text-blue-600 mb-2">Low MOQ Support</h3>
+          <p class="text-gray-600">Small batch order available for Southeast Asia shop owners & online sellers.</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow">
+          <h3 class="text-xl font-bold text-blue-600 mb-2">Custom OEM/ODM</h3>
+          <p class="text-gray-600">Custom fabric, label, print & packing per buyer’s requirement.</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow">
+          <h3 class="text-xl font-bold text-blue-600 mb-2">Fast Shipment</h3>
+          <p class="text-gray-600">Stable logistics to Malaysia, Thailand, Indonesia, Philippines & Vietnam.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 工厂介绍板块 卡片容器 -->
+    <section class="max-w-[1400px] mx-auto px-4 pb-16">
       <div class="bg-white rounded-xl shadow-lg p-6 md:p-10">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           <!-- 左侧：缩小单行标题 + 工厂图 + 联系方式模块 -->
@@ -402,22 +420,6 @@ onUnmounted(() => stopPlay())
             <p class="text-gray-500 text-sm">Confirm receipt<br>Perfect after-sales</p>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- 三大优势区块 原样保留 -->
-    <section class="max-w-7xl mx-auto px-4 py-16 grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-white p-6 rounded-xl shadow">
-        <h3 class="text-xl font-bold text-blue-600 mb-2">Low MOQ Support</h3>
-        <p class="text-gray-600">Small batch order available for Southeast Asia shop owners & online sellers.</p>
-      </div>
-      <div class="bg-white p-6 rounded-xl shadow">
-        <h3 class="text-xl font-bold text-blue-600 mb-2">Custom OEM/ODM</h3>
-        <p class="text-gray-600">Custom fabric, label, print & packing per buyer’s requirement.</p>
-      </div>
-      <div class="bg-white p-6 rounded-xl shadow">
-        <h3 class="text-xl font-bold text-blue-600 mb-2">Fast Shipment</h3>
-        <p class="text-gray-600">Stable logistics to Malaysia, Thailand, Indonesia, Philippines & Vietnam.</p>
       </div>
     </section>
   </div>
