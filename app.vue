@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useHead } from '#imports'
 
+// 1. 全局 SEO 头信息设置（提升谷歌收录和社交卡片分享）
 useHead({
   title: "Southeast Asia Women's Apparel Wholesale | SeakApparel",
   meta: [
@@ -13,6 +14,7 @@ useHead({
       name: 'keywords', 
       content: 'women clothing wholesale, apparel supplier southeast asia, clothing factory, clothing vendor Malaysia, custom clothing manufacturing' 
     },
+    // Open Graph (用于 WhatsApp, Facebook 等社交软件分享时显示漂亮卡片)
     { property: 'og:title', content: "Southeast Asia Women's Apparel Wholesale | SeakApparel" },
     { property: 'og:description', content: 'Factory direct supply, low MOQ, and professional OEM/ODM services for Southeast Asia fashion buyers.' },
     { property: 'og:image', content: 'https://www.seakapparel.com/og-image.jpg' }
@@ -22,9 +24,16 @@ useHead({
   ]
 })
 
+// 2. 移动端移动导航菜单状态控制
 const isMenuOpen = ref(false)
+
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value
+}
+
+// 返回顶部
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 </script>
 
@@ -110,6 +119,52 @@ const toggleMenu = () => {
         </div>
       </div>
     </footer>
+
+    <!-- 右侧悬浮固定工具栏 -->
+    <div class="fixed right-4 bottom-6 flex flex-col gap-3 z-[999]">
+      <!-- WhatsApp -->
+      <a 
+        href="https://wa.me/8618271971983" 
+        target="_blank"
+        class="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition hover:scale-110"
+        style="background-color:#25D366;"
+      >
+        <svg width="24" height="24" fill="#fff" viewBox="0 0 24 24">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471.145-.575.297-.101.15-.39.54-.72 1.09-.134.212-.249.227-.46.082-.16-.074-.729-.27-1.393-.866-.515-.462-.862-1.029-.968-1.248-.099-.21.01-.325.083-.46.075-.134.15-.247.299-.492.099-.168.049-.312-.024-.439-.075-.126-.67-1.611-.916-2.206-.242-.59-.487-.511-.67-.52-.16-.008-.341-.01-.52-.01-.18 0-.47.07-.719.347-.248.277-.944.92-1.433 1.798-.49.878-.49 1.933.028 3.774.52 1.84 1.56 3.582 2.994 4.828 1.433 1.247 3.174 1.943 4.919 2.429.64.14 1.225.227 1.655.273.695.086 1.331.074 1.843-.04 1.05-.23 3.393-1.324 3.896-2.61.503-1.287.503-2.399.354-2.61-.149-.21-.54-.339-1.13-.59zm-4.92 6.53c-1.635 0-3.24-.437-4.64-1.266l-.33-.195-1.156.304.31-1.127-.214-.341c-.87-1.402-1.333-3.024-1.333-4.682 0-5.733 4.667-10.4 10.4-10.4 5.733 0 10.4 4.667 10.4 10.4 0 5.733-4.667 10.4-10.4 10.4z"/>
+        </svg>
+      </a>
+      <!-- Facebook -->
+      <a 
+        href="https://facebook.com/SeakApparel" 
+        target="_blank"
+        class="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition hover:scale-110"
+        style="background-color:#1877F2;"
+      >
+        <svg width="24" height="24" fill="#fff" viewBox="0 0 24 24">
+          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+        </svg>
+      </a>
+      <!-- 返回首页 -->
+      <NuxtLink 
+        to="/"
+        class="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition hover:scale-110"
+        style="background-color:#9d25da;"
+      >
+        <svg width="24" height="24" fill="#fff" viewBox="0 0 24 24">
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+        </svg>
+      </NuxtLink>
+      <!-- 返回顶部 -->
+      <button 
+        @click="scrollToTop"
+        class="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition hover:scale-110"
+        style="background-color:#ff8c28;"
+      >
+        <svg width="24" height="24" fill="#fff" viewBox="0 0 24 24">
+          <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/>
+        </svg>
+      </button>
+    </div>
   </div>
 </template>
 
