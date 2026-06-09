@@ -1,11 +1,11 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 useHead({
   title: 'SeakApparel | Southeast Asia Women Clothing Wholesale'
 })
 
-// 轮播图片数组，替换成你public/banner里真实图片文件名
+// 轮播图片数组
 const bannerList = ref([
   '/banner/banner1.jpg',
   '/banner/banner2.jpg',
@@ -37,19 +37,37 @@ const switchSlide = (idx) => {
   autoPlay()
 }
 
-// 热销产品模拟数据
-const hotProducts = ref([
-  { id: 1, title: 'Summer Short Dress', img: '/banner/banner1.jpg', price: 12.8 },
-  { id: 2, title: 'Casual Blouse', img: '/banner/banner2.jpg', price: 9.9 },
-  { id: 3, title: 'High Waist Skirt', img: '/banner/banner3.jpg', price: 11.5 },
-  { id: 4, title: 'Long Sleeve Top', img: '/banner/banner1.jpg', price: 10.2 },
-  { id: 5, title: 'Bodycon Mini Dress', img: '/banner/banner2.jpg', price: 13.6 },
-  { id: 6, title: 'Loose Cotton Shirt', img: '/banner/banner3.jpg', price: 8.7 },
-  { id: 7, title: 'Printed Maxi Dress', img: '/banner/banner1.jpg', price: 14.2 },
-  { id: 8, title: 'Basic Camisole', img: '/banner/banner2.jpg', price: 6.5 },
-])
+// 后台热销产品接口，取8个商品
+const hotProducts = ref([])
+const hotLoading = ref(false)
+const getHotProducts = async () => {
+  hotLoading.value = true
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
+  try {
+    // 拉取8条产品，完整关联图片
+    const res = await $fetch(`${strapiUrl}/api/products?populate=image&pagination[limit]=8`)
+    hotProducts.value = res.data || []
+  } catch (err) {
+    console.error('Hot products fetch error:', err)
+  } finally {
+    hotLoading.value = false
+  }
+}
 
-onMounted(() => autoPlay())
+// 获取图片地址工具函数（和产品列表页逻辑完全一致）
+const getProductImg = (item) => {
+  if (!item) return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
+  if (item.image?.url) return item.image.url
+  if (Array.isArray(item.image) && item.image[0]?.url) return item.image[0].url
+  if (item.attributes?.image?.data?.attributes?.url) return item.attributes.image.data.attributes.url
+  return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
+}
+
+onMounted(() => {
+  autoPlay()
+  getHotProducts()
+})
 onUnmounted(() => stopPlay())
 </script>
 
@@ -231,7 +249,7 @@ onUnmounted(() => stopPlay())
       </div>
     </section>
 
-    <!-- 新增：热销产品推荐版块 2行每行4个，右上角More按钮跳转产品页 -->
+    <!-- 热销产品推荐版块：从后台真实拉取8条，2行每行4个，右上角More按钮跳转产品页 -->
     <section class="max-w-[1400px] mx-auto px-4 pb-16">
       <div class="flex items-center justify-between mb-10">
         <h2 class="text-[clamp(1.8rem,4vw,2.8rem)] font-bold" style="color:#9d25da;">Hot Selling Products</h2>
@@ -247,21 +265,42 @@ onUnmounted(() => stopPlay())
         </NuxtLink>
       </div>
 
-      <!-- 产品网格 桌面4列 2行共8个 -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- 加载状态 -->
+      <div v-if="hotLoading" class="text-center py-16 text-gray-500">
+        Loading hot products...
+      </div>
+
+      <!-- 产品网格 桌面4列 自动2行共8个，和产品列表卡片样式统一 -->
+      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div
           v-for="item in hotProducts"
-          :key="item.id"
-          class="bg-white rounded-xl shadow overflow-hidden flex flex-col"
+          :key="item.documentId || item.id"
+          class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between border border-gray-100"
         >
-          <NuxtLink to="/products" target="_blank" class="aspect-square block overflow-hidden">
-            <img :src="item.img" alt="product" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+          <NuxtLink
+            :to="`/products/${item.documentId || item.id}`"
+            target="_blank"
+            class="aspect-square overflow-hidden block bg-gray-50 relative"
+          >
+            <img
+              :src="getProductImg(item)"
+              alt="product"
+              class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+            />
           </NuxtLink>
+
           <div class="p-4 flex-1 flex flex-col justify-between">
-            <NuxtLink to="/products" target="_blank">
-              <h3 class="text-lg font-medium text-gray-800 line-clamp-1 mb-3">{{ item.title }}</h3>
+            <NuxtLink
+              :to="`/products/${item.documentId || item.id}`"
+              target="_blank"
+              class="block"
+            >
+              <h3 class="text-lg text-gray-800 line-clamp-2 mb-3">{{ item.title }}</h3>
             </NuxtLink>
-            <span class="text-red-600 text-xl font-bold">${{ item.price }}</span>
+            <div class="flex justify-between items-center">
+              <span class="text-red-600 text-xl font-bold">¥{{ item.price }}</span>
+              <span class="text-gray-500 text-sm">MOQ: {{ item.moq || 10 }} pcs</span>
+            </div>
           </div>
         </div>
       </div>
