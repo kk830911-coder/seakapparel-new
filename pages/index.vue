@@ -111,16 +111,16 @@ onUnmounted(() => stopPlay())
       </NuxtLink>
     </section>
 
-    <!-- 工厂介绍板块 卡片容器 完全匹配截图排版 -->
+    <!-- 工厂介绍板块 卡片容器 -->
     <section class="max-w-[1400px] mx-auto px-4 py-16">
       <div class="bg-white rounded-xl shadow-lg p-6 md:p-10">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <!-- 左侧：标题 + 工厂图 + 联系方式模块 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+          <!-- 左侧：缩小单行标题 + 工厂图 + 联系方式模块 -->
           <div class="lg:col-span-3 flex flex-col gap-6">
-            <h2 class="text-[clamp(2rem,4vw,3.2rem)] font-bold text-center" style="color:#9d25da;">Seak Apparel</h2>
+            <h2 class="text-2xl font-bold text-center whitespace-nowrap" style="color:#9d25da;">Seak Apparel</h2>
             <img src="/gongchang.jpg" alt="Seak Apparel Factory Building" class="w-full rounded-md shadow-md">
             <!-- 联系信息卡片 -->
-            <div class="bg-gray-50 p-4 rounded-lg">
+            <div class="bg-gray-50 p-4 rounded-lg mt-auto">
               <h4 class="text-lg font-semibold mb-3 text-gray-800">Contact Information</h4>
               <p class="mb-2">WhatsApp: +86 18271971983</p>
               <p class="mb-4">Email: kk830911@gmail.com</p>
@@ -136,7 +136,7 @@ onUnmounted(() => stopPlay())
           </div>
 
           <!-- 中间主体介绍文字 -->
-          <div class="lg:col-span-6 text-gray-600 text-lg leading-relaxed space-y-6">
+          <div class="lg:col-span-6 text-gray-600 text-lg leading-relaxed space-y-6 flex flex-col justify-center">
             <p>
               <span class="font-bold" style="color:#9d25da;">Hubei Seak Apparel Co., Ltd.</span> is a women's wear intelligent manufacturing enterprise integrating R&D design, flexible production and cross-border e-commerce operation. We provide full-process ODM/OEM clothing services, including European & American fast fashion development, women's clothing processing and FOB label production. Our product line covers women's dresses, cotton coats, down jackets, skirts, blouses, jumpsuits and all other categories.
             </p>
@@ -145,15 +145,10 @@ onUnmounted(() => stopPlay())
             </p>
           </div>
 
-          <!-- 右侧两段文字 -->
-          <div class="lg:col-span-3 text-gray-600 text-lg leading-relaxed flex flex-col justify-between h-full">
-            <div>
-              <p class="mb-8">
-                Our factory is located in Xiantao City, Hubei Province. We own a 5000m² intelligent workshop and 1000m² standard warehouse, equipped with more than 50 imported machines and digital pattern rooms. Our professional team of over 100 staff strictly follows ISO quality standards. Adhering to the philosophy of "Quality First, Customer Supreme", we realize efficient conversion between fashion trends and consumer demands through precise market research and flexible production systems.
-              </p>
-            </div>
-            <p class="font-medium" style="color:#9d25da;">
-              Global buyers are warmly invited to visit our factory for on-site inspection. Let’s explore ODM development and cross-border supply chain cooperation together.
+          <!-- 右侧文字，已删除底部紫色邀约段落 -->
+          <div class="lg:col-span-3 text-gray-600 text-lg leading-relaxed flex flex-col justify-center">
+            <p>
+              Our factory is located in Xiantao City, Hubei Province. We own a 5000m² intelligent workshop and 1000m² standard warehouse, equipped with more than 50 imported machines and digital pattern rooms. Our professional team of over 100 staff strictly follows ISO quality standards. Adhering to the philosophy of "Quality First, Customer Supreme", we realize efficient conversion between fashion trends and consumer demands through precise market research and flexible production systems.
             </p>
           </div>
         </div>
