@@ -33,21 +33,20 @@
           />
         </NuxtLink>
 
-        <div class="p-0.5 flex-1 flex flex-col justify-between">
+        <!-- 整体内容区域改为 p-px = 1px 内边距，避免内容贴边 -->
+        <div class="p-px flex-1 flex flex-col justify-between">
           <div>
             <NuxtLink
               :to="`/products/${item.documentId || item.attributes?.documentId || item.id}`"
               target="_blank"
               class="block"
             >
-              <!-- 字号缩小：text-lg 改为 text-base -->
               <h3 class="text-base text-gray-800 line-clamp-2">{{ item.title || item.attributes?.title }}</h3>
             </NuxtLink>
           </div>
 
           <div class="mt-4">
             <div class="flex justify-between text-sm mb-3">
-              <!-- 价格增加 font-bold 加粗 -->
               <span class="text-red-600 text-lg font-bold">¥{{ item.price || item.attributes?.price }}</span>
               <span class="text-gray-500 self-center">MOQ: {{ item.moq || item.attributes?.moq || 10 }} pcs</span>
             </div>
