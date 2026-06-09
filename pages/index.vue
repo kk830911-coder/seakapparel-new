@@ -145,12 +145,76 @@ onUnmounted(() => stopPlay())
             </p>
           </div>
 
-          <!-- 右侧文字，已删除底部紫色邀约段落 -->
+          <!-- 右侧文字 -->
           <div class="lg:col-span-3 text-gray-600 text-lg leading-relaxed flex flex-col justify-center">
             <p>
               Our factory is located in Xiantao City, Hubei Province. We own a 5000m² intelligent workshop and 1000m² standard warehouse, equipped with more than 50 imported machines and digital pattern rooms. Our professional team of over 100 staff strictly follows ISO quality standards. Adhering to the philosophy of "Quality First, Customer Supreme", we realize efficient conversion between fashion trends and consumer demands through precise market research and flexible production systems.
             </p>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 新增：源头工厂实景展示区域 完全匹配图片布局 英文翻译 -->
+    <section class="max-w-[1400px] mx-auto px-4 pb-16">
+      <div class="text-center mb-10">
+        <h2 class="text-[clamp(2.2rem,5vw,3.8rem)] font-bold" style="color:#9d25da;">Source Factory / On-site Display</h2>
+        <div class="w-40 h-[2px] mx-auto mt-3 mb-4" style="background-color:#9d25da;"></div>
+        <p class="text-gray-500 text-lg">Direct factory supply, bulk order discount, one-stop service, 24-hour thoughtful support</p>
+      </div>
+
+      <!-- 第一行6宫格 -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div class="relative overflow-hidden rounded-lg">
+          <img src="/gongchang_02.jpg" alt="Source Factory" class="w-full h-64 object-cover">
+          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Source Factory</div>
+        </div>
+        <div class="relative overflow-hidden rounded-lg">
+          <img src="/gongchang_02.jpg" alt="Design & Sample Making" class="w-full h-64 object-cover">
+          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Design & Sample Making</div>
+        </div>
+        <div class="relative overflow-hidden rounded-lg">
+          <img src="/gongchang_02.jpg" alt="Ironing Area" class="w-full h-64 object-cover">
+          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Ironing Zone</div>
+        </div>
+        <div class="relative overflow-hidden rounded-lg">
+          <img src="/gongchang_02.jpg" alt="Cutting Area" class="w-full h-64 object-cover">
+          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Cutting Workshop</div>
+        </div>
+        <div class="relative overflow-hidden rounded-lg">
+          <img src="/gongchang_02.jpg" alt="Sewing Workshop" class="w-full h-64 object-cover">
+          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Sewing Workshop</div>
+        </div>
+        <div class="relative overflow-hidden rounded-lg">
+          <img src="/gongchang_02.jpg" alt="Packaging Area" class="w-full h-64 object-cover">
+          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Final Packaging</div>
+        </div>
+      </div>
+
+      <!-- 第二行通栏大图 -->
+      <div class="relative overflow-hidden rounded-lg mb-4">
+        <img src="/gongchang_04.jpg" alt="5000+ Production Workshop" class="w-full h-80 object-cover">
+        <div class="absolute top-6 left-1/2 -translate-x-1/2 py-2 px-6 text-center text-white font-bold text-xl" style="background-color:rgba(157, 37, 218, 0.9)">
+          5000㎡+ Production Workshop<br>
+          <span class="text-base font-normal">Carefully handle every production process</span>
+        </div>
+      </div>
+
+      <!-- 第三行3宫格 -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="relative overflow-hidden rounded-lg">
+          <img src="/gongchang_02.jpg" alt="Warehouse Corner" class="w-full h-64 object-cover">
+          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Warehouse Corner</div>
+        </div>
+        <!-- 中间紫色文字块 -->
+        <div class="rounded-lg flex items-center justify-center text-white text-center p-8" style="background-color:#9d25da;">
+          <div>
+            <p class="text-5xl font-bold leading-tight">Full Real-shot<br>Factory Visit Welcome</p>
+          </div>
+        </div>
+        <div class="relative overflow-hidden rounded-lg">
+          <img src="/gongchang_02.jpg" alt="Warehouse Corner" class="w-full h-64 object-cover">
+          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Warehouse Corner</div>
         </div>
       </div>
     </section>
