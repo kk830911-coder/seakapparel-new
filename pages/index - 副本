@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 useHead({
   title: 'SeakApparel | Southeast Asia Women Clothing Wholesale'
@@ -36,18 +36,6 @@ const switchSlide = (idx) => {
   currentIndex.value = idx
   autoPlay()
 }
-
-// 热销产品模拟数据
-const hotProducts = ref([
-  { id: 1, title: 'Summer Short Dress', img: '/banner/banner1.jpg', price: 12.8 },
-  { id: 2, title: 'Casual Blouse', img: '/banner/banner2.jpg', price: 9.9 },
-  { id: 3, title: 'High Waist Skirt', img: '/banner/banner3.jpg', price: 11.5 },
-  { id: 4, title: 'Long Sleeve Top', img: '/banner/banner1.jpg', price: 10.2 },
-  { id: 5, title: 'Bodycon Mini Dress', img: '/banner/banner2.jpg', price: 13.6 },
-  { id: 6, title: 'Loose Cotton Shirt', img: '/banner/banner3.jpg', price: 8.7 },
-  { id: 7, title: 'Printed Maxi Dress', img: '/banner/banner1.jpg', price: 14.2 },
-  { id: 8, title: 'Basic Camisole', img: '/banner/banner2.jpg', price: 6.5 },
-])
 
 onMounted(() => autoPlay())
 onUnmounted(() => stopPlay())
@@ -227,42 +215,6 @@ onUnmounted(() => stopPlay())
         <div class="relative overflow-hidden rounded-lg">
           <img src="/gongchang_09.jpg" alt="Warehouse Corner" class="w-full h-64 object-cover">
           <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Warehouse Corner</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 新增：热销产品推荐版块 2行每行4个，右上角More按钮跳转产品页 -->
-    <section class="max-w-[1400px] mx-auto px-4 pb-16">
-      <div class="flex items-center justify-between mb-10">
-        <h2 class="text-[clamp(1.8rem,4vw,2.8rem)] font-bold" style="color:#9d25da;">Hot Selling Products</h2>
-        <NuxtLink
-          to="/products"
-          target="_blank"
-          class="px-6 py-2 rounded-lg border-2 font-medium transition-colors hover:text-white"
-          style="border-color:#9d25da; color:#9d25da;"
-          @mouseover="$event.target.style.backgroundColor='#9d25da'"
-          @mouseout="$event.target.style.backgroundColor='transparent'"
-        >
-          More &rsaquo;
-        </NuxtLink>
-      </div>
-
-      <!-- 产品网格 桌面4列 2行共8个 -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div
-          v-for="item in hotProducts"
-          :key="item.id"
-          class="bg-white rounded-xl shadow overflow-hidden flex flex-col"
-        >
-          <NuxtLink to="/products" target="_blank" class="aspect-square block overflow-hidden">
-            <img :src="item.img" alt="product" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-          </NuxtLink>
-          <div class="p-4 flex-1 flex flex-col justify-between">
-            <NuxtLink to="/products" target="_blank">
-              <h3 class="text-lg font-medium text-gray-800 line-clamp-1 mb-3">{{ item.title }}</h3>
-            </NuxtLink>
-            <span class="text-red-600 text-xl font-bold">${{ item.price }}</span>
-          </div>
         </div>
       </div>
     </section>
