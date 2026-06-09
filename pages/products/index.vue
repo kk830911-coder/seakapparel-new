@@ -33,8 +33,8 @@
           />
         </NuxtLink>
 
-        <!-- 整体内容区域改为 p-px = 1px 内边距，避免内容贴边 -->
-        <div class="p-px flex-1 flex flex-col justify-between">
+        <!-- p-0.5 = 2px 上下左右内边距，文字不会贴边 -->
+        <div class="p-0.5 flex-1 flex flex-col justify-between">
           <div>
             <NuxtLink
               :to="`/products/${item.documentId || item.attributes?.documentId || item.id}`"
