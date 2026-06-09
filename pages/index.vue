@@ -58,7 +58,6 @@ onUnmounted(() => stopPlay())
           :key="img" 
           class="relative min-w-full h-[calc(100vw*750/1920)] max-h-[750px]"
         >
-          <!-- 1920宽750高图片自适应，不变形裁切 -->
           <img 
             :src="img" 
             alt="SeakApparel Wholesale Banner" 
@@ -67,7 +66,7 @@ onUnmounted(() => stopPlay())
         </div>
       </div>
 
-      <!-- 左右切换箭头：背景改为半透明紫色 -->
+      <!-- 左右切换箭头：半透明紫色 -->
       <button 
         @click="prevSlide"
         class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-white text-xl transition-colors"
@@ -105,39 +104,30 @@ onUnmounted(() => stopPlay())
       <p class="text-gray-300 max-w-2xl mx-auto mb-8 text-lg">Factory Direct Supply | Low MOQ | OEM & ODM Custom Service</p>
       <NuxtLink 
         to="/products" 
+        target="_blank"
         class="inline-block bg-[#ff4000] hover:bg-[#e03800] px-7 py-3 rounded-lg font-medium transition-colors"
       >
         Browse All Products
       </NuxtLink>
     </section>
 
-    <!-- 工厂介绍板块 外层卡片容器、全英文、新增联系方式按钮 -->
+    <!-- 工厂介绍板块 卡片容器 完全匹配截图排版 -->
     <section class="max-w-[1400px] mx-auto px-4 py-16">
       <div class="bg-white rounded-xl shadow-lg p-6 md:p-10">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <!-- 左侧图片+标题 -->
-          <div class="lg:col-span-3 text-center">
-            <h2 class="text-[clamp(2rem,4vw,3.2rem)] font-bold mb-6" style="color:#9d25da;">Seak Apparel</h2>
+          <!-- 左侧：标题 + 工厂图 + 联系方式模块 -->
+          <div class="lg:col-span-3 flex flex-col gap-6">
+            <h2 class="text-[clamp(2rem,4vw,3.2rem)] font-bold text-center" style="color:#9d25da;">Seak Apparel</h2>
             <img src="/gongchang.jpg" alt="Seak Apparel Factory Building" class="w-full rounded-md shadow-md">
-          </div>
-
-          <!-- 中间文字 + 新增联系方式区域（箭头指向位置） -->
-          <div class="lg:col-span-6 text-gray-600 text-lg leading-relaxed space-y-6">
-            <p>
-              <span class="font-bold" style="color:#9d25da;">Hubei Seak Apparel Co., Ltd.</span> is a women's wear intelligent manufacturing enterprise integrating R&D design, flexible production and cross-border e-commerce operation. We provide full-process ODM/OEM clothing services, including European & American fast fashion development, women's clothing processing and FOB label production. Our product line covers women's dresses, cotton coats, down jackets, skirts, blouses, jumpsuits and all other categories.
-            </p>
-            <p>
-              Supported by an intelligent supply chain system, we launch over 30 new styles weekly. We support custom design based on pictures, small-batch quick orders and cross-border e-commerce dropshipping. We deeply cooperate with mainstream platforms including Amazon, SHEIN, TikTok and Temu. Our markets cover more than 60 countries in Europe, America, Japan, South Korea, the Middle East and key domestic regions, supporting two service modes: ready goods direct delivery and sample custom production.
-            </p>
-
-            <!-- 新增联系方式区域 -->
-            <div class="mt-8 p-4 rounded-lg bg-gray-50 border border-gray-100">
-              <p class="font-semibold mb-2 text-gray-700">Contact Information</p>
-              <p class="mb-1">WhatsApp: +86 18271971983</p>
+            <!-- 联系信息卡片 -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h4 class="text-lg font-semibold mb-3 text-gray-800">Contact Information</h4>
+              <p class="mb-2">WhatsApp: +86 18271971983</p>
               <p class="mb-4">Email: kk830911@gmail.com</p>
               <NuxtLink
                 to="/contact"
-                class="inline-block px-5 py-2 rounded-lg text-white font-medium transition-colors"
+                target="_blank"
+                class="inline-block px-5 py-2 rounded-lg text-white font-medium w-full text-center"
                 style="background-color:#9d25da;"
               >
                 Contact Us
@@ -145,11 +135,23 @@ onUnmounted(() => stopPlay())
             </div>
           </div>
 
-          <!-- 右侧文字段落 -->
-          <div class="lg:col-span-3 text-gray-600 text-lg leading-relaxed space-y-6">
+          <!-- 中间主体介绍文字 -->
+          <div class="lg:col-span-6 text-gray-600 text-lg leading-relaxed space-y-6">
             <p>
-              Our factory is located in Xiantao City, Hubei Province. We own a 5000m² intelligent workshop and 1000m² standard warehouse, equipped with more than 50 imported machines and digital pattern rooms. Our professional team of over 100 staff strictly follows ISO quality standards. Adhering to the philosophy of "Quality First, Customer Supreme", we realize efficient conversion between fashion trends and consumer demands through precise market research and flexible production systems.
+              <span class="font-bold" style="color:#9d25da;">Hubei Seak Apparel Co., Ltd.</span> is a women's wear intelligent manufacturing enterprise integrating R&D design, flexible production and cross-border e-commerce operation. We provide full-process ODM/OEM clothing services, including European & American fast fashion development, women's clothing processing and FOB label production. Our product line covers women's dresses, cotton coats, down jackets, skirts, blouses, jumpsuits and all other categories.
             </p>
+            <p>
+              Supported by an intelligent supply chain system, we launch over 30 new styles weekly. We support custom design based on pictures, small-batch quick orders and cross-border e-commerce dropshipping. We deeply cooperate with mainstream platforms including Amazon, SHEIN, TikTok and Temu. Our markets cover more than 60 countries in Europe, America, Japan, South Korea, the Middle East and key domestic regions, supporting two service modes: ready goods direct delivery and sample custom production.
+            </p>
+          </div>
+
+          <!-- 右侧两段文字 -->
+          <div class="lg:col-span-3 text-gray-600 text-lg leading-relaxed flex flex-col justify-between h-full">
+            <div>
+              <p class="mb-8">
+                Our factory is located in Xiantao City, Hubei Province. We own a 5000m² intelligent workshop and 1000m² standard warehouse, equipped with more than 50 imported machines and digital pattern rooms. Our professional team of over 100 staff strictly follows ISO quality standards. Adhering to the philosophy of "Quality First, Customer Supreme", we realize efficient conversion between fashion trends and consumer demands through precise market research and flexible production systems.
+              </p>
+            </div>
             <p class="font-medium" style="color:#9d25da;">
               Global buyers are warmly invited to visit our factory for on-site inspection. Let’s explore ODM development and cross-border supply chain cooperation together.
             </p>
@@ -158,7 +160,7 @@ onUnmounted(() => stopPlay())
       </div>
     </section>
 
-    <!-- 三大优势区块 完全保留原样 -->
+    <!-- 三大优势区块 原样保留 -->
     <section class="max-w-7xl mx-auto px-4 py-16 grid grid-cols-1 md:grid-cols-3 gap-6">
       <div class="bg-white p-6 rounded-xl shadow">
         <h3 class="text-xl font-bold text-blue-600 mb-2">Low MOQ Support</h3>
