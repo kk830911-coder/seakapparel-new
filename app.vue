@@ -34,22 +34,23 @@ const toggleMenu = () => {
 
 <template>
   <div class="bg-gray-50 min-h-screen flex flex-col font-sans">
-    <header class="bg-white shadow-sm sticky top-0 z-50">
+    <!-- 导航栏改为紫色背景，文字白色，激活链接橙色 -->
+    <header class="shadow-sm sticky top-0 z-50" style="background-color: #9d25da;">
       <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between relative">
-        <NuxtLink to="/" class="text-2xl font-bold tracking-wide text-slate-800">Seak-Apparel</NuxtLink>
+        <NuxtLink to="/" class="text-2xl font-bold tracking-wide text-white">Seak-Apparel</NuxtLink>
         
-        <nav class="hidden md:flex gap-8 font-medium text-gray-600">
-          <NuxtLink to="/" active-class="text-blue-600">Home</NuxtLink>
-          <NuxtLink to="/products" active-class="text-blue-600">Products</NuxtLink>
-          <NuxtLink to="/blog" active-class="text-blue-600">Blog</NuxtLink>
-          <NuxtLink to="/faq" active-class="text-blue-600">FAQ</NuxtLink>
-          <NuxtLink to="/about" active-class="text-blue-600">About Us</NuxtLink>
-          <NuxtLink to="/contact" active-class="text-blue-600">Contact</NuxtLink>
+        <nav class="hidden md:flex gap-8 font-medium text-white">
+          <NuxtLink to="/" active-class="text-orange-500">Home</NuxtLink>
+          <NuxtLink to="/products" active-class="text-orange-500">Products</NuxtLink>
+          <NuxtLink to="/blog" active-class="text-orange-500">Blog</NuxtLink>
+          <NuxtLink to="/faq" active-class="text-orange-500">FAQ</NuxtLink>
+          <NuxtLink to="/about" active-class="text-orange-500">About Us</NuxtLink>
+          <NuxtLink to="/contact" active-class="text-orange-500">Contact</NuxtLink>
         </nav>
 
         <button 
           @click="toggleMenu" 
-          class="md:hidden p-2 rounded-md text-gray-600 hover:text-blue-600 hover:bg-gray-100 focus:outline-none transition-colors"
+          class="md:hidden p-2 rounded-md text-white hover:text-orange-500 hover:bg-white/10 focus:outline-none transition-colors"
           aria-label="Toggle Menu"
         >
           <svg v-if="!isMenuOpen" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -68,16 +69,18 @@ const toggleMenu = () => {
           leave-from-class="opacity-100 translate-y-0"
           leave-to-class="opacity-0 -translate-y-2"
         >
+          <!-- 移动端下拉菜单紫色背景、白色文字、激活橙色 -->
           <nav 
             v-if="isMenuOpen" 
-            class="absolute top-16 left-0 w-full bg-white border-b border-gray-200 shadow-lg py-4 px-6 flex flex-col gap-4 md:hidden z-50 font-medium text-gray-700"
+            class="absolute top-16 left-0 w-full border-b shadow-lg py-4 px-6 flex flex-col gap-4 md:hidden z-50 font-medium"
+            style="background-color: #9d25da; border-color: rgba(255,255,255,0.15); color:#fff;"
           >
-            <NuxtLink to="/" active-class="text-blue-600" @click="isMenuOpen = false">Home</NuxtLink>
-            <NuxtLink to="/products" active-class="text-blue-600" @click="isMenuOpen = false">Products</NuxtLink>
-            <NuxtLink to="/blog" active-class="text-blue-600" @click="isMenuOpen = false">Blog</NuxtLink>
-            <NuxtLink to="/faq" active-class="text-blue-600" @click="isMenuOpen = false">FAQ</NuxtLink>
-            <NuxtLink to="/about" active-class="text-blue-600" @click="isMenuOpen = false">About Us</NuxtLink>
-            <NuxtLink to="/contact" active-class="text-blue-600" @click="isMenuOpen = false">Contact</NuxtLink>
+            <NuxtLink to="/" active-class="text-orange-500" @click="isMenuOpen = false">Home</NuxtLink>
+            <NuxtLink to="/products" active-class="text-orange-500" @click="isMenuOpen = false">Products</NuxtLink>
+            <NuxtLink to="/blog" active-class="text-orange-500" @click="isMenuOpen = false">Blog</NuxtLink>
+            <NuxtLink to="/faq" active-class="text-orange-500" @click="isMenuOpen = false">FAQ</NuxtLink>
+            <NuxtLink to="/about" active-class="text-orange-500" @click="isMenuOpen = false">About Us</NuxtLink>
+            <NuxtLink to="/contact" active-class="text-orange-500" @click="isMenuOpen = false">Contact</NuxtLink>
           </nav>
         </transition>
       </div>
@@ -87,9 +90,30 @@ const toggleMenu = () => {
       <NuxtPage />
     </main>
 
-    <footer class="bg-gray-900 text-gray-400 py-8 mt-12">
-      <div class="max-w-7xl mx-auto px-4 text-center text-sm">
-        <p>©2026 seakapparel | Women Clothing Wholesale Supplier For Southeast Asia</p>
+    <!-- 底部改为紫色背景，增加联系方式，文字白色 -->
+    <footer class="py-10 mt-12 text-white" style="background-color: #9d25da;">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 text-sm">
+          <div>
+            <h4 class="text-lg font-semibold mb-3">Seak-Apparel</h4>
+            <p class="opacity-90">Women Clothing Wholesale Supplier For Southeast Asia<br>Professional OEM & ODM Custom Factory</p>
+          </div>
+          <div>
+            <h4 class="text-lg font-semibold mb-3">Contact Information</h4>
+            <p class="opacity-90 mb-2">WhatsApp: +86 18271971983</p>
+            <p class="opacity-90 mb-2">Email: kk830911@gmail.com</p>
+            <p class="opacity-90">Factory Address: Xiantao City, Hubei Province, China</p>
+          </div>
+          <div>
+            <h4 class="text-lg font-semibold mb-3">Service Support</h4>
+            <p class="opacity-90 mb-2">Low MOQ Wholesale</p>
+            <p class="opacity-90 mb-2">Custom Sample & Production</p>
+            <p class="opacity-90">24 Hours Online Service</p>
+          </div>
+        </div>
+        <div class="border-t border-white/20 pt-6 text-center text-sm opacity-80">
+          <p>©2026 seakapparel | All Rights Reserved</p>
+        </div>
       </div>
     </footer>
   </div>
