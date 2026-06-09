@@ -99,7 +99,7 @@ onUnmounted(() => stopPlay())
       </div>
     </section>
 
-    <!-- 轮播下方文字按钮区块，背景色改为 #9d25da -->
+    <!-- 轮播下方紫色文字区块 -->
     <section class="text-white py-20 px-6 text-center" style="background-color: #9d25da;">
       <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold mb-4">Southeast Asia Women's Apparel Wholesale</h1>
       <p class="text-gray-300 max-w-2xl mx-auto mb-8 text-lg">Factory Direct Supply | Low MOQ | OEM & ODM Custom Service</p>
@@ -109,6 +109,35 @@ onUnmounted(() => stopPlay())
       >
         Browse All Products
       </NuxtLink>
+    </section>
+
+    <!-- 新增工厂介绍板块 复刻你提供图片排版布局 -->
+    <section class="max-w-[1400px] mx-auto px-4 py-16">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <!-- 左侧图片+标题 -->
+        <div class="lg:col-span-3 text-center">
+          <h2 class="text-[clamp(2rem,4vw,3.2rem)] font-bold mb-6" style="color:#9d25da;">梵菡服饰</h2>
+          <img src="/gongchang.jpg" alt="湖北梵菡服饰工厂厂房" class="w-full rounded-md shadow-md">
+        </div>
+        <!-- 中间文字段落 -->
+        <div class="lg:col-span-6 text-gray-600 text-lg leading-relaxed space-y-6">
+          <p>
+            <span class="font-bold" style="color:#9d25da;">湖北梵菡服饰有限公司</span>是集研发设计、柔性生产与跨境电商运营于一体的女装智造企业。主营服装ODM/OEM全案服务，涵盖欧美快时尚开发、女装代工及FOB贴牌生产，产品线覆盖女装、棉服、羽绒服、裙装、衬衫、连体衣等全品类。
+          </p>
+          <p>
+            公司依托智能供应链系统实现每周30+新款开发，支持来图定制、小单快反及跨境电商代发，深度对接Amazon、SHEIN、TikTok、Temu等主流平台，市场覆盖欧美、日韩、中东等60余国及国内重点区域，提供现货直发与样衣定制双模式服务。
+          </p>
+        </div>
+        <!-- 右侧文字段落 -->
+        <div class="lg:col-span-3 text-gray-600 text-lg leading-relaxed space-y-6">
+          <p>
+            工厂位于湖北省仙桃市，拥有5000m²智能车间与1000m标准仓储，配置50+进口设备及数字化板房，逾百人专业团队严格执行ISO质量体系。秉承"品质为基、客户至上"理念，通过精准市场洞察与柔性生产系统，实现流行趋势与消费需求的高效转化。
+          </p>
+          <p class="font-medium" style="color:#9d25da;">
+            诚邀全球客商实地考察，共探ODM开发与跨境供应链合作。
+          </p>
+        </div>
+      </div>
     </section>
 
     <!-- 三大优势区块 完全保留原样 -->
