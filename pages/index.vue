@@ -203,7 +203,7 @@ onUnmounted(() => stopPlay())
       <!-- 第三行3宫格 -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="relative overflow-hidden rounded-lg">
-          <img src="/gongchang_02.jpg" alt="Warehouse Corner" class="w-full h-64 object-cover">
+          <img src="/gongchang_08.jpg" alt="Warehouse Corner" class="w-full h-64 object-cover">
           <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Warehouse Corner</div>
         </div>
         <!-- 中间紫色文字块 -->
@@ -213,7 +213,7 @@ onUnmounted(() => stopPlay())
           </div>
         </div>
         <div class="relative overflow-hidden rounded-lg">
-          <img src="/gongchang_02.jpg" alt="Warehouse Corner" class="w-full h-64 object-cover">
+          <img src="/gongchang_09.jpg" alt="Warehouse Corner" class="w-full h-64 object-cover">
           <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Warehouse Corner</div>
         </div>
       </div>
