@@ -166,7 +166,7 @@ onUnmounted(() => stopPlay())
       <!-- 第一行6宫格 -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <div class="relative overflow-hidden rounded-lg">
-          <img src="/gongchang_02.jpg" alt="Source Factory" class="w-full h-64 object-cover">
+          <img src="/gongchang_01.jpg" alt="Source Factory" class="w-full h-64 object-cover">
           <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Source Factory</div>
         </div>
         <div class="relative overflow-hidden rounded-lg">
@@ -174,19 +174,19 @@ onUnmounted(() => stopPlay())
           <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Design & Sample Making</div>
         </div>
         <div class="relative overflow-hidden rounded-lg">
-          <img src="/gongchang_02.jpg" alt="Ironing Area" class="w-full h-64 object-cover">
+          <img src="/gongchang_03.jpg" alt="Ironing Area" class="w-full h-64 object-cover">
           <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Ironing Zone</div>
         </div>
         <div class="relative overflow-hidden rounded-lg">
-          <img src="/gongchang_02.jpg" alt="Cutting Area" class="w-full h-64 object-cover">
+          <img src="/gongchang_04.jpg" alt="Cutting Area" class="w-full h-64 object-cover">
           <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Cutting Workshop</div>
         </div>
         <div class="relative overflow-hidden rounded-lg">
-          <img src="/gongchang_02.jpg" alt="Sewing Workshop" class="w-full h-64 object-cover">
+          <img src="/gongchang_05.jpg" alt="Sewing Workshop" class="w-full h-64 object-cover">
           <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Sewing Workshop</div>
         </div>
         <div class="relative overflow-hidden rounded-lg">
-          <img src="/gongchang_02.jpg" alt="Packaging Area" class="w-full h-64 object-cover">
+          <img src="/gongchang_06.jpg" alt="Packaging Area" class="w-full h-64 object-cover">
           <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Final Packaging</div>
         </div>
       </div>
