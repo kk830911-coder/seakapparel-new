@@ -35,14 +35,14 @@
       Failed to connect backend server. Please refresh.
     </div>
 
-    <div v-else-if="allProducts.length === 0" class="text-center py-20 text-gray-500 bg-gray-50 rounded-xl">
+    <div v-else-if="filteredProducts.length === 0" class="text-center py-20 text-gray-500 bg-gray-50 rounded-xl">
       No products found.
     </div>
 
     <!-- 商品网格，使用筛选后的 filteredProducts -->
     <div v-else class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2">
       <div
-        v-for="item in filteredProducts"
+        v-for="item in pageProducts"
         :key="item.id"
         class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between border border-gray-100"
       >
@@ -123,9 +123,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 
-// 分页配置
+// 分页配置：固定每页12条
 const pageSize = 12
 const currentPage = ref(1)
 
@@ -161,7 +161,7 @@ const totalPage = computed(() => {
   return Math.ceil(list.length / pageSize)
 })
 
-// 当前分页切片
+// 当前分页切片：严格截取 0~12 / 12~24 区间，每页最多12条
 const pageProducts = computed(() => {
   const list = filteredProducts.value
   const start = (currentPage.value - 1) * pageSize
