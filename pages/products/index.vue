@@ -2,6 +2,30 @@
   <div class="max-w-7xl mx-auto px-2 py-12">
     <h1 class="text-3xl font-bold mb-10 border-l-4 border-blue-600 pl-3">All Wholesale Products</h1>
 
+    <!-- 分类筛选栏 -->
+    <div class="flex flex-wrap gap-2 mb-8">
+      <button
+        @click="activeCategoryId = null"
+        :class="[
+          'px-4 py-2 rounded border transition-colors',
+          activeCategoryId === null ? 'bg-[#ff4000] text-white border-[#ff4000]' : 'hover:bg-gray-100'
+        ]"
+      >
+        All
+      </button>
+      <button
+        v-for="cat in categoryList"
+        :key="cat.id"
+        @click="activeCategoryId = cat.id"
+        :class="[
+          'px-4 py-2 rounded border transition-colors',
+          activeCategoryId === cat.id ? 'bg-[#ff4000] text-white border-[#ff4000]' : 'hover:bg-gray-100'
+        ]"
+      >
+        {{ cat.name }}
+      </button>
+    </div>
+
     <div v-if="loading" class="text-center py-20 text-gray-500">
       <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mb-4"></div>
       <p>Loading wholesale products...</p>
@@ -15,9 +39,10 @@
       No products found.
     </div>
 
+    <!-- 商品网格，使用筛选后的 filteredProducts -->
     <div v-else class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2">
       <div
-        v-for="item in pageProducts"
+        v-for="item in filteredProducts"
         :key="item.id"
         class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between border border-gray-100"
       >
@@ -64,6 +89,7 @@
       </div>
     </div>
 
+    <!-- 分页（基于筛选后商品计算） -->
     <div v-if="totalPage > 1" class="flex justify-center items-center gap-3 mt-12">
       <button
         @click="currentPage--"
@@ -99,9 +125,15 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 
+// 分页配置
 const pageSize = 12
 const currentPage = ref(1)
 
+// 分类相关
+const categoryList = ref([])
+const activeCategoryId = ref(null)
+
+// 商品数据
 const responseData = ref(null)
 const loading = ref(true)
 const fetchError = ref(false)
@@ -111,14 +143,27 @@ const allProducts = computed(() => {
   return responseData.value.data
 })
 
-const totalPage = computed(() => {
+// 根据选中分类筛选商品
+const filteredProducts = computed(() => {
   const list = allProducts.value
+  if (activeCategoryId.value === null) return list
+  // 匹配商品关联的分类id（Strapi标准关联字段category.id）
+  return list.filter(item => {
+    const cat = item.category || item.attributes?.category
+    return cat && cat.id === activeCategoryId.value
+  })
+})
+
+// 筛选后商品总页数
+const totalPage = computed(() => {
+  const list = filteredProducts.value
   if (!Array.isArray(list) || list.length === 0) return 0
   return Math.ceil(list.length / pageSize)
 })
 
+// 当前分页切片
 const pageProducts = computed(() => {
-  const list = allProducts.value
+  const list = filteredProducts.value
   const start = (currentPage.value - 1) * pageSize
   const end = start + pageSize
   return list.slice(start, end)
@@ -137,16 +182,27 @@ onMounted(async () => {
   const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
   try {
+    // 1. 获取分类列表
+    const catRes = await $fetch(`${strapiUrl}/api/categories`)
+    categoryList.value = catRes.data || []
+
+    // 2. 获取全部商品（带分类关联 populate=category）
     const res = await $fetch(`${strapiUrl}/api/products?populate=*`)
     console.log('列表页收到的原始数据:', res)
     responseData.value = res
   } catch (err) {
-    console.error('Client fetch products failed:', err)
+    console.error('Fetch failed:', err)
     fetchError.value = true
   } finally {
     loading.value = false
   }
 })
+
+// 切换分类时重置到第一页
+const resetPage = () => {
+  currentPage.value = 1
+}
+watch(activeCategoryId, resetPage)
 
 useHead({
   title: 'All Wholesale Products | Southeast Asia Women\'s Apparel Supplier - SeakApparel',
