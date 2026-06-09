@@ -117,14 +117,14 @@ onUnmounted(() => stopPlay())
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <!-- 左侧图片+标题 -->
           <div class="lg:col-span-3 text-center">
-            <h2 class="text-[clamp(2rem,4vw,3.2rem)] font-bold mb-6" style="color:#9d25da;">Fanhan Apparel</h2>
-            <img src="/gongchang.jpg" alt="Fanhan Apparel Factory Building" class="w-full rounded-md shadow-md">
+            <h2 class="text-[clamp(2rem,4vw,3.2rem)] font-bold mb-6" style="color:#9d25da;">Seak Apparel</h2>
+            <img src="/gongchang.jpg" alt="Seak Apparel Factory Building" class="w-full rounded-md shadow-md">
           </div>
 
           <!-- 中间文字 + 新增联系方式区域（箭头指向位置） -->
           <div class="lg:col-span-6 text-gray-600 text-lg leading-relaxed space-y-6">
             <p>
-              <span class="font-bold" style="color:#9d25da;">Hubei Fanhan Apparel Co., Ltd.</span> is a women's wear intelligent manufacturing enterprise integrating R&D design, flexible production and cross-border e-commerce operation. We provide full-process ODM/OEM clothing services, including European & American fast fashion development, women's clothing processing and FOB label production. Our product line covers women's dresses, cotton coats, down jackets, skirts, blouses, jumpsuits and all other categories.
+              <span class="font-bold" style="color:#9d25da;">Hubei Seak Apparel Co., Ltd.</span> is a women's wear intelligent manufacturing enterprise integrating R&D design, flexible production and cross-border e-commerce operation. We provide full-process ODM/OEM clothing services, including European & American fast fashion development, women's clothing processing and FOB label production. Our product line covers women's dresses, cotton coats, down jackets, skirts, blouses, jumpsuits and all other categories.
             </p>
             <p>
               Supported by an intelligent supply chain system, we launch over 30 new styles weekly. We support custom design based on pictures, small-batch quick orders and cross-border e-commerce dropshipping. We deeply cooperate with mainstream platforms including Amazon, SHEIN, TikTok and Temu. Our markets cover more than 60 countries in Europe, America, Japan, South Korea, the Middle East and key domestic regions, supporting two service modes: ready goods direct delivery and sample custom production.
