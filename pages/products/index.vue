@@ -52,15 +52,13 @@
               <span class="text-gray-500 self-center pr-[5px]">MOQ: {{ item.moq || item.attributes?.moq || 10 }} pcs</span>
             </div>
 
-            <!-- 按钮改为 w-2/3 宽度（三分之二），居中显示 -->
-            <div class="flex justify-center">
-              <NuxtLink
-                :to="`/products/${item.documentId || item.attributes?.documentId || item.id}`"
-                class="w-2/3 bg-slate-800 text-white text-center py-2 rounded hover:bg-slate-700 transition-colors font-medium text-sm"
-              >
-                Check Detail & Inquiry
-              </NuxtLink>
-            </div>
+            <NuxtLink
+              :to="`/products/${item.documentId || item.attributes?.documentId || item.id}`"
+              class="block w-full text-white text-center py-2 rounded transition-colors font-medium text-sm"
+              style="background-color: #ff4000;"
+            >
+              Check Detail & Inquiry
+            </NuxtLink>
           </div>
         </div>
       </div>
