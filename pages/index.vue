@@ -9,7 +9,7 @@ useHead({
 const bannerList = ref([
   '/banner/banner1.jpg',
   '/banner/banner2.jpg',
-  '/banner3.jpg'
+  '/banner/banner3.jpg'
 ])
 const currentIndex = ref(0)
 let timer = null
@@ -93,8 +93,8 @@ onUnmounted(() => stopPlay())
       </div>
     </section>
 
-    <!-- 轮播下方文字按钮区块，背景色改为 #9d25da，其余完全原版样式 -->
-    <section style="background-color: #9d25da;" class="text-white py-20 px-6 text-center">
+    <!-- 轮播下方文字按钮区块，样式完全沿用原来首屏横幅样式 -->
+    <section class="bg-slate-900 text-white py-20 px-6 text-center">
       <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold mb-4">Southeast Asia Women's Apparel Wholesale</h1>
       <p class="text-gray-300 max-w-2xl mx-auto mb-8 text-lg">Factory Direct Supply | Low MOQ | OEM & ODM Custom Service</p>
       <NuxtLink 
