@@ -111,31 +111,49 @@ onUnmounted(() => stopPlay())
       </NuxtLink>
     </section>
 
-    <!-- 新增工厂介绍板块 复刻你提供图片排版布局 -->
+    <!-- 工厂介绍板块 外层卡片容器、全英文、新增联系方式按钮 -->
     <section class="max-w-[1400px] mx-auto px-4 py-16">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        <!-- 左侧图片+标题 -->
-        <div class="lg:col-span-3 text-center">
-          <h2 class="text-[clamp(2rem,4vw,3.2rem)] font-bold mb-6" style="color:#9d25da;">梵菡服饰</h2>
-          <img src="/gongchang.jpg" alt="湖北梵菡服饰工厂厂房" class="w-full rounded-md shadow-md">
-        </div>
-        <!-- 中间文字段落 -->
-        <div class="lg:col-span-6 text-gray-600 text-lg leading-relaxed space-y-6">
-          <p>
-            <span class="font-bold" style="color:#9d25da;">湖北梵菡服饰有限公司</span>是集研发设计、柔性生产与跨境电商运营于一体的女装智造企业。主营服装ODM/OEM全案服务，涵盖欧美快时尚开发、女装代工及FOB贴牌生产，产品线覆盖女装、棉服、羽绒服、裙装、衬衫、连体衣等全品类。
-          </p>
-          <p>
-            公司依托智能供应链系统实现每周30+新款开发，支持来图定制、小单快反及跨境电商代发，深度对接Amazon、SHEIN、TikTok、Temu等主流平台，市场覆盖欧美、日韩、中东等60余国及国内重点区域，提供现货直发与样衣定制双模式服务。
-          </p>
-        </div>
-        <!-- 右侧文字段落 -->
-        <div class="lg:col-span-3 text-gray-600 text-lg leading-relaxed space-y-6">
-          <p>
-            工厂位于湖北省仙桃市，拥有5000m²智能车间与1000m标准仓储，配置50+进口设备及数字化板房，逾百人专业团队严格执行ISO质量体系。秉承"品质为基、客户至上"理念，通过精准市场洞察与柔性生产系统，实现流行趋势与消费需求的高效转化。
-          </p>
-          <p class="font-medium" style="color:#9d25da;">
-            诚邀全球客商实地考察，共探ODM开发与跨境供应链合作。
-          </p>
+      <div class="bg-white rounded-xl shadow-lg p-6 md:p-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <!-- 左侧图片+标题 -->
+          <div class="lg:col-span-3 text-center">
+            <h2 class="text-[clamp(2rem,4vw,3.2rem)] font-bold mb-6" style="color:#9d25da;">Fanhan Apparel</h2>
+            <img src="/gongchang.jpg" alt="Fanhan Apparel Factory Building" class="w-full rounded-md shadow-md">
+          </div>
+
+          <!-- 中间文字 + 新增联系方式区域（箭头指向位置） -->
+          <div class="lg:col-span-6 text-gray-600 text-lg leading-relaxed space-y-6">
+            <p>
+              <span class="font-bold" style="color:#9d25da;">Hubei Fanhan Apparel Co., Ltd.</span> is a women's wear intelligent manufacturing enterprise integrating R&D design, flexible production and cross-border e-commerce operation. We provide full-process ODM/OEM clothing services, including European & American fast fashion development, women's clothing processing and FOB label production. Our product line covers women's dresses, cotton coats, down jackets, skirts, blouses, jumpsuits and all other categories.
+            </p>
+            <p>
+              Supported by an intelligent supply chain system, we launch over 30 new styles weekly. We support custom design based on pictures, small-batch quick orders and cross-border e-commerce dropshipping. We deeply cooperate with mainstream platforms including Amazon, SHEIN, TikTok and Temu. Our markets cover more than 60 countries in Europe, America, Japan, South Korea, the Middle East and key domestic regions, supporting two service modes: ready goods direct delivery and sample custom production.
+            </p>
+
+            <!-- 新增联系方式区域 -->
+            <div class="mt-8 p-4 rounded-lg bg-gray-50 border border-gray-100">
+              <p class="font-semibold mb-2 text-gray-700">Contact Information</p>
+              <p class="mb-1">WhatsApp: +86 18271971983</p>
+              <p class="mb-4">Email: kk830911@gmail.com</p>
+              <NuxtLink
+                to="/contact"
+                class="inline-block px-5 py-2 rounded-lg text-white font-medium transition-colors"
+                style="background-color:#9d25da;"
+              >
+                Contact Us
+              </NuxtLink>
+            </div>
+          </div>
+
+          <!-- 右侧文字段落 -->
+          <div class="lg:col-span-3 text-gray-600 text-lg leading-relaxed space-y-6">
+            <p>
+              Our factory is located in Xiantao City, Hubei Province. We own a 5000m² intelligent workshop and 1000m² standard warehouse, equipped with more than 50 imported machines and digital pattern rooms. Our professional team of over 100 staff strictly follows ISO quality standards. Adhering to the philosophy of "Quality First, Customer Supreme", we realize efficient conversion between fashion trends and consumer demands through precise market research and flexible production systems.
+            </p>
+            <p class="font-medium" style="color:#9d25da;">
+              Global buyers are warmly invited to visit our factory for on-site inspection. Let’s explore ODM development and cross-border supply chain cooperation together.
+            </p>
+          </div>
         </div>
       </div>
     </section>
