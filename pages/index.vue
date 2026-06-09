@@ -56,25 +56,14 @@ onUnmounted(() => stopPlay())
         <div 
           v-for="img in bannerList" 
           :key="img" 
-          class="relative min-w-full h-[calc(100vw*750/1920)] max-h-[750px] flex items-center justify-center"
+          class="relative min-w-full h-[calc(100vw*750/1920)] max-h-[750px]"
         >
           <!-- 1920宽750高图片自适应，不变形裁切 -->
           <img 
             :src="img" 
             alt="SeakApparel Wholesale Banner" 
-            class="absolute w-full h-full object-cover object-center"
+            class="w-full h-full object-cover object-center"
           >
-          <!-- 深色遮罩+文字按钮浮层 -->
-          <div class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white px-6 text-center">
-            <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold mb-4">Southeast Asia Women's Apparel Wholesale</h1>
-            <p class="text-gray-200 max-w-2xl mx-auto mb-8 text-lg">Factory Direct Supply | Low MOQ | OEM & ODM Custom Service</p>
-            <NuxtLink 
-              to="/products" 
-              class="inline-block bg-[#ff4000] hover:bg-[#e03800] px-7 py-3 rounded-lg font-medium transition-colors"
-            >
-              Browse All Products
-            </NuxtLink>
-          </div>
         </div>
       </div>
 
@@ -102,6 +91,18 @@ onUnmounted(() => stopPlay())
           :class="currentIndex === idx ? 'bg-white' : 'bg-white/40'"
         ></button>
       </div>
+    </section>
+
+    <!-- 轮播下方文字按钮区块，样式完全沿用原来首屏横幅样式 -->
+    <section class="bg-slate-900 text-white py-20 px-6 text-center">
+      <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold mb-4">Southeast Asia Women's Apparel Wholesale</h1>
+      <p class="text-gray-300 max-w-2xl mx-auto mb-8 text-lg">Factory Direct Supply | Low MOQ | OEM & ODM Custom Service</p>
+      <NuxtLink 
+        to="/products" 
+        class="inline-block bg-[#ff4000] hover:bg-[#e03800] px-7 py-3 rounded-lg font-medium transition-colors"
+      >
+        Browse All Products
+      </NuxtLink>
     </section>
 
     <!-- 三大优势区块 完全保留原样 -->
