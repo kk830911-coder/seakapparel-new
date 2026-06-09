@@ -193,7 +193,7 @@ onUnmounted(() => stopPlay())
 
       <!-- 第二行通栏大图 -->
       <div class="relative overflow-hidden rounded-lg mb-4">
-        <img src="/gongchang_04.jpg" alt="5000+ Production Workshop" class="w-full h-80 object-cover">
+        <img src="/gongchang_07.jpg" alt="5000+ Production Workshop" class="w-full h-80 object-cover">
         <div class="absolute top-6 left-1/2 -translate-x-1/2 py-2 px-6 text-center text-white font-bold text-xl" style="background-color:rgba(157, 37, 218, 0.9)">
           5000㎡+ Production Workshop<br>
           <span class="text-base font-normal">Carefully handle every production process</span>
