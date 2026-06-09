@@ -33,7 +33,7 @@
           />
         </NuxtLink>
 
-        <!-- p-1 = 4px 上下左右内边距，文字与卡片边缘留出4像素空隙 -->
+        <!-- p-1 = 10px 上下左右内边距，文字与卡片边缘留出10像素空隙 -->
         <div class="p-1 flex-1 flex flex-col justify-between">
           <div>
             <NuxtLink
