@@ -392,7 +392,7 @@ onUnmounted(() => stopPlay())
       </div>
 
       <!-- 产品网格 桌面4列 自动2行共8个，和产品列表卡片样式统一 -->
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div v-else class="grid grid-cols-2 lg:grid-cols-4 gap-6">
         <div
           v-for="item in hotProducts"
           :key="item.documentId || item.id"
