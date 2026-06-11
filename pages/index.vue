@@ -87,20 +87,22 @@ const getThumb300 = (url) => {
 
 // ========== 修复：Cloudinary强制优先avif，叠加f=avif兜底 ==========
 const getOptimizedUrl = (url) => {
-  // 默认兜底图
-  const fallbackImg = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=75&f_auto&f=avif'
+  const fallbackImg = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?f=avif&fl_any_format&w=600&h=600&c_fill&q=75&f_auto'
   if (!url) return fallbackImg
 
-  // 1. Cloudinary云端图片：强制avif，f_auto自动降级webp
   if (url.includes('res.cloudinary.com')) {
-    // 清理原有query参数，避免重复拼接
     const cleanUrl = url.split('?')[0]
-    // 新增 &f=avif 强制优先输出avif格式
-    return `${cleanUrl}?w=600&h=600&c_fill&q=75&f_auto&f=avif`
+    // f=avif置顶 + fl_any_format强制无视原图后缀转换格式
+    return `${cleanUrl}?f=avif&fl_any_format&w=600&h=600&c_fill&q=75&f_auto`
   }
-
-  // 2. Strapi本地存储/项目静态图：交由NuxtImg强制输出avif/webp
   return url
+}
+
+// getThumb300 同步修改
+const getThumb300 = (url) => {
+  if (!url || !url.includes('cloudinary')) return url
+  const cleanUrl = url.split('?')[0]
+  return `${cleanUrl}?f=avif&fl_any_format&w=300&h=300&c_fill&q=75&f_auto`
 }
 
 onMounted(() => {
@@ -415,16 +417,18 @@ onUnmounted(() => stopPlay())
             class="aspect-square overflow-hidden block bg-gray-50 relative"
           >
             <NuxtImg
-              :src="getOptimizedUrl(getRawImageUrl(item))"
-              :srcset="`${getThumb300(getRawImageUrl(item))} 300w, ${getOptimizedUrl(getRawImageUrl(item))} 600w`"
-              sizes="(max-width: 768px) 300px, 600px"
-              format="avif"
-              fallbackFormat="webp"
-              accept="image/avif,image/webp,*/*"
-              alt="product"
-              class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-              loading="lazy"
-            />
+  :src="getOptimizedUrl(getRawImageUrl(item))"
+  :srcset="`${getThumb300(getRawImageUrl(item))} 300w, ${getOptimizedUrl(getRawImageUrl(item))} 600w`"
+  sizes="(max-width: 768px) 300px, 600px"
+  format="avif"
+  fallbackFormat="webp"
+  :headers="{
+    accept: 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'
+  }"
+  alt="product"
+  class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+  loading="lazy"
+/>
           </NuxtLink>
 
           <div class="p-4 flex-1 flex flex-col justify-between">
