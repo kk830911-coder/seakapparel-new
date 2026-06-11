@@ -95,10 +95,10 @@ const renderedDescriptionHtml = computed(() => renderStrapiRichText(product.valu
 // 新增缩略图滚动容器ref、滚动控制函数
 const thumbScrollRef = ref(null)
 const scrollThumbLeft = () => {
-  if (thumbScrollRef.value) thumbScrollRef.value.scrollBy({ left: -260, behavior: 'smooth' })
+  if (thumbScrollRef.value) thumbScrollRef.value.scrollBy({ left: -130, behavior: 'smooth' })
 }
 const scrollThumbRight = () => {
-  if (thumbScrollRef.value) thumbScrollRef.value.scrollBy({ left: 260, behavior: 'smooth' })
+  if (thumbScrollRef.value) thumbScrollRef.value.scrollBy({ left: 130, behavior: 'smooth' })
 }
 </script>
 
@@ -152,7 +152,7 @@ const scrollThumbRight = () => {
             </div>
           </div>
           
-          <!-- 【核心修改区域：固定可视区域，默认只展示3张80px缩略图，容器overflow:hidden彻底消除溢出】 -->
+          <!-- 缩略图区域：尺寸改为w-10 h-10（原w-20一半大小），容器overflow-hidden杜绝页面溢出 -->
           <div v-if="imagesList.length > 1" class="relative flex items-center w-full overflow-hidden">
             <!-- 左滚动箭头 -->
             <button
@@ -165,16 +165,17 @@ const scrollThumbRight = () => {
               </svg>
             </button>
 
-            <!-- 滚动容器：固定可视宽度，padding左右预留箭头空间，overflow-x:auto仅内部滚动，页面无溢出 -->
+            <!-- 滚动容器 -->
             <div 
               ref="thumbScrollRef"
-              class="flex gap-3 overflow-x-auto pb-2 scrollbar-thin pl-10 pr-10 w-full"
+              class="flex gap-2 overflow-x-auto pb-2 scrollbar-thin pl-10 pr-10 w-full"
             >
+              <!-- 核心修改：w-10 h-10 缩略图缩小一半，gap同步缩小为2 -->
               <button
                 v-for="(url, index) in imagesList"
                 :key="index"
                 @click="activeImageIndex = index"
-                class="w-20 h-20 rounded-lg overflow-hidden border-2 bg-gray-50 flex-shrink-0 transition-all"
+                class="w-10 h-10 rounded-lg overflow-hidden border-2 bg-gray-50 flex-shrink-0 transition-all"
                 :class="activeImageIndex === index ? 'border-blue-600 ring-2 ring-blue-100 scale-95' : 'border-gray-200 opacity-70 hover:opacity-100'"
               >
                 <!-- 缩略图替换为NuxtImg -->
