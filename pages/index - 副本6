@@ -168,7 +168,7 @@ onUnmounted(() => stopPlay())
       <NuxtLink
         to="/products"
         target="_blank"
-        class="inline-block bg-[#ff4000] hover:bg-[#e03800] px-7 py-3 rounded-lg font-medium transition-colors text-base tracking-wide"
+        class="inline-block bg-[#ff4000] hover:bg-[#e03800] px-7 py-3 rounded-lg font-medium transition-colors"
       >
         Browse All Products
       </NuxtLink>
@@ -262,7 +262,7 @@ onUnmounted(() => stopPlay())
             class="w-full h-64 object-cover"
             loading="lazy"
           />
-          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium tracking-wider z-10" style="background-color:rgba(157, 37, 218, 0.85)">Source Factory</div>
+          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Source Factory</div>
         </div>
         <div class="relative overflow-hidden rounded-lg">
           <NuxtImg
@@ -273,7 +273,7 @@ onUnmounted(() => stopPlay())
             class="w-full h-64 object-cover"
             loading="lazy"
           />
-          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium tracking-wider z-10" style="background-color:rgba(157, 37, 218, 0.85)">Design & Sample Making</div>
+          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Design & Sample Making</div>
         </div>
         <div class="relative overflow-hidden rounded-lg">
           <NuxtImg
@@ -284,7 +284,7 @@ onUnmounted(() => stopPlay())
             class="w-full h-64 object-cover"
             loading="lazy"
           />
-          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium tracking-wider z-10" style="background-color:rgba(157, 37, 218, 0.85)">Ironing Zone</div>
+          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Ironing Zone</div>
         </div>
         <div class="relative overflow-hidden rounded-lg">
           <NuxtImg
@@ -295,7 +295,7 @@ onUnmounted(() => stopPlay())
             class="w-full h-64 object-cover"
             loading="lazy"
           />
-          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium tracking-wider z-10" style="background-color:rgba(157, 37, 218, 0.85)">Cutting Workshop</div>
+          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Cutting Workshop</div>
         </div>
         <div class="relative overflow-hidden rounded-lg">
           <NuxtImg
@@ -306,7 +306,7 @@ onUnmounted(() => stopPlay())
             class="w-full h-64 object-cover"
             loading="lazy"
           />
-          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium tracking-wider z-10" style="background-color:rgba(157, 37, 218, 0.85)">Sewing Workshop</div>
+          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Sewing Workshop</div>
         </div>
         <div class="relative overflow-hidden rounded-lg">
           <NuxtImg
@@ -317,7 +317,7 @@ onUnmounted(() => stopPlay())
             class="w-full h-64 object-cover"
             loading="lazy"
           />
-          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium tracking-wider z-10" style="background-color:rgba(157, 37, 218, 0.85)">Final Packaging</div>
+          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Final Packaging</div>
         </div>
       </div>
 
@@ -331,7 +331,7 @@ onUnmounted(() => stopPlay())
           class="w-full h-[800px] object-cover"
           loading="lazy"
         />
-        <div class="absolute top-6 left-1/2 -translate-x-1/2 py-2 px-6 text-center text-white font-bold text-xl z-10" style="background-color:rgba(157, 37, 218, 0.9)">
+        <div class="absolute top-6 left-1/2 -translate-x-1/2 py-2 px-6 text-center text-white font-bold text-xl" style="background-color:rgba(157, 37, 218, 0.9)">
           5000㎡+ Production Workshop<br>
           <span class="text-base font-normal">Carefully handle every production process</span>
         </div>
@@ -348,7 +348,7 @@ onUnmounted(() => stopPlay())
             class="w-full h-64 object-cover"
             loading="lazy"
           />
-          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium tracking-wider z-10" style="background-color:rgba(157, 37, 218, 0.85)">Warehouse Corner</div>
+          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Warehouse Corner</div>
         </div>
         <!-- 中间紫色文字块 -->
         <div class="rounded-lg flex items-center justify-center text-white text-center p-8" style="background-color:#9d25da;">
@@ -365,14 +365,14 @@ onUnmounted(() => stopPlay())
             class="w-full h-64 object-cover"
             loading="lazy"
           />
-          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium tracking-wider z-10" style="background-color:rgba(157, 37, 218, 0.85)">Warehouse Corner</div>
+          <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Warehouse Corner</div>
         </div>
       </div>
     </section>
 
-    <!-- 热销产品推荐版块：手机左右边距5px，卡片间距5px，卡片内边距5px -->
-    <section class="max-w-[1400px] mx-auto px-[5px] pb-16">
-      <div class="flex items-center justify-between mb-10 px-[5px]">
+    <!-- 热销产品推荐版块：从后台真实拉取8条，2行每行4个，右上角More按钮跳转产品页 -->
+    <section class="max-w-[1400px] mx-auto px-4 pb-16">
+      <div class="flex items-center justify-between mb-10">
         <h2 class="text-[clamp(1.8rem,4vw,2.8rem)] font-bold" style="color:#9d25da;">Hot Selling Products</h2>
         <NuxtLink
           to="/products"
@@ -391,8 +391,8 @@ onUnmounted(() => stopPlay())
         Loading hot products...
       </div>
 
-      <!-- 手机2列，电脑4列，卡片间隙5px -->
-      <div v-else class="grid grid-cols-2 lg:grid-cols-4 gap-[5px]">
+      <!-- 产品网格 桌面4列 自动2行共8个，和产品列表卡片样式统一 -->
+      <div v-else class="grid grid-cols-2 lg:grid-cols-4 gap-6">
         <div
           v-for="item in hotProducts"
           :key="item.documentId || item.id"
@@ -409,14 +409,13 @@ onUnmounted(() => stopPlay())
               width="600"
               height="600"
               sizes="(max-width: 768px) 300px, 600px"
-              class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
               alt="product"
+              class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
               loading="lazy"
             />
           </NuxtLink>
 
-          <!-- 卡片内部上下左右内边距5px -->
-          <div class="p-[5px] flex-1 flex flex-col justify-between">
+          <div class="p-4 flex-1 flex flex-col justify-between">
             <NuxtLink
               :to="`/products/${item.slug || item.attributes?.slug}`"
               target="_blank"
@@ -506,7 +505,7 @@ onUnmounted(() => stopPlay())
 
           <!-- Step5 Shipment -->
           <div class="bg-white rounded-lg p-6 text-center">
-            <svg width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="#9d25da" stroke-width="2.5" class="mx-auto mb-4">
+            <svg width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="#9d25da" stroke-width="1.5" class="mx-auto mb-4">
               <circle cx="12" cy="12" r="3"></circle>
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
             </svg>
