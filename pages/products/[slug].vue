@@ -91,6 +91,14 @@ const renderStrapiRichText = (nodes) => {
 }
 
 const renderedDescriptionHtml = computed(() => renderStrapiRichText(product.value?.description || product.value?.attributes?.description))
+
+// 新增缩略图滚动容器ref、滚动控制函数
+const thumbScrollRef = ref(null)
+const scrollThumbLeft = () => {
+  if (thumbScrollRef.value) thumbScrollRef.value.scrollBy({ left: -120, behavior: 'smooth' })
+}
+const scrollThumbRight = () => {
+  if (thumbScrollRef.value) thumbScrollRef.value.scrollBy({ left: 120, behavior: 'smooth' })
 </script>
 
 <template>
@@ -143,23 +151,52 @@ const renderedDescriptionHtml = computed(() => renderStrapiRichText(product.valu
             </div>
           </div>
           
-          <div v-if="imagesList.length > 1" class="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
+          <!-- 【修改区域：带左右箭头缩略图滚动容器，解决手机溢出】 -->
+          <div v-if="imagesList.length > 1" class="relative flex items-center">
+            <!-- 左滚动箭头 -->
             <button
-              v-for="(url, index) in imagesList"
-              :key="index"
-              @click="activeImageIndex = index"
-              class="w-20 h-20 rounded-lg overflow-hidden border-2 bg-gray-50 flex-shrink-0 transition-all"
-              :class="activeImageIndex === index ? 'border-blue-600 ring-2 ring-blue-100 scale-95' : 'border-gray-200 opacity-70 hover:opacity-100'"
+              @click="scrollThumbLeft"
+              class="absolute left-0 z-10 w-8 h-8 bg-white/90 shadow-md rounded-full flex items-center justify-center hover:bg-white transition-all"
+              aria-label="Scroll thumbnails left"
             >
-              <!-- 缩略图替换为NuxtImg -->
-              <NuxtImg 
-                :src="getCleanImageUrl(url)"
-                width="300"
-                height="300"
-                class="w-full h-full object-cover" 
-                :alt="'Thumbnail ' + (index + 1)"
-                loading="lazy"
-              />
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#333" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+            </button>
+
+            <!-- 缩略图滚动容器，隐藏横向溢出 -->
+            <div 
+              ref="thumbScrollRef"
+              class="flex gap-3 overflow-x-auto pb-2 scrollbar-thin pl-10 pr-10 w-full"
+            >
+              <button
+                v-for="(url, index) in imagesList"
+                :key="index"
+                @click="activeImageIndex = index"
+                class="w-20 h-20 rounded-lg overflow-hidden border-2 bg-gray-50 flex-shrink-0 transition-all"
+                :class="activeImageIndex === index ? 'border-blue-600 ring-2 ring-blue-100 scale-95' : 'border-gray-200 opacity-70 hover:opacity-100'"
+              >
+                <!-- 缩略图替换为NuxtImg -->
+                <NuxtImg 
+                  :src="getCleanImageUrl(url)"
+                  width="300"
+                  height="300"
+                  class="w-full h-full object-cover" 
+                  :alt="'Thumbnail ' + (index + 1)"
+                  loading="lazy"
+                />
+              </button>
+            </div>
+
+            <!-- 右滚动箭头 -->
+            <button
+              @click="scrollThumbRight"
+              class="absolute right-0 z-10 w-8 h-8 bg-white/90 shadow-md rounded-full flex items-center justify-center hover:bg-white transition-all"
+              aria-label="Scroll thumbnails right"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#333" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
             </button>
           </div>
         </div>
