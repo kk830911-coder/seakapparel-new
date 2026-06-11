@@ -43,7 +43,7 @@ const { data: responseData } = await useFetch(() => `${strapiUrl}/api/products`,
 const product = computed(() => {
   const res = responseData.value
   if (res && Array.isArray(res.data) && res.data.length > 0) {
-    return res.data[0]
+    return res.data[0].attributes
   }
   return null
 })
@@ -53,28 +53,25 @@ const previewOpen = ref(false)
 const previewIndex = ref(0)
 const imgPreviewKey = ref(0)
 
-// ========== 修复 imagesList 图片收集逻辑 ==========
+// ========== 彻底修复Strapi图片提取逻辑（关键） ==========
 const imagesList = computed(() => {
   const data = product.value
   if (!data) return []
-  const list = []
+  const rawImages = []
 
-  // 处理主图 data.image（Strapi 单图为对象，不是数组）
-  if (data.image) {
-    list.push(data.image)
+  // 主图 single image
+  if (data.image?.data) {
+    rawImages.push(data.image.data.attributes.url)
+  }
+  // 多图图集 gallery
+  if (data.images?.data && Array.isArray(data.images.data)) {
+    data.images.data.forEach(item => {
+      if (item?.attributes?.url) rawImages.push(item.attributes.url)
+    })
   }
 
-  // 处理多图图集 data.images（标准数组）
-  if (data.images && Array.isArray(data.images)) {
-    list.push(...data.images)
-  }
-
-  // 统一提取 url，过滤无效空图
-  return list.map(img => {
-    // Strapi v4/v5 两种兼容：直接url / attributes.url
-    const url = img?.url || img?.attributes?.url
-    return url
-  }).filter(url => !!url)
+  // 过滤空url，返回完整有效图片地址数组
+  return rawImages.filter(url => !!url)
 })
 
 const currentMainImageUrl = computed(() => imagesList.value[activeImageIndex.value] || '')
@@ -147,7 +144,7 @@ const renderStrapiRichTextNodes = (nodes) => {
   return result
 }
 
-const descriptionNodes = computed(() => renderStrapiRichTextNodes(product.value?.description || product.value?.attributes?.description))
+const descriptionNodes = computed(() => renderStrapiRichTextNodes(product.value?.description))
 
 const thumbScrollRef = ref(null)
 const scrollThumbLeft = () => {}
@@ -162,7 +159,7 @@ const handleTouchStart = (e) => {
 const handleTouchEnd = (e) => {
   touchEndX = e.changedTouches[0].screenX
   const diff = touchEndX - touchStartX
-  if (Math.abs(diff) > 50) {
+  if (Math.abs(diff) > 50 && imagesList.value.length > 1) {
     diff < 0 ? nextImage() : prevImage()
   }
 }
@@ -185,7 +182,7 @@ const previewTouchEnd = (e) => {
 <template>
   <div class="max-w-7xl mx-auto py-12">
     
-    <div v-if="!product" class="text-center py-20 text-red-500 bg-red-50 rounded-none">
+    <div v-if="!product || imagesList.value.length === 0" class="text-center py-20 text-red-500 bg-red-50 rounded-none">
       Product detail not found. Please refresh the page or back to list.
     </div>
 
@@ -268,20 +265,20 @@ const previewTouchEnd = (e) => {
             </span>
             
             <h1 class="text-3xl font-bold text-gray-900 mt-3 mb-4 leading-tight">
-              {{ product.title || product.attributes?.title }}
+              {{ product.title }}
             </h1>
             
             <div class="bg-gray-50 p-4 rounded-none space-y-3 my-6">
               <div class="flex justify-between items-center border-b border-gray-200 pb-2">
                 <span class="text-gray-500 text-sm">Wholesale Price</span>
                 <span class="text-2xl font-extrabold text-blue-600">
-                  ${{ product.price || product.attributes?.price }}
+                  ${{ product.price }}
                 </span>
               </div>
               <div class="flex justify-between items-center pt-1">
                 <span class="text-gray-500 text-sm">Minimum Order Quantity</span>
                 <span class="text-gray-800 font-semibold">
-                  {{ product.moq || product.attributes?.moq || 10 }} pcs
+                  {{ product.moq || 10 }} pcs
                 </span>
               </div>
             </div>
@@ -289,7 +286,7 @@ const previewTouchEnd = (e) => {
 
           <div class="mt-4 pt-4 border-t border-gray-100 pl-[5px] pr-[5px]">
             <a 
-              :href="`https://wa.me/+8613800000000?text=Hi, I am interested in your product: ${product.title || product.attributes?.title}`"
+              :href="`https://wa.me/+8613800000000?text=Hi, I am interested in your product: ${product.title}`"
               target="_blank"
               class="block w-full bg-green-600 text-white text-center py-4 rounded-none font-bold hover:bg-green-700 transition-colors shadow-sm text-base tracking-wide"
             >
@@ -378,7 +375,7 @@ const previewTouchEnd = (e) => {
       <button
         v-if="imagesList.length > 1"
         @click.stop="nextPreview"
-        class="absolute right-3 md:left-6 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 text-white z-10"
+        class="absolute right-3 md:right-6 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 text-white z-10"
       >
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 md:w-6 md:h-6">
           <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
