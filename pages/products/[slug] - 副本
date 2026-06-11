@@ -8,32 +8,14 @@ const route = useRoute()
 const isLocal = process.dev 
 const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
-// 新增：纯净无参图片地址，剥离所有query，交给NuxtImage全局配置自动处理avif/尺寸/画质
-const getCleanImageUrl = (rawUrl) => {
-  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&c_fill&q=75&f_auto'
-  if (!rawUrl) return fallback
-  // 本地Strapi路径补全域名
-  if (rawUrl.startsWith('/')) return `${strapiUrl}${rawUrl}`
-  // Cloudinary剥离全部查询参数
-  return rawUrl.split('?')[0]
-}
-
-// 生成主图600尺寸参数（仅裁切画质，格式由全局nuxt.config控制avif）
+// ✅ 核心优化函数：自动添加 Cloudinary 转换参数 (f_auto=自动格式, q_auto=自动画质)
 const getOptimizedUrl = (url) => {
-  const clean = getCleanImageUrl(url)
-  if (clean.includes('res.cloudinary.com')) {
-    return `${clean}?w=600&h=600&c_fill&q=75&f_auto`
+  if (!url) return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop'
+  // 如果路径包含 cloudinary，注入 f_auto,q_auto，CDN 会自动转为 AVIF/WebP
+  if (url.includes('cloudinary.com')) {
+    return url.replace('/upload/', '/upload/f_auto,q_auto/')
   }
-  return clean
-}
-
-// 缩略图300尺寸
-const getThumb300 = (url) => {
-  const clean = getCleanImageUrl(url)
-  if (clean.includes('res.cloudinary.com')) {
-    return `${clean}?w=300&h=300&c_fill&q=75&f_auto`
-  }
-  return clean
+  return url
 }
 
 // ========== 仅此处修改：由ID单条查询改为slug筛选查询 ==========
@@ -65,7 +47,7 @@ const imagesList = computed(() => {
   
   return list.map(img => {
     const url = typeof img === 'string' ? img : (img.url || img.attributes?.url)
-    return url || null
+    return url ? (url.startsWith('http') ? url : `${strapiUrl}${url}`) : null
   }).filter(Boolean)
 })
 
@@ -74,14 +56,13 @@ const currentMainImageUrl = computed(() => imagesList.value[activeImageIndex.val
 const nextImage = () => { if (imagesList.value.length > 1) activeImageIndex.value = (activeImageIndex.value + 1) % imagesList.value.length }
 const prevImage = () => { if (imagesList.value.length > 1) activeImageIndex.value = (activeImageIndex.value - 1 + imagesList.value.length) % imagesList.value.length }
 
-// ✅ 渲染函数优化：富文本图片改用NuxtImg逻辑，统一avif转换
+// ✅ 渲染函数优化
 const renderStrapiRichText = (nodes) => {
   if (!nodes || !Array.isArray(nodes)) return ''
   return nodes.map(node => {
     if (node.type === 'image') {
-      const rawUrl = node.image?.url || ''
-      const imgUrl = getOptimizedUrl(rawUrl)
-      return rawUrl ? `<div class="my-6 flex justify-center"><img src="${imgUrl}" alt="${node.image.alternativeText || 'Product'}" class="rounded-xl shadow-sm" /></div>` : ''
+      const rawUrl = node.image?.url ? (node.image.url.startsWith('/') ? `${strapiUrl}${node.image.url}` : node.image.url) : ''
+      return rawUrl ? `<div class="my-6 flex justify-center"><img src="${getOptimizedUrl(rawUrl)}" alt="${node.image.alternativeText || 'Product'}" class="rounded-xl shadow-sm" /></div>` : ''
     }
     // ... 其他逻辑保持不变
     if (node.type === 'text') return node.text
@@ -105,16 +86,11 @@ const renderedDescriptionHtml = computed(() => renderStrapiRichText(product.valu
         
         <div class="space-y-4">
           <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group">
-            <!-- 替换原生img为NuxtImg，自动走图片代理输出avif -->
-            <NuxtImg
-              :src="getCleanImageUrl(currentMainImageUrl)"
-              width="600"
-              height="600"
-              sizes="600px"
-              class="w-full h-full object-cover transition-all duration-300"
-              :alt="product.title || 'Product Image'"
-              loading="lazy"
-            />
+           <img
+             :src="getOptimizedUrl(currentMainImageUrl)"
+                class="w-full h-full object-cover transition-all duration-300"
+             :alt="product.title || 'Product Image'"
+                />
             
             <button 
               v-if="imagesList.length > 1"
@@ -151,15 +127,11 @@ const renderedDescriptionHtml = computed(() => renderStrapiRichText(product.valu
               class="w-20 h-20 rounded-lg overflow-hidden border-2 bg-gray-50 flex-shrink-0 transition-all"
               :class="activeImageIndex === index ? 'border-blue-600 ring-2 ring-blue-100 scale-95' : 'border-gray-200 opacity-70 hover:opacity-100'"
             >
-              <!-- 缩略图替换为NuxtImg -->
-              <NuxtImg 
-                :src="getCleanImageUrl(url)"
-                width="300"
-                height="300"
-                class="w-full h-full object-cover" 
-                :alt="'Thumbnail ' + (index + 1)"
-                loading="lazy"
-              />
+              <img 
+  :src="getOptimizedUrl(url)" 
+  class="w-full h-full object-cover" 
+  :alt="'Thumbnail ' + (index + 1)" 
+/>
             </button>
           </div>
         </div>
