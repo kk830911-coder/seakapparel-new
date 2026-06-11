@@ -71,17 +71,8 @@ const imagesList = computed(() => {
 
 const currentMainImageUrl = computed(() => imagesList.value[activeImageIndex.value] || '')
 
-// 左右切换逻辑保留（缩略图点击、滑动共用）
-const nextImage = () => { 
-  if (imagesList.value.length > 1) {
-    activeImageIndex.value = (activeImageIndex.value + 1) % imagesList.value.length 
-  }
-}
-const prevImage = () => { 
-  if (imagesList.value.length > 1) {
-    activeImageIndex.value = (activeImageIndex.value - 1 + imagesList.value.length) % imagesList.value.length 
-  }
-}
+const nextImage = () => { if (imagesList.value.length > 1) activeImageIndex.value = (activeImageIndex.value + 1) % imagesList.value.length }
+const prevImage = () => { if (imagesList.value.length > 1) activeImageIndex.value = (activeImageIndex.value - 1 + imagesList.value.length) % imagesList.value.length }
 
 // ✅ 渲染函数优化：富文本图片改用NuxtImg逻辑，统一avif转换
 const renderStrapiRichText = (nodes) => {
@@ -105,27 +96,6 @@ const renderedDescriptionHtml = computed(() => renderStrapiRichText(product.valu
 const thumbScrollRef = ref(null)
 const scrollThumbLeft = () => {}
 const scrollThumbRight = () => {}
-
-// 触屏滑动变量
-let touchStartX = 0
-let touchEndX = 0
-const handleTouchStart = (e) => {
-  touchStartX = e.changedTouches[0].screenX
-}
-const handleTouchEnd = (e) => {
-  touchEndX = e.changedTouches[0].screenX
-  const diff = touchEndX - touchStartX
-  // 滑动阈值大于50像素判定有效滑动
-  if (Math.abs(diff) > 50) {
-    if (diff < 0) {
-      // 左滑 下一张
-      nextImage()
-    } else {
-      // 右滑 上一张
-      prevImage()
-    }
-  }
-}
 </script>
 
 <template>
@@ -141,12 +111,8 @@ const handleTouchEnd = (e) => {
       <div class="grid md:grid-cols-2 gap-12 bg-white md:p-6 md:px-10 rounded-none shadow-sm border border-gray-100">
         
         <div class="space-y-4">
-          <!-- 新增touch滑动事件，删除左右悬浮箭头按钮，圆角直角不变 -->
-          <div 
-            class="rounded-none overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group"
-            @touchstart="handleTouchStart"
-            @touchend="handleTouchEnd"
-          >
+          <!-- rounded-xl 改为 rounded-none 直角 -->
+          <div class="rounded-none overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group">
             <!-- 替换原生img为NuxtImg，自动走图片代理输出avif -->
             <NuxtImg
               :src="getCleanImageUrl(currentMainImageUrl)"
@@ -158,20 +124,41 @@ const handleTouchEnd = (e) => {
               loading="lazy"
             />
             
-            <!-- 【已删除】左右悬浮箭头按钮，不再显示 -->
+            <button 
+              v-if="imagesList.length > 1"
+              @click="prevImage"
+              class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:outline-none z-10 shadow-md"
+              aria-label="Previous Image"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+            </button>
+
+            <button 
+              v-if="imagesList.length > 1"
+              @click="nextImage"
+              class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:outline-none z-10 shadow-md"
+              aria-label="Next Image"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+            </button>
 
             <div v-if="imagesList.length > 1" class="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-none text-xs font-medium tracking-wider z-10">
               {{ activeImageIndex + 1 }} / {{ imagesList.length }}
             </div>
           </div>
           
-          <!-- 缩略图区域：删除左右箭头按钮，取消左右padding，尺寸w-14 h-14不变 -->
+          <!-- 缩略图区域：删除左右箭头按钮，取消左右padding，其余全部样式不变 -->
           <div v-if="imagesList.length > 1" class="w-full">
             <!-- 滚动容器，移除pl-10 pr-10，删除左右悬浮箭头 -->
             <div 
               ref="thumbScrollRef"
               class="flex gap-2 overflow-x-auto pb-2 scrollbar-thin w-full"
             >
+              <!-- 尺寸修改 w-10 h-10 → w-14 h-14 放大1/3，其余完全不变 -->
               <button
                 v-for="(url, index) in imagesList"
                 :key="index"
