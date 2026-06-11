@@ -50,7 +50,7 @@ const getHotProducts = async () => {
     // 拉取8条产品，完整关联图片
     const res = await $fetch(`${strapiUrl}/api/products?populate=image&pagination[limit]=8`)
     hotProducts.value = res.data || []
-  } catch (err)
+  } catch (err) {
     console.error('Hot products fetch error:', err)
   } finally {
     hotLoading.value = false
@@ -391,7 +391,7 @@ onUnmounted(() => stopPlay())
         Loading hot products...
       </div>
 
-      <!-- 核心：手机2列，电脑4列，电脑间隙固定15px，手机间隙5px -->
+      <!-- 核心修改：lg:gap-[15px] 电脑端间隙固定15像素，手机gap-[5px]不变 -->
       <div v-else class="grid grid-cols-2 lg:grid-cols-4 gap-[5px] lg:gap-[15px]">
         <div
           v-for="item in hotProducts"
@@ -446,8 +446,8 @@ onUnmounted(() => stopPlay())
           </div>
         </div>
 
-        <!-- 仅此处修改：grid-cols-2 手机一行2张，电脑6列不变 -->
-        <div class="grid grid-cols-2 lg:grid-cols-6 gap-4">
+        <!-- 6步流程卡片 大屏6列 自适应折叠 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
           <!-- Step1 Consult -->
           <div class="bg-white rounded-lg p-6 text-center">
             <svg width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="#9d25da" stroke-width="1.5" class="mx-auto mb-4">
