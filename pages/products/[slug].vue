@@ -99,14 +99,16 @@ const scrollThumbRight = () => {}
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto px-4 py-12">
+  <!-- 核心修改：移除 px-4 页面左右内边距，手机端贴左右屏幕边缘 -->
+  <div class="max-w-7xl mx-auto py-12">
     
     <div v-if="!product" class="text-center py-20 text-red-500 bg-red-50 rounded-xl">
       Product detail not found. Please refresh the page or back to list.
     </div>
 
     <div v-else class="space-y-12">
-      <div class="grid md:grid-cols-2 gap-12 bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
+      <!-- md: 桌面端保留左右内边距，移动端无左右间隙，卡片贴边 -->
+      <div class="grid md:grid-cols-2 gap-12 bg-white md:p-6 md:px-10 rounded-2xl shadow-sm border border-gray-100">
         
         <div class="space-y-4">
           <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group">
@@ -216,7 +218,8 @@ const scrollThumbRight = () => {}
 
       </div>
 
-      <div class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
+      <!-- 描述卡片：移动端无左右内边距，贴屏幕边缘 -->
+      <div class="bg-white md:p-6 md:px-10 rounded-2xl shadow-sm border border-gray-100">
         <h3 class="text-lg font-bold text-gray-800 border-l-4 border-blue-600 pl-3 mb-4">
           Product Description
         </h3>
