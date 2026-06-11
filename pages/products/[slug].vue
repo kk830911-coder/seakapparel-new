@@ -71,7 +71,7 @@ const imagesList = computed(() => {
 
 const currentMainImageUrl = computed(() => imagesList.value[activeImageIndex.value] || '')
 
-// 左右切换逻辑保留（缩略图点击、滑动共用）
+// 左右切换通用方法（箭头/滑动/缩略图共用）
 const nextImage = () => { 
   if (imagesList.value.length > 1) {
     activeImageIndex.value = (activeImageIndex.value + 1) % imagesList.value.length 
@@ -83,7 +83,7 @@ const prevImage = () => {
   }
 }
 
-// ✅ 渲染函数优化：富文本图片改用NuxtImg逻辑，统一avif转换
+// ✅ 富文本图片渲染
 const renderStrapiRichText = (nodes) => {
   if (!nodes || !Array.isArray(nodes)) return ''
   return nodes.map(node => {
@@ -92,7 +92,6 @@ const renderStrapiRichText = (nodes) => {
       const imgUrl = getOptimizedUrl(rawUrl)
       return rawUrl ? `<div class="my-6 flex justify-center"><img src="${imgUrl}" alt="${node.image.alternativeText || 'Product'}" class="rounded-none shadow-sm" /></div>` : ''
     }
-    // ... 其他逻辑保持不变
     if (node.type === 'text') return node.text
     const childrenHtml = node.children ? renderStrapiRichText(node.children) : ''
     return `<p>${childrenHtml}</p>`
@@ -101,12 +100,12 @@ const renderStrapiRichText = (nodes) => {
 
 const renderedDescriptionHtml = computed(() => renderStrapiRichText(product.value?.description || product.value?.attributes?.description))
 
-// 移除滚动箭头对应函数，保留变量不报错
+// 缩略图滚动容器
 const thumbScrollRef = ref(null)
 const scrollThumbLeft = () => {}
 const scrollThumbRight = () => {}
 
-// 触屏滑动变量
+// 移动端触摸滑动逻辑
 let touchStartX = 0
 let touchEndX = 0
 const handleTouchStart = (e) => {
@@ -115,21 +114,15 @@ const handleTouchStart = (e) => {
 const handleTouchEnd = (e) => {
   touchEndX = e.changedTouches[0].screenX
   const diff = touchEndX - touchStartX
-  // 滑动阈值大于50像素判定有效滑动
+  // 滑动阈值50px，防止误触
   if (Math.abs(diff) > 50) {
-    if (diff < 0) {
-      // 左滑 下一张
-      nextImage()
-    } else {
-      // 右滑 上一张
-      prevImage()
-    }
+    diff < 0 ? nextImage() : prevImage()
   }
 }
 </script>
 
 <template>
-  <!-- 核心修改：移除 px-4 页面左右内边距，手机端贴左右屏幕边缘 -->
+  <!-- 页面外层无左右边距，手机贴屏 -->
   <div class="max-w-7xl mx-auto py-12">
     
     <div v-if="!product" class="text-center py-20 text-red-500 bg-red-50 rounded-none">
@@ -137,17 +130,15 @@ const handleTouchEnd = (e) => {
     </div>
 
     <div v-else class="space-y-12">
-      <!-- md: 桌面端保留左右内边距，移动端无左右间隙，卡片贴边 -->
       <div class="grid md:grid-cols-2 gap-12 bg-white md:p-6 md:px-10 rounded-none shadow-sm border border-gray-100">
         
         <div class="space-y-4">
-          <!-- 新增touch滑动事件，删除左右悬浮箭头按钮，圆角直角不变 -->
+          <!-- 仅手机端绑定触摸滑动事件，电脑端无触摸 -->
           <div 
             class="rounded-none overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group"
             @touchstart="handleTouchStart"
             @touchend="handleTouchEnd"
           >
-            <!-- 替换原生img为NuxtImg，自动走图片代理输出avif -->
             <NuxtImg
               :src="getCleanImageUrl(currentMainImageUrl)"
               width="600"
@@ -158,16 +149,36 @@ const handleTouchEnd = (e) => {
               loading="lazy"
             />
             
-            <!-- 【已删除】左右悬浮箭头按钮，不再显示 -->
+            <!-- 核心：md:flex hidden → 手机隐藏箭头，平板/电脑显示 -->
+            <button 
+              v-if="imagesList.length > 1"
+              @click="prevImage"
+              class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:outline-none z-10 shadow-md hidden md:flex"
+              aria-label="Previous Image"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+            </button>
+
+            <button 
+              v-if="imagesList.length > 1"
+              @click="nextImage"
+              class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:outline-none z-10 shadow-md hidden md:flex"
+              aria-label="Next Image"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+            </button>
 
             <div v-if="imagesList.length > 1" class="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-none text-xs font-medium tracking-wider z-10">
               {{ activeImageIndex + 1 }} / {{ imagesList.length }}
             </div>
           </div>
           
-          <!-- 缩略图区域：删除左右箭头按钮，取消左右padding，尺寸w-14 h-14不变 -->
+          <!-- 缩略图区域：无箭头、尺寸w-14 h-14不变 -->
           <div v-if="imagesList.length > 1" class="w-full">
-            <!-- 滚动容器，移除pl-10 pr-10，删除左右悬浮箭头 -->
             <div 
               ref="thumbScrollRef"
               class="flex gap-2 overflow-x-auto pb-2 scrollbar-thin w-full"
@@ -179,7 +190,6 @@ const handleTouchEnd = (e) => {
                 class="w-14 h-14 rounded-none overflow-hidden border-2 bg-gray-50 flex-shrink-0 transition-all"
                 :class="activeImageIndex === index ? 'border-blue-600 ring-2 ring-blue-100 scale-95' : 'border-gray-200 opacity-70 hover:opacity-100'"
               >
-                <!-- 缩略图替换为NuxtImg -->
                 <NuxtImg 
                   :src="getCleanImageUrl(url)"
                   width="300"
@@ -232,7 +242,7 @@ const handleTouchEnd = (e) => {
 
       </div>
 
-      <!-- 描述卡片：移动端无左右内边距，贴屏幕边缘，圆角改为直角 -->
+      <!-- 描述卡片 -->
       <div class="bg-white md:p-6 md:px-10 rounded-none shadow-sm border border-gray-100">
         <h3 class="text-lg font-bold text-gray-800 border-l-4 border-blue-600 pl-3 mb-4 pl-[5px] pr-[5px]">
           Product Description
@@ -263,9 +273,6 @@ const handleTouchEnd = (e) => {
   background: #94a3b8;
 }
 
-/* ==========================================================================
-   🎨 针对富文本输出的 HTML 样式层级微调
-   ========================================================================== */
 .markdown-body :deep(h1),
 .markdown-body :deep(h2),
 .markdown-body :deep(h3) {
