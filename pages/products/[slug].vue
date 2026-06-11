@@ -92,14 +92,10 @@ const renderStrapiRichText = (nodes) => {
 
 const renderedDescriptionHtml = computed(() => renderStrapiRichText(product.value?.description || product.value?.attributes?.description))
 
-// 新增缩略图滚动容器ref、滚动控制函数
+// 移除滚动箭头对应函数，保留变量不报错
 const thumbScrollRef = ref(null)
-const scrollThumbLeft = () => {
-  if (thumbScrollRef.value) thumbScrollRef.value.scrollBy({ left: -130, behavior: 'smooth' })
-}
-const scrollThumbRight = () => {
-  if (thumbScrollRef.value) thumbScrollRef.value.scrollBy({ left: 130, behavior: 'smooth' })
-}
+const scrollThumbLeft = () => {}
+const scrollThumbRight = () => {}
 </script>
 
 <template>
@@ -152,25 +148,14 @@ const scrollThumbRight = () => {
             </div>
           </div>
           
-          <!-- 缩略图区域：尺寸改为w-10 h-10（原w-20一半大小），容器overflow-hidden杜绝页面溢出 -->
-          <div v-if="imagesList.length > 1" class="relative flex items-center w-full overflow-hidden">
-            <!-- 左滚动箭头 -->
-            <button
-              @click="scrollThumbLeft"
-              class="absolute left-1 z-10 w-8 h-8 bg-white/95 shadow-md rounded-full flex items-center justify-center hover:bg-white transition-all"
-              aria-label="Scroll thumbnails left"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#333" class="w-4 h-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-              </svg>
-            </button>
-
-            <!-- 滚动容器 -->
+          <!-- 缩略图区域：删除左右箭头按钮，取消左右padding，其余全部样式不变 -->
+          <div v-if="imagesList.length > 1" class="w-full">
+            <!-- 滚动容器，移除pl-10 pr-10，删除左右悬浮箭头 -->
             <div 
               ref="thumbScrollRef"
-              class="flex gap-2 overflow-x-auto pb-2 scrollbar-thin pl-10 pr-10 w-full"
+              class="flex gap-2 overflow-x-auto pb-2 scrollbar-thin w-full"
             >
-              <!-- 核心修改：w-10 h-10 缩略图缩小一半，gap同步缩小为2 -->
+              <!-- 缩略图 w-10 h-10 尺寸保持不变 -->
               <button
                 v-for="(url, index) in imagesList"
                 :key="index"
@@ -189,17 +174,6 @@ const scrollThumbRight = () => {
                 />
               </button>
             </div>
-
-            <!-- 右滚动箭头 -->
-            <button
-              @click="scrollThumbRight"
-              class="absolute right-1 z-10 w-8 h-8 bg-white/95 shadow-md rounded-full flex items-center justify-center hover:bg-white transition-all"
-              aria-label="Scroll thumbnails right"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#333" class="w-4 h-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-              </svg>
-            </button>
           </div>
         </div>
 
