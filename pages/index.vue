@@ -59,7 +59,7 @@ const getHotProducts = async () => {
 
 // 【不变】获取原始图片地址，区分本地/uploads与cloudinary外链
 const getRawImageUrl = (item) => {
-  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=75&f_auto&f=avif'
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?f=avif&fl_any_format&w=600&h=600&c_fill&q=75&f_auto'
   if (!item) return fallback
 
   // 单图顶层url
@@ -78,14 +78,14 @@ const getRawImageUrl = (item) => {
   return fallback
 }
 
-// 【不变】生成300px小尺寸srcset链接
+// 生成300px小尺寸srcset链接（只保留这一份，删掉下方重复的）
 const getThumb300 = (url) => {
   if (!url || !url.includes('cloudinary')) return url
   const cleanUrl = url.split('?')[0]
-  return `${cleanUrl}?w=300&h=300&c_fill&q=75&f_auto&f=avif`
+  return `${cleanUrl}?f=avif&fl_any_format&w=300&h=300&c_fill&q=75&f_auto`
 }
 
-// ========== 修复：Cloudinary强制优先avif，叠加f=avif兜底 ==========
+// 修复：Cloudinary强制优先avif，叠加f=avif兜底
 const getOptimizedUrl = (url) => {
   const fallbackImg = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?f=avif&fl_any_format&w=600&h=600&c_fill&q=75&f_auto'
   if (!url) return fallbackImg
@@ -96,13 +96,6 @@ const getOptimizedUrl = (url) => {
     return `${cleanUrl}?f=avif&fl_any_format&w=600&h=600&c_fill&q=75&f_auto`
   }
   return url
-}
-
-// getThumb300 同步修改
-const getThumb300 = (url) => {
-  if (!url || !url.includes('cloudinary')) return url
-  const cleanUrl = url.split('?')[0]
-  return `${cleanUrl}?f=avif&fl_any_format&w=300&h=300&c_fill&q=75&f_auto`
 }
 
 onMounted(() => {
@@ -416,15 +409,13 @@ onUnmounted(() => stopPlay())
             target="_blank"
             class="aspect-square overflow-hidden block bg-gray-50 relative"
           >
-            <NuxtImg
+<NuxtImg
   :src="getOptimizedUrl(getRawImageUrl(item))"
   :srcset="`${getThumb300(getRawImageUrl(item))} 300w, ${getOptimizedUrl(getRawImageUrl(item))} 600w`"
   sizes="(max-width: 768px) 300px, 600px"
   format="avif"
   fallbackFormat="webp"
-  :headers="{
-    accept: 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'
-  }"
+  :headers="{ accept: 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8' }"
   alt="product"
   class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
   loading="lazy"
