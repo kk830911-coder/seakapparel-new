@@ -163,7 +163,7 @@ const scrollThumbRight = () => {}
                 v-for="(url, index) in imagesList"
                 :key="index"
                 @click="activeImageIndex = index"
-                class="w-15 h-15 rounded-none overflow-hidden border-2 bg-gray-50 flex-shrink-0 transition-all"
+                class="w-10 h-10 rounded-none overflow-hidden border-2 bg-gray-50 flex-shrink-0 transition-all"
                 :class="activeImageIndex === index ? 'border-blue-600 ring-2 ring-blue-100 scale-95' : 'border-gray-200 opacity-70 hover:opacity-100'"
               >
                 <!-- 缩略图替换为NuxtImg -->
