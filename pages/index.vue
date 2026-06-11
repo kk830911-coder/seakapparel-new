@@ -371,7 +371,7 @@ onUnmounted(() => stopPlay())
     </section>
 
     <!-- 热销产品推荐版块：手机左右边距5px，卡片间距5px，卡片内边距5px -->
-    <section class="max-w-[1400px] mx-auto px-[5px] pb-16">
+    <section class="max-w-[1400px] mx-auto px-[5px] lg:px-4 pb-16">
       <div class="flex items-center justify-between mb-10 px-[5px]">
         <h2 class="text-[clamp(1.8rem,4vw,2.8rem)] font-bold" style="color:#9d25da;">Hot Selling Products</h2>
         <NuxtLink
@@ -392,7 +392,7 @@ onUnmounted(() => stopPlay())
       </div>
 
       <!-- 手机2列，电脑4列，卡片间隙5px -->
-      <div v-else class="grid grid-cols-2 lg:grid-cols-4 gap-[5px]">
+      <div v-else class="grid grid-cols-2 lg:grid-cols-4 gap-[5px] lg:gap-12">
         <div
           v-for="item in hotProducts"
           :key="item.documentId || item.id"
