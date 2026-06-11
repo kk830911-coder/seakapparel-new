@@ -12,9 +12,28 @@ const fetchError = ref(false)
 // 拿到博客数组数据
 const blogs = computed(() => responseData.value?.data || [])
 
+// 新增：获取纯净无参数图片地址，剥离全部query，交给NuxtImage全局配置处理avif
+const getCleanImageUrl = (rawUrl) => {
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=375&c_fill&q=75&f_auto'
+  if (!rawUrl) return fallback
+  // 本地Strapi路径补全域名
+  if (rawUrl.startsWith('/')) return `${strapiUrl}${rawUrl}`
+  // Cloudinary剥离全部查询参数
+  return rawUrl.split('?')[0]
+}
+
+// 统一图片裁切压缩，格式由nuxt.config全局avif配置控制
+const getOptimizedUrl = (url) => {
+  const clean = getCleanImageUrl(url)
+  if (clean.includes('res.cloudinary.com')) {
+    return `${clean}?w=600&h=375&c_fill&q=75&f_auto`
+  }
+  return clean
+}
+
 // 适配 Strapi 的封面图片 cover 获取逻辑 + 补全后端域名修复404
 const getImageUrl = (item) => {
-  const defaultImg = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
+  const defaultImg = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f'
   if (!item) return defaultImg
   
   // 兼容 Strapi v4 (普通格式或带 attributes 格式) 
@@ -80,9 +99,13 @@ useHead({ title: 'Latest Blogs & Fashion News | SeakApparel' })
           class="aspect-[16/10] overflow-hidden block bg-gray-50 relative"
         >
           <NuxtImg
-            :src="getImageUrl(item)"
+            :src="getCleanImageUrl(getImageUrl(item))"
+            width="600"
+            height="375"
+            sizes="600px"
             class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
             alt="Blog Cover Image"
+            loading="lazy"
           />
         </NuxtLink>
 

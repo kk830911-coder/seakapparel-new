@@ -23,6 +23,25 @@ const post = computed(() => {
 const isLocal = process.dev
 const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
+// 新增：纯净无参图片地址，剥离全部query，交给NuxtImage全局配置自动avif
+const getCleanImageUrl = (rawUrl) => {
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1200&h=514&c_fill&q=75&f_auto'
+  if (!rawUrl) return fallback
+  // 本地Strapi路径补全域名
+  if (rawUrl.startsWith('/')) return `${strapiUrl}${rawUrl}`
+  // Cloudinary剥离全部查询参数
+  return rawUrl.split('?')[0]
+}
+
+// 统一大图裁切压缩，格式由nuxt.config全局avif配置自动处理
+const getOptimizedUrl = (url) => {
+  const clean = getCleanImageUrl(url)
+  if (clean.includes('res.cloudinary.com')) {
+    return `${clean}?w=1200&h=514&c_fill&q=75&f_auto`
+  }
+  return clean
+}
+
 // 适配 Strapi 的主封面图获取逻辑 + 补全后端域名修复404
 const getImageUrl = (postItem) => {
   if (!postItem) return ''
@@ -111,10 +130,15 @@ useHead({
       </p>
 
       <div v-if="getImageUrl(post)" class="w-full aspect-[21/9] rounded-xl overflow-hidden mb-10 bg-gray-100">
+        <!-- 替换为NuxtImg，自动全局AVIF转换 -->
         <NuxtImg 
-          :src="getImageUrl(post)" 
+          :src="getCleanImageUrl(getImageUrl(post))"
+          width="1200"
+          height="514"
+          sizes="1200px"
           class="w-full h-full object-cover"
           alt="Blog Detail Cover"
+          loading="lazy"
         />
       </div>
 
