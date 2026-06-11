@@ -18,20 +18,20 @@ const getCleanImageUrl = (rawUrl) => {
   return rawUrl.split('?')[0]
 }
 
-// 生成主图640尺寸参数（仅裁切画质，格式由全局nuxt.config控制avif）
+// 生成主图600尺寸参数（仅裁切画质，格式由全局nuxt.config控制avif）
 const getOptimizedUrl = (url) => {
   const clean = getCleanImageUrl(url)
   if (clean.includes('res.cloudinary.com')) {
-    return `${clean}?w=640&h=640&c_fill&q=75&f_auto`
+    return `${clean}?w=600&h=600&c_fill&q=75&f_auto`
   }
   return clean
 }
 
-// 缩略图固定53尺寸
-const getThumb53 = (url) => {
+// 缩略图300尺寸
+const getThumb300 = (url) => {
   const clean = getCleanImageUrl(url)
   if (clean.includes('res.cloudinary.com')) {
-    return `${clean}?w=53&h=53&c_fill&q=75&f_auto`
+    return `${clean}?w=300&h=300&c_fill&q=75&f_auto`
   }
   return clean
 }
@@ -55,8 +55,6 @@ const product = computed(() => {
 })
 
 const activeImageIndex = ref(0)
-// 大图弹窗状态
-const showFullImage = ref(false)
 
 const imagesList = computed(() => {
   const data = product.value
@@ -137,14 +135,6 @@ const handleTouchEnd = (e) => {
     diff < 0 ? nextImage() : prevImage()
   }
 }
-// 打开原图弹窗
-const openFullImage = () => {
-  showFullImage.value = true
-}
-// 关闭原图弹窗
-const closeFullImage = () => {
-  showFullImage.value = false
-}
 </script>
 
 <template>
@@ -161,16 +151,15 @@ const closeFullImage = () => {
         <div class="space-y-4">
           <!-- 仅手机端绑定触摸滑动事件，电脑端无触摸 -->
           <div 
-            class="rounded-none overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group cursor-zoom-in"
+            class="rounded-none overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group"
             @touchstart="handleTouchStart"
             @touchend="handleTouchEnd"
-            @click="openFullImage"
           >
             <NuxtImg
               :src="getCleanImageUrl(currentMainImageUrl)"
-              width="640"
-              height="640"
-              sizes="640px"
+              width="600"
+              height="600"
+              sizes="600px"
               class="w-full h-full object-cover transition-all duration-300"
               :alt="product.title || 'Product Image'"
               loading="lazy"
@@ -179,7 +168,7 @@ const closeFullImage = () => {
             <!-- 核心：md:flex hidden → 手机隐藏箭头，平板/电脑显示 -->
             <button 
               v-if="imagesList.length > 1"
-              @click.stop="prevImage"
+              @click="prevImage"
               class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:outline-none z-10 shadow-md hidden md:flex"
               aria-label="Previous Image"
             >
@@ -190,7 +179,7 @@ const closeFullImage = () => {
 
             <button 
               v-if="imagesList.length > 1"
-              @click.stop="nextImage"
+              @click="nextImage"
               class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:outline-none z-10 shadow-md hidden md:flex"
               aria-label="Next Image"
             >
@@ -204,7 +193,7 @@ const closeFullImage = () => {
             </div>
           </div>
           
-          <!-- 缩略图区域：固定宽高53px -->
+          <!-- 缩略图区域：无箭头、尺寸w-14 h-14不变 -->
           <div v-if="imagesList.length > 1" class="w-full">
             <div 
               ref="thumbScrollRef"
@@ -214,13 +203,13 @@ const closeFullImage = () => {
                 v-for="(url, index) in imagesList"
                 :key="index"
                 @click="activeImageIndex = index"
-                class="w-[53px] h-[53px] rounded-none overflow-hidden border-2 bg-gray-50 flex-shrink-0 transition-all"
+                class="w-14 h-14 rounded-none overflow-hidden border-2 bg-gray-50 flex-shrink-0 transition-all"
                 :class="activeImageIndex === index ? 'border-blue-600 ring-2 ring-blue-100 scale-95' : 'border-gray-200 opacity-70 hover:opacity-100'"
               >
                 <NuxtImg 
                   :src="getCleanImageUrl(url)"
-                  width="53"
-                  height="53"
+                  width="300"
+                  height="300"
                   class="w-full h-full object-cover" 
                   :alt="'Thumbnail ' + (index + 1)"
                   loading="lazy"
@@ -315,20 +304,6 @@ const closeFullImage = () => {
         </div>
       </div>
 
-    </div>
-
-    <!-- 点击图片弹出原图遮罩 -->
-    <div 
-      v-if="showFullImage" 
-      class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
-      @click="closeFullImage"
-    >
-      <NuxtImg
-        :src="getCleanImageUrl(currentMainImageUrl)"
-        class="max-w-full max-h-[90vh] object-contain"
-        :alt="product.title || 'Full Image'"
-      />
-      <button class="absolute top-6 right-6 text-white text-3xl" @click.stop="closeFullImage">✕</button>
     </div>
   </div>
 </template>
