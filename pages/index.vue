@@ -296,7 +296,7 @@ onUnmounted(() => stopPlay())
           class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between border border-gray-100"
         >
           <NuxtLink
-            :to="`/products/${item.documentId || item.id}`"
+            :to="`/products/${item.slug}`"
             target="_blank"
             class="aspect-square overflow-hidden block bg-gray-50 relative"
           >
@@ -309,7 +309,7 @@ onUnmounted(() => stopPlay())
 
           <div class="p-4 flex-1 flex flex-col justify-between">
             <NuxtLink
-              :to="`/products/${item.documentId || item.id}`"
+              :to="`/products/${item.slug}`"
               target="_blank"
               class="block"
             >
