@@ -95,10 +95,10 @@ const renderedDescriptionHtml = computed(() => renderStrapiRichText(product.valu
 // 新增缩略图滚动容器ref、滚动控制函数
 const thumbScrollRef = ref(null)
 const scrollThumbLeft = () => {
-  if (thumbScrollRef.value) thumbScrollRef.value.scrollBy({ left: -120, behavior: 'smooth' })
+  if (thumbScrollRef.value) thumbScrollRef.value.scrollBy({ left: -260, behavior: 'smooth' })
 }
 const scrollThumbRight = () => {
-  if (thumbScrollRef.value) thumbScrollRef.value.scrollBy({ left: 120, behavior: 'smooth' })
+  if (thumbScrollRef.value) thumbScrollRef.value.scrollBy({ left: 260, behavior: 'smooth' })
 }
 </script>
 
@@ -152,12 +152,12 @@ const scrollThumbRight = () => {
             </div>
           </div>
           
-          <!-- 【修改区域：带左右箭头缩略图滚动容器，解决手机溢出】 -->
-          <div v-if="imagesList.length > 1" class="relative flex items-center">
+          <!-- 【核心修改区域：固定可视区域，默认只展示3张80px缩略图，容器overflow:hidden彻底消除溢出】 -->
+          <div v-if="imagesList.length > 1" class="relative flex items-center w-full overflow-hidden">
             <!-- 左滚动箭头 -->
             <button
               @click="scrollThumbLeft"
-              class="absolute left-0 z-10 w-8 h-8 bg-white/90 shadow-md rounded-full flex items-center justify-center hover:bg-white transition-all"
+              class="absolute left-1 z-10 w-8 h-8 bg-white/95 shadow-md rounded-full flex items-center justify-center hover:bg-white transition-all"
               aria-label="Scroll thumbnails left"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#333" class="w-4 h-4">
@@ -165,7 +165,7 @@ const scrollThumbRight = () => {
               </svg>
             </button>
 
-            <!-- 缩略图滚动容器，隐藏横向溢出 -->
+            <!-- 滚动容器：固定可视宽度，padding左右预留箭头空间，overflow-x:auto仅内部滚动，页面无溢出 -->
             <div 
               ref="thumbScrollRef"
               class="flex gap-3 overflow-x-auto pb-2 scrollbar-thin pl-10 pr-10 w-full"
@@ -192,7 +192,7 @@ const scrollThumbRight = () => {
             <!-- 右滚动箭头 -->
             <button
               @click="scrollThumbRight"
-              class="absolute right-0 z-10 w-8 h-8 bg-white/90 shadow-md rounded-full flex items-center justify-center hover:bg-white transition-all"
+              class="absolute right-1 z-10 w-8 h-8 bg-white/95 shadow-md rounded-full flex items-center justify-center hover:bg-white transition-all"
               aria-label="Scroll thumbnails right"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#333" class="w-4 h-4">
