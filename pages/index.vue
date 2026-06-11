@@ -8,7 +8,7 @@ useHead({
 // 轮播图片数组
 const bannerList = ref([
   '/banner/banner1.jpg',
-  '/banner/banner2.jpg',
+  '/banner/banner/banner2.jpg',
   '/banner/banner3.jpg'
 ])
 const currentIndex = ref(0)
@@ -57,7 +57,7 @@ const getHotProducts = async () => {
   }
 }
 
-// 【和产品列表完全一致】获取原始图片地址，区分本地/uploads与cloudinary外链
+// 【不变】获取原始图片地址，区分本地/uploads与cloudinary外链
 const getRawImageUrl = (item) => {
   const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=80'
   if (!item) return fallback
@@ -78,19 +78,26 @@ const getRawImageUrl = (item) => {
   return fallback
 }
 
-// 【和产品列表完全一致】生成300px小尺寸srcset链接
+// 【不变】生成300px小尺寸srcset链接
 const getThumb300 = (url) => {
   if (!url || !url.includes('cloudinary')) return url
   return url.replace('w=600&h=600', 'w=300&h=300')
 }
 
-// 【和产品列表完全一致】统一图片自动压缩裁切
+// ========== 全新重写自动压缩图片函数 ==========
 const getOptimizedUrl = (url) => {
-  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=80'
-  if (!url) return fallback
-  if (url.includes('cloudinary.com')) {
-    return url + '?w=600&h=600&c_fill&q=80'
+  // 默认兜底图
+  const fallbackImg = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=80'
+  if (!url) return fallbackImg
+
+  // 1. Cloudinary云端图片：强制正方形裁切、画质80、宽度600
+  if (url.includes('res.cloudinary.com')) {
+    // 清理原有query参数，避免重复拼接
+    const cleanUrl = url.split('?')[0]
+    return `${cleanUrl}?w=600&h=600&c_fill&q=80&f_auto`
   }
+
+  // 2. Strapi本地存储图片：交由NuxtImg自动格式、压缩
   return url
 }
 

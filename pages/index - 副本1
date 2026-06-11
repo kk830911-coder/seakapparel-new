@@ -1,22 +1,53 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-useHead({title: 'SeakApparel | Southeast Asia Women Clothing Wholesale'})
-const bannerList = ref(['/banner/banner1.jpg','/banner/banner2.jpg','/banner/banner3.jpg'])
+
+useHead({
+  title: 'SeakApparel | Southeast Asia Women Clothing Wholesale'
+})
+
+// 轮播图片数组
+const bannerList = ref([
+  '/banner/banner1.jpg',
+  '/banner/banner2.jpg',
+  '/banner/banner3.jpg'
+])
 const currentIndex = ref(0)
 let timer = null
-const autoPlay = ()=>{timer=setInterval(()=>{currentIndex.value=(currentIndex.value+1)%bannerList.value.length},3000)}
-const stopPlay = ()=>clearInterval(timer)
-const prevSlide = ()=>{stopPlay();currentIndex.value=currentIndex.value-1<0?bannerList.value.length-1:currentIndex.value-1;autoPlay()}
-const nextSlide = ()=>{stopPlay();currentIndex.value=(currentIndex.value+1)%bannerList.value.length;autoPlay()}
-const switchSlide = (idx)=>{stopPlay();currentIndex.value=idx;autoPlay()}
+
+// 自动轮播3秒切换
+const autoPlay = () => {
+  timer = setInterval(() => {
+    currentIndex.value = (currentIndex.value + 1) % bannerList.value.length
+  }, 3000)
+}
+const stopPlay = () => clearInterval(timer)
+const prevSlide = () => {
+  stopPlay()
+  currentIndex.value = currentIndex.value - 1 < 0 ? bannerList.value.length - 1 : currentIndex.value - 1
+  autoPlay()
+}
+const nextSlide = () => {
+  stopPlay()
+  currentIndex.value = (currentIndex.value + 1) % bannerList.value.length
+  autoPlay()
+}
+const switchSlide = (idx) => {
+  stopPlay()
+  currentIndex.value = idx
+  autoPlay()
+}
+
+// 后端基础域名（和产品列表页统一，无window）
+const isLocal = process.dev
+const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
+
+// 后台热销产品接口，取8个商品
 const hotProducts = ref([])
 const hotLoading = ref(false)
-// 关键：压缩换行，保证try/catch/finally括号无解析异常
 const getHotProducts = async () => {
   hotLoading.value = true
-  const isLocal = import.meta.dev
-  const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
   try {
+    // 拉取8条产品，完整关联图片
     const res = await $fetch(`${strapiUrl}/api/products?populate=image&pagination[limit]=8`)
     hotProducts.value = res.data || []
   } catch (err) {
@@ -25,28 +56,50 @@ const getHotProducts = async () => {
     hotLoading.value = false
   }
 }
-const getProductImg = (item) => {
-  let imgUrl = ''
+
+// 【和产品列表完全一致】获取原始图片地址，区分本地/uploads与cloudinary外链
+const getRawImageUrl = (item) => {
   const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=80'
-  if (!item) imgUrl = fallback
-  else if (item.image?.url) imgUrl = item.image.url
-  else if (Array.isArray(item.image) && item.image[0]?.url) imgUrl = item.image[0].url
-  else if (item.attributes?.image?.data?.attributes?.url) imgUrl = item.attributes.image.data.attributes.url
-  else imgUrl = fallback
-  if (imgUrl && imgUrl.includes('cloudinary')) imgUrl = imgUrl.replace('/upload/', '/upload/w_600,h_600,c_fill,q_80/')
-  return imgUrl
+  if (!item) return fallback
+
+  // 单图顶层url
+  if (item.image?.url) {
+    return item.image.url.startsWith('/') ? `${strapiUrl}${item.image.url}` : item.image.url
+  }
+  // 图片数组取第一张
+  if (Array.isArray(item.image) && item.image[0]?.url) {
+    return item.image[0].url.startsWith('/') ? `${strapiUrl}${item.image[0].url}` : item.image[0].url
+  }
+  // attributes嵌套结构
+  if (item.attributes?.image?.data?.attributes?.url) {
+    const raw = item.attributes.image.data.attributes.url
+    return raw.startsWith('/') ? `${strapiUrl}${raw}` : raw
+  }
+  return fallback
 }
-const getImgSrcset300 = (item) => {
-  const fullUrl = getProductImg(item)
-  if (!fullUrl) return ''
-  return fullUrl.replace('w_600,h_600', 'w_300,h_300')
+
+// 【和产品列表完全一致】生成300px小尺寸srcset链接
+const getThumb300 = (url) => {
+  if (!url || !url.includes('cloudinary')) return url
+  return url.replace('w=600&h=600', 'w=300&h=300')
 }
-onMounted(()=>{autoPlay();getHotProducts()})
-onUnmounted(()=>stopPlay())
+
+// 【和产品列表完全一致】统一图片自动压缩裁切
+const getOptimizedUrl = (url) => {
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=80'
+  if (!url) return fallback
+  if (url.includes('cloudinary.com')) {
+    return url + '?w=600&h=600&c_fill&q=80'
+  }
+  return url
+}
+
+onMounted(() => {
+  autoPlay()
+  getHotProducts()
+})
+onUnmounted(() => stopPlay())
 </script>
-
-
-
 
 <template>
   <div>
@@ -265,21 +318,21 @@ onUnmounted(()=>stopPlay())
         Loading hot products...
       </div>
 
-      <!-- 商品网格：手机默认2列，平板2列，桌面4列 -->
-      <div v-else class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- 产品网格 桌面4列 自动2行共8个，和产品列表卡片样式统一 -->
+      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div
           v-for="item in hotProducts"
           :key="item.documentId || item.id"
           class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between border border-gray-100"
         >
           <NuxtLink
-            :to="`/products/${item.slug}`"
+            :to="`/products/${item.slug || item.attributes?.slug}`"
             target="_blank"
             class="aspect-square overflow-hidden block bg-gray-50 relative"
           >
-            <img
-              :src="getProductImg(item)"
-              :srcset="`${getImgSrcset300(item)} 300w, ${getProductImg(item)} 600w`"
+            <NuxtImg
+              :src="getOptimizedUrl(getRawImageUrl(item))"
+              :srcset="`${getThumb300(getRawImageUrl(item))} 300w, ${getOptimizedUrl(getRawImageUrl(item))} 600w`"
               sizes="(max-width: 768px) 300px, 600px"
               alt="product"
               class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
@@ -289,15 +342,15 @@ onUnmounted(()=>stopPlay())
 
           <div class="p-4 flex-1 flex flex-col justify-between">
             <NuxtLink
-              :to="`/products/${item.slug}`"
+              :to="`/products/${item.slug || item.attributes?.slug}`"
               target="_blank"
               class="block"
             >
-              <h3 class="text-lg text-gray-800 line-clamp-2 mb-3">{{ item.title }}</h3>
+              <h3 class="text-lg text-gray-800 line-clamp-2 mb-3">{{ item.title || item.attributes?.title }}</h3>
             </NuxtLink>
             <div class="flex justify-between items-center">
-              <span class="text-red-600 text-xl font-bold">¥{{ item.price }}</span>
-              <span class="text-gray-500 text-sm">MOQ: {{ item.moq || 10 }} pcs</span>
+              <span class="text-red-600 text-xl font-bold">¥{{ item.price || item.attributes?.price }}</span>
+              <span class="text-gray-500 text-sm">MOQ: {{ item.moq || item.attributes?.moq || 10 }} pcs</span>
             </div>
           </div>
         </div>
