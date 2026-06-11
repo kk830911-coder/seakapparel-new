@@ -12,6 +12,30 @@ const fetchError = ref(false)
 // FAQ 列表数据
 const faqList = computed(() => responseData.value?.data || [])
 
+// 新增全站统一图片工具函数（和所有页面保持一致，预留后续图片扩展）
+const getCleanImageUrl = (rawUrl) => {
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=75&f_auto'
+  if (!rawUrl) return fallback
+  if (rawUrl.startsWith('/')) return `${strapiUrl}${rawUrl}`
+  return rawUrl.split('?')[0]
+}
+
+const getOptimizedUrl = (url) => {
+  const clean = getCleanImageUrl(url)
+  if (clean.includes('res.cloudinary.com')) {
+    return `${clean}?w=600&h=600&c_fill&q=75&f_auto`
+  }
+  return clean
+}
+
+const getThumb300 = (url) => {
+  const clean = getCleanImageUrl(url)
+  if (clean.includes('res.cloudinary.com')) {
+    return `${clean}?w=300&h=300&c_fill&q=75&f_auto`
+  }
+  return clean
+}
+
 // 富文本渲染函数，兼容Strapi blocks格式
 const renderFaqContent = (content) => {
   if (!content) return ''

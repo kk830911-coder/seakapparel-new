@@ -12,6 +12,30 @@ const responseData = ref(null)
 const loading = ref(true)
 const fetchError = ref(false)
 
+// 新增全站统一图片处理函数，和首页/产品/博客页面完全一致
+const getCleanImageUrl = (rawUrl) => {
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=75&f_auto'
+  if (!rawUrl) return fallback
+  if (rawUrl.startsWith('/')) return `${strapiUrl}${rawUrl}`
+  return rawUrl.split('?')[0]
+}
+
+const getOptimizedUrl = (url) => {
+  const clean = getCleanImageUrl(url)
+  if (clean.includes('res.cloudinary.com')) {
+    return `${clean}?w=600&h=600&c_fill&q=75&f_auto`
+  }
+  return clean
+}
+
+const getThumb300 = (url) => {
+  const clean = getCleanImageUrl(url)
+  if (clean.includes('res.cloudinary.com')) {
+    return `${clean}?w=300&h=300&c_fill&q=75&f_auto`
+  }
+  return clean
+}
+
 // 单条FAQ数据
 const faqItem = computed(() => {
   const res = responseData.value

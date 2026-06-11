@@ -8,7 +8,7 @@ useHead({
 // 轮播图片数组
 const bannerList = ref([
   '/banner/banner1.jpg',
-  '/banner/banner/banner2.jpg',
+  '/banner/banner2.jpg',
   '/banner/banner3.jpg'
 ])
 const currentIndex = ref(0)
