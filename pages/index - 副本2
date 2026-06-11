@@ -59,7 +59,7 @@ const getHotProducts = async () => {
 
 // 【不变】获取原始图片地址，区分本地/uploads与cloudinary外链
 const getRawImageUrl = (item) => {
-  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=75&f_auto'
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=80'
   if (!item) return fallback
 
   // 单图顶层url
@@ -81,24 +81,23 @@ const getRawImageUrl = (item) => {
 // 【不变】生成300px小尺寸srcset链接
 const getThumb300 = (url) => {
   if (!url || !url.includes('cloudinary')) return url
-  const cleanUrl = url.split('?')[0]
-  return `${cleanUrl}?w=300&h=300&c_fill&q=75&f_auto`
+  return url.replace('w=600&h=600', 'w=300&h=300')
 }
 
-// ========== 优化：Cloudinary强制AVIF自动格式，压缩q=75 ==========
+// ========== 全新重写自动压缩图片函数 ==========
 const getOptimizedUrl = (url) => {
   // 默认兜底图
-  const fallbackImg = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=75&f_auto'
+  const fallbackImg = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=80'
   if (!url) return fallbackImg
 
-  // 1. Cloudinary云端图片：f_auto优先AVIF，画质75，正方形裁切
+  // 1. Cloudinary云端图片：强制正方形裁切、画质80、宽度600
   if (url.includes('res.cloudinary.com')) {
     // 清理原有query参数，避免重复拼接
     const cleanUrl = url.split('?')[0]
-    return `${cleanUrl}?w=600&h=600&c_fill&q=75&f_auto`
+    return `${cleanUrl}?w=600&h=600&c_fill&q=80&f_auto`
   }
 
-  // 2. Strapi本地存储/项目静态图：交由NuxtImg强制输出avif/webp
+  // 2. Strapi本地存储图片：交由NuxtImg自动格式、压缩
   return url
 }
 
@@ -126,15 +125,11 @@ onUnmounted(() => stopPlay())
           :key="img" 
           class="relative min-w-full h-[calc(100vw*750/1920)] max-h-[750px]"
         >
-          <!-- 静态轮播图替换NuxtImg，强制avif/webp -->
-          <NuxtImg
-            :src="img"
-            format="avif"
-            fallbackFormat="webp"
+          <img 
+            :src="img" 
+            alt="SeakApparel Wholesale Banner" 
             class="w-full h-full object-cover object-center"
-            alt="SeakApparel Wholesale Banner"
-            loading="lazy"
-          />
+          >
         </div>
       </div>
 
@@ -208,15 +203,7 @@ onUnmounted(() => stopPlay())
           <!-- 左侧：缩小单行标题 + 工厂图 + 联系方式模块 -->
           <div class="lg:col-span-3 flex flex-col gap-6">
             <h2 class="text-2xl font-bold text-center whitespace-nowrap" style="color:#9d25da;">Seak Apparel</h2>
-            <!-- 工厂静态图替换NuxtImg avif -->
-            <NuxtImg
-              src="/gongchang.jpg"
-              format="avif"
-              fallbackFormat="webp"
-              alt="Seak Apparel Factory Building"
-              class="w-full rounded-md shadow-md"
-              loading="lazy"
-            />
+            <img src="/gongchang.jpg" alt="Seak Apparel Factory Building" class="w-full rounded-md shadow-md">
             <!-- 联系信息卡片 -->
             <div class="bg-gray-50 p-4 rounded-lg mt-auto">
               <h4 class="text-lg font-semibold mb-3 text-gray-800">Contact Information</h4>
@@ -264,83 +251,34 @@ onUnmounted(() => stopPlay())
       <!-- 第一行6宫格 -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <div class="relative overflow-hidden rounded-lg">
-          <NuxtImg
-            src="/gongchang_01.jpg"
-            format="avif"
-            fallbackFormat="webp"
-            alt="Source Factory"
-            class="w-full h-64 object-cover"
-            loading="lazy"
-          />
+          <img src="/gongchang_01.jpg" alt="Source Factory" class="w-full h-64 object-cover">
           <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Source Factory</div>
         </div>
         <div class="relative overflow-hidden rounded-lg">
-          <NuxtImg
-            src="/gongchang_02.jpg"
-            format="avif"
-            fallbackFormat="webp"
-            alt="Design & Sample Making"
-            class="w-full h-64 object-cover"
-            loading="lazy"
-          />
+          <img src="/gongchang_02.jpg" alt="Design & Sample Making" class="w-full h-64 object-cover">
           <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Design & Sample Making</div>
         </div>
         <div class="relative overflow-hidden rounded-lg">
-          <NuxtImg
-            src="/gongchang_03.jpg"
-            format="avif"
-            fallbackFormat="webp"
-            alt="Ironing Area"
-            class="w-full h-64 object-cover"
-            loading="lazy"
-          />
+          <img src="/gongchang_03.jpg" alt="Ironing Area" class="w-full h-64 object-cover">
           <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Ironing Zone</div>
         </div>
         <div class="relative overflow-hidden rounded-lg">
-          <NuxtImg
-            src="/gongchang_04.jpg"
-            format="avif"
-            fallbackFormat="webp"
-            alt="Cutting Area"
-            class="w-full h-64 object-cover"
-            loading="lazy"
-          />
+          <img src="/gongchang_04.jpg" alt="Cutting Area" class="w-full h-64 object-cover">
           <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Cutting Workshop</div>
         </div>
         <div class="relative overflow-hidden rounded-lg">
-          <NuxtImg
-            src="/gongchang_05.jpg"
-            format="avif"
-            fallbackFormat="webp"
-            alt="Sewing Workshop"
-            class="w-full h-64 object-cover"
-            loading="lazy"
-          />
+          <img src="/gongchang_05.jpg" alt="Sewing Workshop" class="w-full h-64 object-cover">
           <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Sewing Workshop</div>
         </div>
         <div class="relative overflow-hidden rounded-lg">
-          <NuxtImg
-            src="/gongchang_06.jpg"
-            format="avif"
-            fallbackFormat="webp"
-            alt="Packaging Area"
-            class="w-full h-64 object-cover"
-            loading="lazy"
-          />
+          <img src="/gongchang_06.jpg" alt="Packaging Area" class="w-full h-64 object-cover">
           <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Final Packaging</div>
         </div>
       </div>
 
       <!-- 第二行通栏大图，高度改为h-[800px] -->
       <div class="relative overflow-hidden rounded-lg mb-4">
-        <NuxtImg
-          src="/gongchang_07.jpg"
-          format="avif"
-          fallbackFormat="webp"
-          alt="5000+ Production Workshop"
-          class="w-full h-[800px] object-cover"
-          loading="lazy"
-        />
+        <img src="/gongchang_07.jpg" alt="5000+ Production Workshop" class="w-full h-[800px] object-cover">
         <div class="absolute top-6 left-1/2 -translate-x-1/2 py-2 px-6 text-center text-white font-bold text-xl" style="background-color:rgba(157, 37, 218, 0.9)">
           5000㎡+ Production Workshop<br>
           <span class="text-base font-normal">Carefully handle every production process</span>
@@ -350,14 +288,7 @@ onUnmounted(() => stopPlay())
       <!-- 第三行3宫格 -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="relative overflow-hidden rounded-lg">
-          <NuxtImg
-            src="/gongchang_08.jpg"
-            format="avif"
-            fallbackFormat="webp"
-            alt="Warehouse Corner"
-            class="w-full h-64 object-cover"
-            loading="lazy"
-          />
+          <img src="/gongchang_08.jpg" alt="Warehouse Corner" class="w-full h-64 object-cover">
           <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Warehouse Corner</div>
         </div>
         <!-- 中间紫色文字块 -->
@@ -367,14 +298,7 @@ onUnmounted(() => stopPlay())
           </div>
         </div>
         <div class="relative overflow-hidden rounded-lg">
-          <NuxtImg
-            src="/gongchang_09.jpg"
-            format="avif"
-            fallbackFormat="webp"
-            alt="Warehouse Corner"
-            class="w-full h-64 object-cover"
-            loading="lazy"
-          />
+          <img src="/gongchang_09.jpg" alt="Warehouse Corner" class="w-full h-64 object-cover">
           <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium" style="background-color:rgba(157, 37, 218, 0.85)">Warehouse Corner</div>
         </div>
       </div>
@@ -417,8 +341,6 @@ onUnmounted(() => stopPlay())
               :src="getOptimizedUrl(getRawImageUrl(item))"
               :srcset="`${getThumb300(getRawImageUrl(item))} 300w, ${getOptimizedUrl(getRawImageUrl(item))} 600w`"
               sizes="(max-width: 768px) 300px, 600px"
-              format="avif"
-              fallbackFormat="webp"
               alt="product"
               class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
               loading="lazy"
