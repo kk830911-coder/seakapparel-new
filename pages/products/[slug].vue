@@ -8,14 +8,17 @@ const route = useRoute()
 const isLocal = process.dev 
 const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
-// 纯净无参图片地址，剥离所有query
+// 新增：纯净无参图片地址，剥离所有query，交给NuxtImage全局配置自动处理avif/尺寸/画质
 const getCleanImageUrl = (rawUrl) => {
   const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&c_fill&q=75&f_auto'
   if (!rawUrl) return fallback
+  // 本地Strapi路径补全域名
   if (rawUrl.startsWith('/')) return `${strapiUrl}${rawUrl}`
+  // Cloudinary剥离全部查询参数
   return rawUrl.split('?')[0]
 }
 
+// 生成主图600尺寸参数（仅裁切画质，格式由全局nuxt.config控制avif）
 const getOptimizedUrl = (url) => {
   const clean = getCleanImageUrl(url)
   if (clean.includes('res.cloudinary.com')) {
@@ -24,6 +27,7 @@ const getOptimizedUrl = (url) => {
   return clean
 }
 
+// 缩略图300尺寸
 const getThumb300 = (url) => {
   const clean = getCleanImageUrl(url)
   if (clean.includes('res.cloudinary.com')) {
@@ -32,6 +36,7 @@ const getThumb300 = (url) => {
   return clean
 }
 
+// ========== 仅此处修改：由ID单条查询改为slug筛选查询 ==========
 const { data: responseData } = await useFetch(() => `${strapiUrl}/api/products`, {
   query: { 
     populate: '*',
@@ -42,42 +47,38 @@ const { data: responseData } = await useFetch(() => `${strapiUrl}/api/products`,
 
 const product = computed(() => {
   const res = responseData.value
+  // 筛选接口返回 { data: [商品数组] }，取第一条匹配slug的商品
   if (res && Array.isArray(res.data) && res.data.length > 0) {
-    return res.data[0].attributes
+    return res.data[0]
   }
   return null
 })
 
 const activeImageIndex = ref(0)
+// 原图弹窗状态
 const previewOpen = ref(false)
+// 弹窗内图片索引，和外部同步
 const previewIndex = ref(0)
+// 弹窗图片独立key，每次打开强制销毁图片组件
 const imgPreviewKey = ref(0)
 
-// ========== 彻底修复Strapi图片提取逻辑（关键） ==========
 const imagesList = computed(() => {
   const data = product.value
   if (!data) return []
-  const rawImages = []
-
-  // 主图 single image
-  if (data.image?.data) {
-    rawImages.push(data.image.data.attributes.url)
-  }
-  // 多图图集 gallery
-  if (data.images?.data && Array.isArray(data.images.data)) {
-    data.images.data.forEach(item => {
-      if (item?.attributes?.url) rawImages.push(item.attributes.url)
-    })
-  }
-
-  // 过滤空url，返回完整有效图片地址数组
-  return rawImages.filter(url => !!url)
+  let list = []
+  if (data.image) Array.isArray(data.image) ? list.push(...data.image) : list.push(data.image)
+  if (data.images && Array.isArray(data.images)) list.push(...data.images)
+  
+  return list.map(img => {
+    const url = typeof img === 'string' ? img : (img.url || img.attributes?.url)
+    return url || null
+  }).filter(Boolean)
 })
 
 const currentMainImageUrl = computed(() => imagesList.value[activeImageIndex.value] || '')
 const previewImageUrl = computed(() => imagesList.value[previewIndex.value] || '')
 
-// 列表主图切换
+// 左右切换通用方法（箭头/滑动/缩略图共用）
 const nextImage = () => { 
   if (imagesList.value.length > 1) {
     activeImageIndex.value = (activeImageIndex.value + 1) % imagesList.value.length 
@@ -89,32 +90,35 @@ const prevImage = () => {
   }
 }
 
-// 弹窗大图切换
+// 弹窗内切换
 const nextPreview = () => {
-  if (imagesList.value.length <= 1) return
-  previewIndex.value = (previewIndex.value + 1) % imagesList.value.length
-  imgPreviewKey.value++
+  if (imagesList.value.length > 1) {
+    previewIndex.value = (previewIndex.value + 1) % imagesList.value.length
+    imgPreviewKey.value++
+  }
 }
 const prevPreview = () => {
-  if (imagesList.value.length <= 1) return
-  previewIndex.value = (previewIndex.value - 1 + imagesList.value.length) % imagesList.value.length
-  imgPreviewKey.value++
+  if (imagesList.value.length > 1) {
+    previewIndex.value = (previewIndex.value - 1 + imagesList.value.length) % imagesList.value.length
+    imgPreviewKey.value++
+  }
 }
 
-// 打开弹窗同步索引
+// 打开原图弹窗，同步当前索引 + 强制重绘图片
 const openPreview = async () => {
   previewIndex.value = activeImageIndex.value
   imgPreviewKey.value++
   await nextTick()
   previewOpen.value = true
 }
+// 关闭弹窗重置key，清空缓存尺寸
 const closePreview = async () => {
   previewOpen.value = false
   await nextTick()
   imgPreviewKey.value++
 }
 
-// 富文本图片解析
+// ✅ 富文本图片渲染改造：返回渲染节点数组，模板用v-for渲染NuxtImg，自动avif
 const renderStrapiRichTextNodes = (nodes) => {
   if (!nodes || !Array.isArray(nodes)) return []
   const result = []
@@ -133,6 +137,7 @@ const renderStrapiRichTextNodes = (nodes) => {
         content: node.text
       })
     } else {
+      // 段落/标题等容器节点，递归读取子内容
       const childNodes = node.children ? renderStrapiRichTextNodes(node.children) : []
       result.push({
         type: 'block',
@@ -144,13 +149,14 @@ const renderStrapiRichTextNodes = (nodes) => {
   return result
 }
 
-const descriptionNodes = computed(() => renderStrapiRichTextNodes(product.value?.description))
+const descriptionNodes = computed(() => renderStrapiRichTextNodes(product.value?.description || product.value?.attributes?.description))
 
+// 缩略图滚动容器
 const thumbScrollRef = ref(null)
 const scrollThumbLeft = () => {}
 const scrollThumbRight = () => {}
 
-// 页面主图触摸滑动
+// 移动端触摸滑动逻辑
 let touchStartX = 0
 let touchEndX = 0
 const handleTouchStart = (e) => {
@@ -159,12 +165,13 @@ const handleTouchStart = (e) => {
 const handleTouchEnd = (e) => {
   touchEndX = e.changedTouches[0].screenX
   const diff = touchEndX - touchStartX
-  if (Math.abs(diff) > 50 && imagesList.value.length > 1) {
+  // 滑动阈值50px，防止误触
+  if (Math.abs(diff) > 50) {
     diff < 0 ? nextImage() : prevImage()
   }
 }
 
-// 弹窗大图触摸滑动
+// 弹窗触摸滑动
 let previewTouchStartX = 0
 let previewTouchEndX = 0
 const previewTouchStart = (e) => {
@@ -173,16 +180,17 @@ const previewTouchStart = (e) => {
 const previewTouchEnd = (e) => {
   previewTouchEndX = e.changedTouches[0].screenX
   const diff = previewTouchEndX - previewTouchStartX
-  if (Math.abs(diff) > 50 && imagesList.value.length > 1) {
+  if (Math.abs(diff) > 50) {
     diff < 0 ? nextPreview() : prevPreview()
   }
 }
 </script>
 
 <template>
+  <!-- 页面外层无左右边距，手机贴屏 -->
   <div class="max-w-7xl mx-auto py-12">
     
-    <div v-if="!product || imagesList.value.length === 0" class="text-center py-20 text-red-500 bg-red-50 rounded-none">
+    <div v-if="!product" class="text-center py-20 text-red-500 bg-red-50 rounded-none">
       Product detail not found. Please refresh the page or back to list.
     </div>
 
@@ -190,6 +198,7 @@ const previewTouchEnd = (e) => {
       <div class="grid md:grid-cols-2 gap-12 bg-white md:p-6 md:px-10 rounded-none shadow-sm border border-gray-100">
         
         <div class="space-y-4">
+          <!-- 仅手机端绑定触摸滑动事件，电脑端无触摸；点击打开原图弹窗 -->
           <div 
             class="rounded-none overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group cursor-zoom-in"
             @touchstart="handleTouchStart"
@@ -206,6 +215,7 @@ const previewTouchEnd = (e) => {
               loading="lazy"
             />
             
+            <!-- 核心：md:flex hidden → 手机隐藏箭头，平板/电脑显示 -->
             <button 
               v-if="imagesList.length > 1"
               @click.stop="prevImage"
@@ -233,6 +243,7 @@ const previewTouchEnd = (e) => {
             </div>
           </div>
           
+          <!-- 缩略图区域：无箭头、尺寸w-14 h-14不变 -->
           <div v-if="imagesList.length > 1" class="w-full">
             <div 
               ref="thumbScrollRef"
@@ -265,20 +276,20 @@ const previewTouchEnd = (e) => {
             </span>
             
             <h1 class="text-3xl font-bold text-gray-900 mt-3 mb-4 leading-tight">
-              {{ product.title }}
+              {{ product.title || product.attributes?.title }}
             </h1>
             
             <div class="bg-gray-50 p-4 rounded-none space-y-3 my-6">
               <div class="flex justify-between items-center border-b border-gray-200 pb-2">
                 <span class="text-gray-500 text-sm">Wholesale Price</span>
                 <span class="text-2xl font-extrabold text-blue-600">
-                  ${{ product.price }}
+                  ${{ product.price || product.attributes?.price }}
                 </span>
               </div>
               <div class="flex justify-between items-center pt-1">
                 <span class="text-gray-500 text-sm">Minimum Order Quantity</span>
                 <span class="text-gray-800 font-semibold">
-                  {{ product.moq || 10 }} pcs
+                  {{ product.moq || product.attributes?.moq || 10 }} pcs
                 </span>
               </div>
             </div>
@@ -286,7 +297,7 @@ const previewTouchEnd = (e) => {
 
           <div class="mt-4 pt-4 border-t border-gray-100 pl-[5px] pr-[5px]">
             <a 
-              :href="`https://wa.me/+8613800000000?text=Hi, I am interested in your product: ${product.title}`"
+              :href="`https://wa.me/+8613800000000?text=Hi, I am interested in your product: ${product.title || product.attributes?.title}`"
               target="_blank"
               class="block w-full bg-green-600 text-white text-center py-4 rounded-none font-bold hover:bg-green-700 transition-colors shadow-sm text-base tracking-wide"
             >
@@ -297,12 +308,14 @@ const previewTouchEnd = (e) => {
 
       </div>
 
+      <!-- 描述卡片：重构渲染逻辑，使用NuxtImg自动AVIF -->
       <div class="bg-white md:p-6 md:px-10 rounded-none shadow-sm border border-gray-100">
         <h3 class="text-lg font-bold text-gray-800 border-l-4 border-blue-600 pl-3 mb-4 pl-[5px] pr-[5px]">
           Product Description
         </h3>
         <div class="text-gray-600 leading-relaxed text-sm bg-slate-50 p-6 rounded-none min-h-[150px] markdown-body">
           <template v-for="(node, idx) in descriptionNodes" :key="idx">
+            <!-- 富文本图片，NuxtImg自动输出avif/webp -->
             <div v-if="node.type === 'image'" class="my-6 flex justify-center">
               <NuxtImg
                 :src="node.url"
@@ -314,7 +327,9 @@ const previewTouchEnd = (e) => {
                 loading="lazy"
               />
             </div>
+            <!-- 纯文本 -->
             <span v-else-if="node.type === 'text'">{{ node.content }}</span>
+            <!-- 段落/标题容器 -->
             <component
               v-else
               :is="node.tag === 'paragraph' ? 'p' : node.tag"
@@ -341,7 +356,7 @@ const previewTouchEnd = (e) => {
 
     </div>
 
-    <!-- 大图弹窗 -->
+    <!-- 原图弹窗遮罩层 -->
     <div 
       v-if="previewOpen"
       class="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center p-4 w-full h-full"
@@ -349,6 +364,7 @@ const previewTouchEnd = (e) => {
       @touchstart="previewTouchStart"
       @touchend="previewTouchEnd"
     >
+      <!-- 电脑端左右箭头 -->
       <button
         v-if="imagesList.length > 1"
         @click.stop="prevPreview"
@@ -359,10 +375,12 @@ const previewTouchEnd = (e) => {
         </svg>
       </button>
 
+      <!-- 图片容器单独绑定key，每次强制销毁NuxtImg，移除固定宽高 -->
       <div 
         :key="imgPreviewKey"
         class="w-full h-full flex items-center justify-center"
       >
+        <!-- 重点修复：弹窗NuxtImg删除 width/height 固定尺寸，仅靠class自适应全屏 -->
         <NuxtImg
           :src="getCleanImageUrl(previewImageUrl)"
           sizes="100vw"
@@ -382,6 +400,7 @@ const previewTouchEnd = (e) => {
         </svg>
       </button>
 
+      <!-- 关闭按钮 -->
       <button
         @click.stop="closePreview"
         class="absolute top-4 right-4 text-white text-3xl w-10 h-10 flex items-center justify-center bg-white/20 hover:bg-white/40 rounded-full z-10"
@@ -389,6 +408,7 @@ const previewTouchEnd = (e) => {
         ✕
       </button>
 
+      <!-- 页码提示 -->
       <div v-if="imagesList.length > 1" class="absolute bottom-6 text-white text-sm bg-black/50 px-4 py-2 rounded z-10">
         {{ previewIndex + 1 }} / {{ imagesList.length }}
       </div>
