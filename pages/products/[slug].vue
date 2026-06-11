@@ -99,6 +99,7 @@ const scrollThumbLeft = () => {
 }
 const scrollThumbRight = () => {
   if (thumbScrollRef.value) thumbScrollRef.value.scrollBy({ left: 120, behavior: 'smooth' })
+}
 </script>
 
 <template>
