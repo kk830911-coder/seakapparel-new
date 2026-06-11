@@ -83,38 +83,22 @@ const prevImage = () => {
   }
 }
 
-// ✅ 富文本图片渲染改造：返回渲染节点数组，模板用v-for渲染NuxtImg，自动avif
-const renderStrapiRichTextNodes = (nodes) => {
-  if (!nodes || !Array.isArray(nodes)) return []
-  const result = []
-  for (const node of nodes) {
+// ✅ 富文本图片渲染
+const renderStrapiRichText = (nodes) => {
+  if (!nodes || !Array.isArray(nodes)) return ''
+  return nodes.map(node => {
     if (node.type === 'image') {
       const rawUrl = node.image?.url || ''
-      const cleanUrl = getCleanImageUrl(rawUrl)
-      result.push({
-        type: 'image',
-        url: cleanUrl,
-        alt: node.image?.alternativeText || 'Product'
-      })
-    } else if (node.type === 'text') {
-      result.push({
-        type: 'text',
-        content: node.text
-      })
-    } else {
-      // 段落/标题等容器节点，递归读取子内容
-      const childNodes = node.children ? renderStrapiRichTextNodes(node.children) : []
-      result.push({
-        type: 'block',
-        tag: node.type,
-        children: childNodes
-      })
+      const imgUrl = getOptimizedUrl(rawUrl)
+      return rawUrl ? `<div class="my-6 flex justify-center"><img src="${imgUrl}" alt="${node.image.alternativeText || 'Product'}" class="rounded-none shadow-sm" /></div>` : ''
     }
-  }
-  return result
+    if (node.type === 'text') return node.text
+    const childrenHtml = node.children ? renderStrapiRichText(node.children) : ''
+    return `<p>${childrenHtml}</p>`
+  }).join('')
 }
 
-const descriptionNodes = computed(() => renderStrapiRichTextNodes(product.value?.description || product.value?.attributes?.description))
+const renderedDescriptionHtml = computed(() => renderStrapiRichText(product.value?.description || product.value?.attributes?.description))
 
 // 缩略图滚动容器
 const thumbScrollRef = ref(null)
@@ -258,50 +242,15 @@ const handleTouchEnd = (e) => {
 
       </div>
 
-      <!-- 描述卡片：重构渲染逻辑，使用NuxtImg自动AVIF -->
+      <!-- 描述卡片 -->
       <div class="bg-white md:p-6 md:px-10 rounded-none shadow-sm border border-gray-100">
         <h3 class="text-lg font-bold text-gray-800 border-l-4 border-blue-600 pl-3 mb-4 pl-[5px] pr-[5px]">
           Product Description
         </h3>
-        <div class="text-gray-600 leading-relaxed text-sm bg-slate-50 p-6 rounded-none min-h-[150px] markdown-body">
-          <template v-for="(node, idx) in descriptionNodes" :key="idx">
-            <!-- 富文本图片，NuxtImg自动输出avif/webp -->
-            <div v-if="node.type === 'image'" class="my-6 flex justify-center">
-              <NuxtImg
-                :src="node.url"
-                width="800"
-                height="600"
-                sizes="(max-width:768px) 100vw, 700px"
-                class="rounded-none shadow-sm max-w-full"
-                :alt="node.alt"
-                loading="lazy"
-              />
-            </div>
-            <!-- 纯文本 -->
-            <span v-else-if="node.type === 'text'">{{ node.content }}</span>
-            <!-- 段落/标题容器 -->
-            <component
-              v-else
-              :is="node.tag === 'paragraph' ? 'p' : node.tag"
-              class="markdown-block"
-            >
-              <template v-for="(child, cIdx) in node.children" :key="cIdx">
-                <div v-if="child.type === 'image'" class="my-6 flex justify-center">
-                  <NuxtImg
-                    :src="child.url"
-                    width="800"
-                    height="600"
-                    sizes="(max-width:768px) 100vw, 700px"
-                    class="rounded-none shadow-sm max-w-full"
-                    :alt="child.alt"
-                    loading="lazy"
-                  />
-                </div>
-                <span v-else-if="child.type === 'text'">{{ child.content }}</span>
-              </template>
-            </component>
-          </template>
-        </div>
+        <div 
+          class="text-gray-600 leading-relaxed text-sm bg-slate-50 p-6 rounded-none min-h-[150px] markdown-body"
+          v-html="renderedDescriptionHtml"
+        />
       </div>
 
     </div>
