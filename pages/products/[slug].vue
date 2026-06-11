@@ -158,7 +158,7 @@ const scrollThumbRight = () => {}
               ref="thumbScrollRef"
               class="flex gap-2 overflow-x-auto pb-2 scrollbar-thin w-full"
             >
-              <!-- 核心修改：w-15 h-15 = 60px 正方形缩略图，直角 -->
+              <!-- rounded-lg 改成 rounded-none 直角 -->
               <button
                 v-for="(url, index) in imagesList"
                 :key="index"
@@ -292,4 +292,3 @@ const scrollThumbRight = () => {}
   margin-bottom: 0.75rem;
   line-height: 1.6;
 }
-</style>
