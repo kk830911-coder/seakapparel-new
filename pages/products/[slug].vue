@@ -81,7 +81,7 @@ const renderStrapiRichText = (nodes) => {
     if (node.type === 'image') {
       const rawUrl = node.image?.url || ''
       const imgUrl = getOptimizedUrl(rawUrl)
-      return rawUrl ? `<div class="my-6 flex justify-center"><img src="${imgUrl}" alt="${node.image.alternativeText || 'Product'}" class="rounded-xl shadow-sm" /></div>` : ''
+      return rawUrl ? `<div class="my-6 flex justify-center"><img src="${imgUrl}" alt="${node.image.alternativeText || 'Product'}" class="rounded-none shadow-sm" /></div>` : ''
     }
     // ... 其他逻辑保持不变
     if (node.type === 'text') return node.text
@@ -102,16 +102,17 @@ const scrollThumbRight = () => {}
   <!-- 核心修改：移除 px-4 页面左右内边距，手机端贴左右屏幕边缘 -->
   <div class="max-w-7xl mx-auto py-12">
     
-    <div v-if="!product" class="text-center py-20 text-red-500 bg-red-50 rounded-xl">
+    <div v-if="!product" class="text-center py-20 text-red-500 bg-red-50 rounded-none">
       Product detail not found. Please refresh the page or back to list.
     </div>
 
     <div v-else class="space-y-12">
       <!-- md: 桌面端保留左右内边距，移动端无左右间隙，卡片贴边 -->
-      <div class="grid md:grid-cols-2 gap-12 bg-white md:p-6 md:px-10 rounded-2xl shadow-sm border border-gray-100">
+      <div class="grid md:grid-cols-2 gap-12 bg-white md:p-6 md:px-10 rounded-none shadow-sm border border-gray-100">
         
         <div class="space-y-4">
-          <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group">
+          <!-- rounded-xl 改为 rounded-none 直角 -->
+          <div class="rounded-none overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group">
             <!-- 替换原生img为NuxtImg，自动走图片代理输出avif -->
             <NuxtImg
               :src="getCleanImageUrl(currentMainImageUrl)"
@@ -145,7 +146,7 @@ const scrollThumbRight = () => {}
               </svg>
             </button>
 
-            <div v-if="imagesList.length > 1" class="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-xs font-medium tracking-wider z-10">
+            <div v-if="imagesList.length > 1" class="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-none text-xs font-medium tracking-wider z-10">
               {{ activeImageIndex + 1 }} / {{ imagesList.length }}
             </div>
           </div>
@@ -157,12 +158,12 @@ const scrollThumbRight = () => {}
               ref="thumbScrollRef"
               class="flex gap-2 overflow-x-auto pb-2 scrollbar-thin w-full"
             >
-              <!-- 缩略图 w-10 h-10 尺寸保持不变 -->
+              <!-- rounded-lg 改成 rounded-none 直角 -->
               <button
                 v-for="(url, index) in imagesList"
                 :key="index"
                 @click="activeImageIndex = index"
-                class="w-10 h-10 rounded-lg overflow-hidden border-2 bg-gray-50 flex-shrink-0 transition-all"
+                class="w-10 h-10 rounded-none overflow-hidden border-2 bg-gray-50 flex-shrink-0 transition-all"
                 :class="activeImageIndex === index ? 'border-blue-600 ring-2 ring-blue-100 scale-95' : 'border-gray-200 opacity-70 hover:opacity-100'"
               >
                 <!-- 缩略图替换为NuxtImg -->
@@ -180,8 +181,8 @@ const scrollThumbRight = () => {}
         </div>
 
         <div class="flex flex-col justify-between">
-          <div>
-            <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase">
+          <div class="pl-[5px] pr-[5px]">
+            <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-none text-xs font-semibold tracking-wide uppercase">
               Southeast Asia Wholesale
             </span>
             
@@ -189,7 +190,7 @@ const scrollThumbRight = () => {}
               {{ product.title || product.attributes?.title }}
             </h1>
             
-            <div class="bg-gray-50 p-4 rounded-xl space-y-3 my-6">
+            <div class="bg-gray-50 p-4 rounded-none space-y-3 my-6">
               <div class="flex justify-between items-center border-b border-gray-200 pb-2">
                 <span class="text-gray-500 text-sm">Wholesale Price</span>
                 <span class="text-2xl font-extrabold text-blue-600">
@@ -205,11 +206,11 @@ const scrollThumbRight = () => {}
             </div>
           </div>
 
-          <div class="mt-4 pt-4 border-t border-gray-100">
+          <div class="mt-4 pt-4 border-t border-gray-100 pl-[5px] pr-[5px]">
             <a 
               :href="`https://wa.me/+8613800000000?text=Hi, I am interested in your product: ${product.title || product.attributes?.title}`"
               target="_blank"
-              class="block w-full bg-green-600 text-white text-center py-4 rounded-xl font-bold hover:bg-green-700 transition-colors shadow-sm text-base tracking-wide"
+              class="block w-full bg-green-600 text-white text-center py-4 rounded-none font-bold hover:bg-green-700 transition-colors shadow-sm text-base tracking-wide"
             >
               💬 Inquiry via WhatsApp (Fast Response)
             </a>
@@ -218,13 +219,13 @@ const scrollThumbRight = () => {}
 
       </div>
 
-      <!-- 描述卡片：移动端无左右内边距，贴屏幕边缘 -->
-      <div class="bg-white md:p-6 md:px-10 rounded-2xl shadow-sm border border-gray-100">
-        <h3 class="text-lg font-bold text-gray-800 border-l-4 border-blue-600 pl-3 mb-4">
+      <!-- 描述卡片：移动端无左右内边距，贴屏幕边缘，圆角改为直角 -->
+      <div class="bg-white md:p-6 md:px-10 rounded-none shadow-sm border border-gray-100">
+        <h3 class="text-lg font-bold text-gray-800 border-l-4 border-blue-600 pl-3 mb-4 pl-[5px] pr-[5px]">
           Product Description
         </h3>
         <div 
-          class="text-gray-600 leading-relaxed text-sm bg-slate-50 p-6 rounded-xl min-h-[150px] markdown-body"
+          class="text-gray-600 leading-relaxed text-sm bg-slate-50 p-6 rounded-none min-h-[150px] markdown-body"
           v-html="renderedDescriptionHtml"
         />
       </div>
