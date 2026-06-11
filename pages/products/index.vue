@@ -53,8 +53,11 @@
         >
           <NuxtImg
             :src="getOptimizedUrl(getRawImageUrl(item))"
+            :srcset="`${getThumb300(getRawImageUrl(item))} 300w, ${getOptimizedUrl(getRawImageUrl(item))} 600w`"
+            sizes="(max-width: 768px) 300px, 600px"
             class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
             :alt="`${item.title || item.attributes?.title || 'Wholesale Women Clothing'} - SeakApparel`"
+            loading="lazy"
           />
         </NuxtLink>
 
@@ -175,7 +178,7 @@ const pageProducts = computed(() => {
 
 // 修复：补全后端图片域名，解决404
 const getRawImageUrl = (item) => {
-  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=80'
   if (!item) return fallback
 
   // 单图顶层url
@@ -194,12 +197,19 @@ const getRawImageUrl = (item) => {
   return fallback
 }
 
-// 统一图片自动压缩（和详情页逻辑一致）
+// 生成300px小图用于srcset移动端
+const getThumb300 = (url) => {
+  if (!url || !url.includes('cloudinary')) return url
+  return url.replace('w=600&h=600', 'w=300&h=300')
+}
+
+// 统一图片自动压缩（和首页逻辑完全一致）
 const getOptimizedUrl = (url) => {
-  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=80'
   if (!url) return fallback
   if (url.includes('cloudinary.com')) {
-    return url.replace('/upload/', '/upload/f_auto,q_auto/')
+    // 固定600正方形居中裁切、画质80
+    return url + '?w=600&h=600&c_fill&q=80'
   }
   return url
 }
