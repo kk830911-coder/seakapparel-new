@@ -404,32 +404,23 @@ onUnmounted(() => stopPlay())
           :key="item.documentId || item.id"
           class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between border border-gray-100"
         >
-   <NuxtLink
-  :to="`/products/${item.slug || item.attributes?.slug}`"
-  target="_blank"
-  class="aspect-square overflow-hidden block bg-gray-50 relative"
->
-  <!-- 原生picture，浏览器优先avif，不支持自动切webp，兜底原图 -->
-  <picture>
-    <!-- AVIF 源 -->
-    <source
-      :srcset="getOptimizedUrl(getRawImageUrl(item))"
-      type="image/avif"
-    />
-    <!-- WebP 降级源 -->
-    <source
-      :srcset="getOptimizedUrl(getRawImageUrl(item)).replace('f=avif','f=webp')"
-      type="image/webp"
-    />
-    <!-- 兜底JPG -->
-    <img
-      :src="getOptimizedUrl(getRawImageUrl(item)).replace('f=avif','')"
-      alt="product"
-      class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-      loading="lazy"
-    />
-  </picture>
-</NuxtLink>
+          <NuxtLink
+            :to="`/products/${item.slug || item.attributes?.slug}`"
+            target="_blank"
+            class="aspect-square overflow-hidden block bg-gray-50 relative"
+          >
+<NuxtImg
+  :src="getOptimizedUrl(getRawImageUrl(item))"
+  :srcset="`${getThumb300(getRawImageUrl(item))} 300w, ${getOptimizedUrl(getRawImageUrl(item))} 600w`"
+  sizes="(max-width: 768px) 300px, 600px"
+  format="avif"
+  fallbackFormat="webp"
+  :headers="{ accept: 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8' }"
+  alt="product"
+  class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+  loading="lazy"
+/>
+          </NuxtLink>
 
           <div class="p-4 flex-1 flex flex-col justify-between">
             <NuxtLink
