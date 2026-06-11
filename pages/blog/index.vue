@@ -1,6 +1,10 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 
+// 后端域名置顶统一声明，和产品页逻辑完全一致
+const isLocal = process.dev
+const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
+
 const responseData = ref(null)
 const loading = ref(true)
 const fetchError = ref(false)
@@ -8,7 +12,7 @@ const fetchError = ref(false)
 // 拿到博客数组数据
 const blogs = computed(() => responseData.value?.data || [])
 
-// 适配 Strapi 的封面图片 cover 获取逻辑
+// 适配 Strapi 的封面图片 cover 获取逻辑 + 补全后端域名修复404
 const getImageUrl = (item) => {
   const defaultImg = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
   if (!item) return defaultImg
@@ -18,17 +22,19 @@ const getImageUrl = (item) => {
   if (!coverData) return defaultImg
 
   // 如果 cover 直接带 url (REST API 展开后)
-  if (coverData.url) return coverData.url
+  if (coverData.url) {
+    return coverData.url.startsWith('/') ? `${strapiUrl}${coverData.url}` : coverData.url
+  }
   // 如果是标准的 Strapi 媒体嵌套格式 data.attributes.url
-  if (coverData.data?.attributes?.url) return coverData.data.attributes.url
+  if (coverData.data?.attributes?.url) {
+    const raw = coverData.data.attributes.url
+    return raw.startsWith('/') ? `${strapiUrl}${raw}` : raw
+  }
   
   return defaultImg
 }
 
 onMounted(async () => {
-  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
-  
   try {
     // 请求 blogs 接口，并使用 populate=* 展开 cover 图片和分类数据
     const res = await $fetch(`${strapiUrl}/api/blogs?populate=*`)
@@ -68,8 +74,9 @@ useHead({ title: 'Latest Blogs & Fashion News | SeakApparel' })
         :key="item.id" 
         class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between border border-gray-100"
       >
+        <!-- 跳转改用slug链接 -->
         <NuxtLink 
-          :to="`/blog/${item.documentId || item.attributes?.documentId || item.id}`" 
+          :to="`/blog/${item.slug || item.attributes?.slug}`" 
           class="aspect-[16/10] overflow-hidden block bg-gray-50 relative"
         >
           <NuxtImg
@@ -89,7 +96,7 @@ useHead({ title: 'Latest Blogs & Fashion News | SeakApparel' })
             </span>
 
             <h3 class="font-bold text-xl text-gray-800 line-clamp-2 hover:text-blue-600 transition-colors">
-              <NuxtLink :to="`/blog/${item.documentId || item.attributes?.documentId || item.id}`">
+              <NuxtLink :to="`/blog/${item.slug || item.attributes?.slug}`">
                 {{ item.title || item.attributes?.title }}
               </NuxtLink>
             </h3>
@@ -102,7 +109,7 @@ useHead({ title: 'Latest Blogs & Fashion News | SeakApparel' })
           <div class="mt-5 pt-4 border-t border-gray-100 flex justify-between items-center">
             <span class="text-xs text-gray-400">June 2026</span>
             <NuxtLink 
-              :to="`/blog/${item.documentId || item.attributes?.documentId || item.id}`" 
+              :to="`/blog/${item.slug || item.attributes?.slug}`" 
               class="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1"
             >
               Read Full Article →

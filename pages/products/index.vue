@@ -47,12 +47,12 @@
         class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between border border-gray-100"
       >
         <NuxtLink
-          :to="`/products/${item.documentId || item.attributes?.documentId || item.id}`"
+          :to="`/products/${item.slug || item.attributes?.slug}`"
           target="_blank"
           class="aspect-square overflow-hidden block bg-gray-50 relative"
         >
           <NuxtImg
-            :src="getImageUrl(item)"
+            :src="getOptimizedUrl(getRawImageUrl(item))"
             class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
             :alt="`${item.title || item.attributes?.title || 'Wholesale Women Clothing'} - SeakApparel`"
           />
@@ -62,7 +62,7 @@
           <!-- 标题左右5px间距 -->
           <div class="px-[5px]">
             <NuxtLink
-              :to="`/products/${item.documentId || item.attributes?.documentId || item.id}`"
+              :to="`/products/${item.slug || item.attributes?.slug}`"
               target="_blank"
               class="block"
             >
@@ -78,7 +78,7 @@
             </div>
 
             <NuxtLink
-              :to="`/products/${item.documentId || item.attributes?.documentId || item.id}`"
+              :to="`/products/${item.slug || item.attributes?.slug}`"
               class="block w-full text-white text-center py-2 rounded transition-colors font-medium text-sm"
               style="background-color: #ff4000;"
             >
@@ -125,6 +125,10 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 
+// 先定义后端域名，所有函数直接读取，无window全局
+const isLocal = process.dev
+const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
+
 // 分页配置：固定每页12条
 const pageSize = 12
 const currentPage = ref(1)
@@ -169,18 +173,38 @@ const pageProducts = computed(() => {
   return list.slice(start, end)
 })
 
-const getImageUrl = (item) => {
-  if (!item) return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
-  if (item.image?.url) return item.image.url
-  if (Array.isArray(item.image) && item.image[0]?.url) return item.image[0].url
-  if (item.attributes?.image?.data?.attributes?.url) return item.attributes.image.data.attributes.url
-  return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
+// 修复：补全后端图片域名，解决404
+const getRawImageUrl = (item) => {
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
+  if (!item) return fallback
+
+  // 单图顶层url
+  if (item.image?.url) {
+    return item.image.url.startsWith('/') ? `${strapiUrl}${item.image.url}` : item.image.url
+  }
+  // 图片数组取第一张
+  if (Array.isArray(item.image) && item.image[0]?.url) {
+    return item.image[0].url.startsWith('/') ? `${strapiUrl}${item.image[0].url}` : item.image[0].url
+  }
+  // attributes嵌套结构
+  if (item.attributes?.image?.data?.attributes?.url) {
+    const raw = item.attributes.image.data.attributes.url
+    return raw.startsWith('/') ? `${strapiUrl}${raw}` : raw
+  }
+  return fallback
+}
+
+// 统一图片自动压缩（和详情页逻辑一致）
+const getOptimizedUrl = (url) => {
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
+  if (!url) return fallback
+  if (url.includes('cloudinary.com')) {
+    return url.replace('/upload/', '/upload/f_auto,q_auto/')
+  }
+  return url
 }
 
 onMounted(async () => {
-  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
-
   try {
     // 1. 获取分类列表
     const catRes = await $fetch(`${strapiUrl}/api/categories`)
