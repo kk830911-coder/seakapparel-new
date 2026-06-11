@@ -55,13 +55,34 @@ const getHotProducts = async () => {
   }
 }
 
-// 获取图片地址工具函数（和产品列表页逻辑完全一致）
+// 获取图片地址工具函数（Cloudinary统一拼接600*600裁切压缩参数）
 const getProductImg = (item) => {
-  if (!item) return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
-  if (item.image?.url) return item.image.url
-  if (Array.isArray(item.image) && item.image[0]?.url) return item.image[0].url
-  if (item.attributes?.image?.data?.attributes?.url) return item.attributes.image.data.attributes.url
-  return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop'
+  let imgUrl = ''
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=80'
+
+  if (!item) {
+    imgUrl = fallback
+  } else if (item.image?.url) {
+    imgUrl = item.image.url
+  } else if (Array.isArray(item.image) && item.image[0]?.url) {
+    imgUrl = item.image[0].url
+  } else if (item.attributes?.image?.data?.attributes?.url) {
+    imgUrl = item.attributes.image.data.attributes.url
+  } else {
+    imgUrl = fallback
+  }
+
+  // 仅对 cloudinary 原图追加裁切压缩参数
+  if (imgUrl.includes('cloudinary')) {
+    imgUrl = imgUrl + '?w=600&h=600&c_fill&q=80'
+  }
+  return imgUrl
+}
+
+// 生成300px小尺寸srcset链接（移动端用）
+const getImgSrcset300 = (item) => {
+  const fullUrl = getProductImg(item)
+  return fullUrl.replace('w=600&h=600', 'w=300&h=300')
 }
 
 onMounted(() => {
@@ -302,8 +323,11 @@ onUnmounted(() => stopPlay())
           >
             <img
               :src="getProductImg(item)"
+              :srcset="`${getImgSrcset300(item)} 300w, ${getProductImg(item)} 600w`"
+              sizes="(max-width: 768px) 300px, 600px"
               alt="product"
               class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+              loading="lazy"
             />
           </NuxtLink>
 

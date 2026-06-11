@@ -48,14 +48,14 @@ const getHotProducts = async () => {
     // 拉取8条产品，完整关联图片
     const res = await $fetch(`${strapiUrl}/api/products?populate=image&pagination[limit]=8`)
     hotProducts.value = res.data || []
-  } catch (err) {
+  } catch (err)
     console.error('Hot products fetch error:', err)
   } finally {
     hotLoading.value = false
   }
 }
 
-// 获取图片地址工具函数（Cloudinary统一拼接600*600裁切压缩参数）
+// 获取图片地址工具函数（Cloudinary正确路径内嵌裁切参数，不再使用?拼接）
 const getProductImg = (item) => {
   let imgUrl = ''
   const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=80'
@@ -72,9 +72,9 @@ const getProductImg = (item) => {
     imgUrl = fallback
   }
 
-  // 仅对 cloudinary 原图追加裁切压缩参数
+  // Cloudinary 正确写法：在 /upload/ 后插入尺寸参数
   if (imgUrl.includes('cloudinary')) {
-    imgUrl = imgUrl + '?w=600&h=600&c_fill&q=80'
+    imgUrl = imgUrl.replace('/upload/', '/upload/w_600,h_600,c_fill,q_80/')
   }
   return imgUrl
 }
@@ -82,7 +82,7 @@ const getProductImg = (item) => {
 // 生成300px小尺寸srcset链接（移动端用）
 const getImgSrcset300 = (item) => {
   const fullUrl = getProductImg(item)
-  return fullUrl.replace('w=600&h=600', 'w=300&h=300')
+  return fullUrl.replace('w_600,h_600', 'w_300,h_300')
 }
 
 onMounted(() => {
@@ -309,8 +309,8 @@ onUnmounted(() => stopPlay())
         Loading hot products...
       </div>
 
-      <!-- 产品网格 桌面4列 自动2行共8个，和产品列表卡片样式统一 -->
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- 商品网格：手机默认2列，平板2列，桌面4列 -->
+      <div v-else class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div
           v-for="item in hotProducts"
           :key="item.documentId || item.id"
