@@ -6,29 +6,46 @@ const route = useRoute()
 
 // 后端域名
 const isLocal = process.dev 
-const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
+const strapiBaseUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
-// 统一拼接 avif 格式 + 裁切参数（新增 format=avif 强制avif）
-// 通用：获取压缩裁切AVIF图片链接
-const getOptimizedImageUrl = (rawUrl, width = 600, height = 600) => {
-  if (!rawUrl) return ''
-  const cleanSrc = rawUrl.split('?')[0]
-  // 强制 avif、居中裁切、质量75
-  return `${strapiUrl}${cleanSrc}?w=${width}&h=${height}&c_fill&q=75&format=avif`
+// 判断图片是否为完整外网URL（Cloudinary完整地址直接用，不再拼接后端域名）
+const isFullExternalUrl = (url) => {
+  return url.startsWith('http://') || url.startsWith('https://')
 }
 
-// 缩略图专用 300px avif
+// 1、修复：智能拼接地址，完整外链不重复加域名；优先avif，失败降级jpg
+const getOptimizedImageUrl = (rawUrl, width = 600, height = 600) => {
+  if (!rawUrl) return ''
+  // 去除原有所有查询参数
+  const cleanSrc = rawUrl.split('?')[0]
+  const params = `w=${width}&h=${height}&c_fill&q=75`
+
+  let baseImgUrl
+  // 关键修复：如果已经是完整http/https地址，直接使用，不再拼接strapi域名
+  if (isFullExternalUrl(cleanSrc)) {
+    baseImgUrl = cleanSrc
+  } else {
+    baseImgUrl = `${strapiBaseUrl}${cleanSrc}`
+  }
+  // 返回两套地址，NuxtImg自动降级avif→jpg
+  return {
+    avif: `${baseImgUrl}?${params}&format=avif`,
+    fallback: `${baseImgUrl}?${params}`
+  }
+}
+
+// 缩略图专用 300px
 const getThumbUrl = (rawUrl) => {
   return getOptimizedImageUrl(rawUrl, 300, 300)
 }
 
-// 富文本内图专用 800px avif
+// 富文本内图专用 800px
 const getRichImageUrl = (rawUrl) => {
   return getOptimizedImageUrl(rawUrl, 800, 800)
 }
 
 // ========== 接口请求产品数据 ==========
-const { data: responseData } = await useFetch(() => `${strapiUrl}/api/products`, {
+const { data: responseData } = await useFetch(() => `${strapiBaseUrl}/api/products`, {
   query: { 
     populate: '*',
     'filters[slug][$eq]': route.params.slug
@@ -55,16 +72,16 @@ const imagesList = computed(() => {
   return list.filter(img => img?.url)
 })
 
-// 当前预览图链接（600尺寸avif）
-const currentMainImageUrl = computed(() => {
+// 当前预览图链接对象（avif + 降级jpg）
+const currentMainImageSrc = computed(() => {
   const item = imagesList.value[activeImageIndex.value]
-  return item ? getOptimizedImageUrl(item.url, 600, 600) : ''
+  return item ? getOptimizedImageUrl(item.url, 600, 600) : { avif: '', fallback: '' }
 })
 
-// 点击弹窗高清大图（1400尺寸avif）
-const bigViewImageUrl = computed(() => {
+// 点击弹窗高清大图（1400尺寸）
+const bigViewImageSrc = computed(() => {
   const item = imagesList.value[activeImageIndex.value]
-  return item ? getOptimizedImageUrl(item.url, 1400, 1400) : ''
+  return item ? getOptimizedImageUrl(item.url, 1400, 1400) : { avif: '', fallback: '' }
 })
 
 // 切换图片共用函数
@@ -79,15 +96,20 @@ const prevImage = () => {
   }
 }
 
-// 修复：富文本图片全部转avif，替换所有图片src
+// 修复：富文本图片，不强制avif参数，直接原图，避免Cloudinary报错
 const renderStrapiRichText = (nodes) => {
   if (!nodes || !Array.isArray(nodes)) return ''
   return nodes.map(node => {
     if (node.type === 'image') {
       const rawUrl = node.image?.url || ''
-      const avifSrc = getRichImageUrl(rawUrl)
-      // 富文本图片也加 object-cover 限制尺寸，不会原图撑开
-      return rawUrl ? `<div class="my-6 flex justify-center"><img src="${avifSrc}" alt="${node.image.alternativeText || 'Product'}" class="rounded-none shadow-sm max-w-full max-h-[70vh] object-contain" /></div>` : ''
+      // 富文本不再强制format=avif，防止后端图片转换失败空白
+      let imgSrc
+      if (isFullExternalUrl(rawUrl)) {
+        imgSrc = rawUrl
+      } else {
+        imgSrc = `${strapiBaseUrl}${rawUrl}`
+      }
+      return rawUrl ? `<div class="my-6 flex justify-center"><img src="${imgSrc}" alt="${node.image.alternativeText || 'Product'}" class="rounded-none shadow-sm max-w-full max-h-[70vh] object-contain" /></div>` : ''
     }
     if (node.type === 'text') return node.text
     const childrenHtml = node.children ? renderStrapiRichText(node.children) : ''
@@ -115,7 +137,7 @@ const handleTouchEnd = (e) => {
   }
 }
 
-// 点击打开大图弹窗标记（简易实现点击放大）
+// 点击打开大图弹窗标记
 const showBigImage = ref(false)
 </script>
 
@@ -130,16 +152,16 @@ const showBigImage = ref(false)
       <div class="grid md:grid-cols-2 gap-12 bg-white md:p-6 md:px-10 rounded-none shadow-sm border border-gray-100">
         
         <div class="space-y-4">
-          <!-- 正方形容器强制裁切，点击弹出高清大图 -->
           <div 
             class="rounded-none overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group cursor-pointer"
             @touchstart="handleTouchStart"
             @touchend="handleTouchEnd"
             @click="showBigImage = true"
           >
-            <!-- 预览图固定600avif，object-cover填满裁切，不会拉伸原图 -->
+            <!-- NuxtImg 支持srcset多格式，avif优先，失败自动加载fallback jpg -->
             <NuxtImg
-              :src="currentMainImageUrl"
+              :src="currentMainImageSrc.fallback"
+              :srcset="`${currentMainImageSrc.avif} format('avif'), ${currentMainImageSrc.fallback}`"
               width="600"
               height="600"
               sizes="(max-width:768px) 90vw, 600px"
@@ -148,7 +170,7 @@ const showBigImage = ref(false)
               loading="lazy"
             />
             
-            <!-- 电脑端才显示箭头 hidden md:flex -->
+            <!-- 电脑端箭头 hidden md:flex -->
             <button 
               v-if="imagesList.length > 1"
               @click.stop="prevImage"
@@ -176,7 +198,7 @@ const showBigImage = ref(false)
             </div>
           </div>
           
-          <!-- 缩略图 300尺寸avif -->
+          <!-- 缩略图 w-14 h-14 60px -->
           <div v-if="imagesList.length > 1" class="w-full">
             <div 
               ref="thumbScrollRef"
@@ -190,7 +212,8 @@ const showBigImage = ref(false)
                 :class="activeImageIndex === index ? 'border-blue-600 ring-2 ring-blue-100 scale-95' : 'border-gray-200 opacity-70 hover:opacity-100'"
               >
                 <NuxtImg 
-                  :src="getThumbUrl(imgItem.url)"
+                  :src="getThumbUrl(imgItem.url).fallback"
+                  :srcset="`${getThumbUrl(imgItem.url).avif} format('avif'), ${getThumbUrl(imgItem.url).fallback}`"
                   width="300"
                   height="300"
                   class="w-full h-full object-cover" 
@@ -253,14 +276,15 @@ const showBigImage = ref(false)
       </div>
     </div>
 
-    <!-- 点击大图弹窗（高清1400avif） -->
+    <!-- 点击大图弹窗 -->
     <div 
       v-if="showBigImage" 
       class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
       @click="showBigImage = false"
     >
       <NuxtImg
-        :src="bigViewImageUrl"
+        :src="bigViewImageSrc.fallback"
+        :srcset="`${bigViewImageSrc.avif} format('avif'), ${bigViewImageSrc.fallback}`"
         width="1400"
         height="1400"
         class="max-w-full max-h-[90vh] object-contain"
