@@ -158,12 +158,12 @@ const scrollThumbRight = () => {}
               ref="thumbScrollRef"
               class="flex gap-2 overflow-x-auto pb-2 scrollbar-thin w-full"
             >
-              <!-- rounded-lg 改成 rounded-none 直角 -->
+              <!-- 核心修改：w-15 h-15 = 60px 正方形缩略图，直角 -->
               <button
                 v-for="(url, index) in imagesList"
                 :key="index"
                 @click="activeImageIndex = index"
-                class="w-10 h-10 rounded-none overflow-hidden border-2 bg-gray-50 flex-shrink-0 transition-all"
+                class="w-15 h-15 rounded-none overflow-hidden border-2 bg-gray-50 flex-shrink-0 transition-all"
                 :class="activeImageIndex === index ? 'border-blue-600 ring-2 ring-blue-100 scale-95' : 'border-gray-200 opacity-70 hover:opacity-100'"
               >
                 <!-- 缩略图替换为NuxtImg -->
