@@ -55,6 +55,10 @@ const product = computed(() => {
 })
 
 const activeImageIndex = ref(0)
+// 原图弹窗状态
+const previewOpen = ref(false)
+// 弹窗内图片索引，和外部同步
+const previewIndex = ref(0)
 
 const imagesList = computed(() => {
   const data = product.value
@@ -70,6 +74,7 @@ const imagesList = computed(() => {
 })
 
 const currentMainImageUrl = computed(() => imagesList.value[activeImageIndex.value] || '')
+const previewImageUrl = computed(() => imagesList.value[previewIndex.value] || '')
 
 // 左右切换通用方法（箭头/滑动/缩略图共用）
 const nextImage = () => { 
@@ -81,6 +86,27 @@ const prevImage = () => {
   if (imagesList.value.length > 1) {
     activeImageIndex.value = (activeImageIndex.value - 1 + imagesList.value.length) % imagesList.value.length 
   }
+}
+
+// 弹窗内切换
+const nextPreview = () => {
+  if (imagesList.value.length > 1) {
+    previewIndex.value = (previewIndex.value + 1) % imagesList.value.length
+  }
+}
+const prevPreview = () => {
+  if (imagesList.value.length > 1) {
+    previewIndex.value = (previewIndex.value - 1 + imagesList.value.length) % imagesList.value.length
+  }
+}
+
+// 打开原图弹窗，同步当前索引
+const openPreview = () => {
+  previewIndex.value = activeImageIndex.value
+  previewOpen.value = true
+}
+const closePreview = () => {
+  previewOpen.value = false
 }
 
 // ✅ 富文本图片渲染改造：返回渲染节点数组，模板用v-for渲染NuxtImg，自动avif
@@ -135,6 +161,20 @@ const handleTouchEnd = (e) => {
     diff < 0 ? nextImage() : prevImage()
   }
 }
+
+// 弹窗触摸滑动
+let previewTouchStartX = 0
+let previewTouchEndX = 0
+const previewTouchStart = (e) => {
+  previewTouchStartX = e.changedTouches[0].screenX
+}
+const previewTouchEnd = (e) => {
+  previewTouchEndX = e.changedTouches[0].screenX
+  const diff = previewTouchEndX - previewTouchStartX
+  if (Math.abs(diff) > 50) {
+    diff < 0 ? nextPreview() : prevPreview()
+  }
+}
 </script>
 
 <template>
@@ -149,11 +189,12 @@ const handleTouchEnd = (e) => {
       <div class="grid md:grid-cols-2 gap-12 bg-white md:p-6 md:px-10 rounded-none shadow-sm border border-gray-100">
         
         <div class="space-y-4">
-          <!-- 仅手机端绑定触摸滑动事件，电脑端无触摸 -->
+          <!-- 仅手机端绑定触摸滑动事件，电脑端无触摸；点击打开原图弹窗 -->
           <div 
-            class="rounded-none overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group"
+            class="rounded-none overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group cursor-zoom-in"
             @touchstart="handleTouchStart"
             @touchend="handleTouchEnd"
+            @click="openPreview"
           >
             <NuxtImg
               :src="getCleanImageUrl(currentMainImageUrl)"
@@ -168,7 +209,7 @@ const handleTouchEnd = (e) => {
             <!-- 核心：md:flex hidden → 手机隐藏箭头，平板/电脑显示 -->
             <button 
               v-if="imagesList.length > 1"
-              @click="prevImage"
+              @click.stop="prevImage"
               class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:outline-none z-10 shadow-md hidden md:flex"
               aria-label="Previous Image"
             >
@@ -179,7 +220,7 @@ const handleTouchEnd = (e) => {
 
             <button 
               v-if="imagesList.length > 1"
-              @click="nextImage"
+              @click.stop="nextImage"
               class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:outline-none z-10 shadow-md hidden md:flex"
               aria-label="Next Image"
             >
@@ -304,6 +345,55 @@ const handleTouchEnd = (e) => {
         </div>
       </div>
 
+    </div>
+
+    <!-- 原图弹窗遮罩层 -->
+    <div 
+      v-if="previewOpen"
+      class="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center p-4"
+      @click="closePreview"
+      @touchstart="previewTouchStart"
+      @touchend="previewTouchEnd"
+    >
+      <!-- 电脑端左右箭头 -->
+      <button
+        v-if="imagesList.length > 1"
+        @click.stop="prevPreview"
+        class="absolute left-3 md:left-6 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 text-white z-10"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 md:w-6 md:h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+      </button>
+
+      <NuxtImg
+        :src="getCleanImageUrl(previewImageUrl)"
+        class="max-w-full max-h-[90vh] object-contain"
+        :alt="product.title || 'Preview'"
+      />
+
+      <button
+        v-if="imagesList.length > 1"
+        @click.stop="nextPreview"
+        class="absolute right-3 md:right-6 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 text-white z-10"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 md:w-6 md:h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+        </svg>
+      </button>
+
+      <!-- 关闭按钮 -->
+      <button
+        @click.stop="closePreview"
+        class="absolute top-4 right-4 text-white text-3xl w-10 h-10 flex items-center justify-center bg-white/20 hover:bg-white/40 rounded-full"
+      >
+        ✕
+      </button>
+
+      <!-- 页码提示 -->
+      <div v-if="imagesList.length > 1" class="absolute bottom-6 text-white text-sm bg-black/50 px-4 py-2 rounded">
+        {{ previewIndex + 1 }} / {{ imagesList.length }}
+      </div>
     </div>
   </div>
 </template>
