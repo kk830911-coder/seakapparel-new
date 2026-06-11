@@ -59,8 +59,8 @@ const activeImageIndex = ref(0)
 const previewOpen = ref(false)
 // 弹窗内图片索引，和外部同步
 const previewIndex = ref(0)
-// 弹窗key，每次打开刷新组件
-const previewKey = ref(0)
+// 弹窗图片独立key，每次打开强制销毁图片组件
+const imgPreviewKey = ref(0)
 
 const imagesList = computed(() => {
   const data = product.value
@@ -94,25 +94,28 @@ const prevImage = () => {
 const nextPreview = () => {
   if (imagesList.value.length > 1) {
     previewIndex.value = (previewIndex.value + 1) % imagesList.value.length
-    previewKey.value++ // 切换图片强制重绘
+    imgPreviewKey.value++
   }
 }
 const prevPreview = () => {
   if (imagesList.value.length > 1) {
     previewIndex.value = (previewIndex.value - 1 + imagesList.value.length) % imagesList.value.length
-    previewKey.value++ // 切换图片强制重绘
+    imgPreviewKey.value++
   }
 }
 
-// 打开原图弹窗，同步当前索引 + 强制重绘
+// 打开原图弹窗，同步当前索引 + 强制重绘图片
 const openPreview = async () => {
   previewIndex.value = activeImageIndex.value
-  previewKey.value++ // 每次打开弹窗更新key，销毁重建图片DOM
+  imgPreviewKey.value++
   await nextTick()
   previewOpen.value = true
 }
-const closePreview = () => {
+// 关闭弹窗重置key，清空缓存尺寸
+const closePreview = async () => {
   previewOpen.value = false
+  await nextTick()
+  imgPreviewKey.value++
 }
 
 // ✅ 富文本图片渲染改造：返回渲染节点数组，模板用v-for渲染NuxtImg，自动avif
@@ -353,10 +356,9 @@ const previewTouchEnd = (e) => {
 
     </div>
 
-    <!-- 原图弹窗遮罩层 增加key强制重建 -->
+    <!-- 原图弹窗遮罩层 -->
     <div 
       v-if="previewOpen"
-      :key="previewKey"
       class="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center p-4 w-full h-full"
       @click="closePreview"
       @touchstart="previewTouchStart"
@@ -373,12 +375,18 @@ const previewTouchEnd = (e) => {
         </svg>
       </button>
 
-      <!-- 外层100%宽高容器，强制全屏计算 -->
-      <div class="w-full h-full flex items-center justify-center">
+      <!-- 图片容器单独绑定key，每次强制销毁NuxtImg，移除固定宽高 -->
+      <div 
+        :key="imgPreviewKey"
+        class="w-full h-full flex items-center justify-center"
+      >
+        <!-- 重点修复：弹窗NuxtImg删除 width/height 固定尺寸，仅靠class自适应全屏 -->
         <NuxtImg
           :src="getCleanImageUrl(previewImageUrl)"
+          sizes="100vw"
           class="max-w-[98vw] max-h-[90vh] w-auto h-auto object-contain block"
           :alt="product.title || 'Preview'"
+          loading="eager"
         />
       </div>
 
