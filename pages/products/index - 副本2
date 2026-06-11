@@ -52,9 +52,8 @@
           class="aspect-square overflow-hidden block bg-gray-50 relative"
         >
           <NuxtImg
-            :src="getCleanImageUrl(item)"
-            width="600"
-            height="600"
+            :src="getOptimizedUrl(getRawImageUrl(item))"
+            :srcset="`${getThumb300(getRawImageUrl(item))} 300w, ${getOptimizedUrl(getRawImageUrl(item))} 600w`"
             sizes="(max-width: 768px) 300px, 600px"
             class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
             :alt="`${item.title || item.attributes?.title || 'Wholesale Women Clothing'} - SeakApparel`"
@@ -177,39 +176,40 @@ const pageProducts = computed(() => {
   return list.slice(start, end)
 })
 
-// 新增：获取纯净无参数图片地址，剥离全部query，交给NuxtImage全局配置处理格式、尺寸、画质
-const getCleanImageUrl = (item) => {
-  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=75&f_auto'
-  let url = ''
+// 修复：补全后端图片域名，解决404
+const getRawImageUrl = (item) => {
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=80'
+  if (!item) return fallback
 
-  if (item?.image?.url) url = item.image.url
-  else if (Array.isArray(item?.image) && item.image[0]?.url) url = item.image[0].url
-  else if (item?.attributes?.image?.data?.attributes?.url) url = item.attributes.image.data.attributes.url
-
-  if (!url) return fallback
-
-  // 本地Strapi图片补全域名
-  if (url.startsWith('/')) return `${strapiUrl}${url}`
-
-  // Cloudinary地址剥离全部查询参数，只保留基础路径
-  return url.split('?')[0]
+  // 单图顶层url
+  if (item.image?.url) {
+    return item.image.url.startsWith('/') ? `${strapiUrl}${item.image.url}` : item.image.url
+  }
+  // 图片数组取第一张
+  if (Array.isArray(item.image) && item.image[0]?.url) {
+    return item.image[0].url.startsWith('/') ? `${strapiUrl}${item.image[0].url}` : item.image[0].url
+  }
+  // attributes嵌套结构
+  if (item.attributes?.image?.data?.attributes?.url) {
+    const raw = item.attributes.image.data.attributes.url
+    return raw.startsWith('/') ? `${strapiUrl}${raw}` : raw
+  }
+  return fallback
 }
 
-// 生成300px缩略图srcset，仅保留裁切压缩，移除自定义格式参数（全局nuxt.config统一avif）
+// 生成300px小图用于srcset移动端
 const getThumb300 = (url) => {
-  if (!url || !url.includes('res.cloudinary.com')) return url
-  const cleanUrl = url.split('?')[0]
-  return `${cleanUrl}?w=300&h=300&c_fill&q=75&f_auto`
+  if (!url || !url.includes('cloudinary')) return url
+  return url.replace('w=600&h=600', 'w=300&h=300')
 }
 
-// 生成600px商品主图，仅裁切+画质，格式由nuxt.config全局format自动控制avif
+// 统一图片自动压缩（和首页逻辑完全一致）
 const getOptimizedUrl = (url) => {
-  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=75&f_auto'
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=80'
   if (!url) return fallback
-
-  if (url.includes('res.cloudinary.com')) {
-    const cleanUrl = url.split('?')[0]
-    return `${cleanUrl}?w=600&h=600&c_fill&q=75&f_auto`
+  if (url.includes('cloudinary.com')) {
+    // 固定600正方形居中裁切、画质80
+    return url + '?w=600&h=600&c_fill&q=80'
   }
   return url
 }
