@@ -113,11 +113,11 @@ onUnmounted(() => stopPlay())
     class="flex w-full transition-transform duration-700 ease-in-out"
     :style="{ transform: `translateX(-${currentIndex * 100}%)` }"
   >
-    <!-- 高度分层：手机h-[40vh]最小320px，平板md:h-[42vh]，桌面原比例max-h-[750px] -->
+    <!-- 高度分层：手机h-[30vh]最小320px，平板md:h-[30vh]，桌面原比例max-h-[750px] -->
     <div
       v-for="img in bannerList"
       :key="img"
-      class="relative min-w-full h-[40vh] min-h-[320px] md:h-[42vh] lg:h-[calc(100vw*750/1920)] lg:max-h-[750px]"
+      class="relative min-w-full h-[30vh] min-h-[320px] md:h-[30vh] lg:h-[calc(100vw*750/1920)] lg:max-h-[750px]"
     >
       <!-- object-position：移动端向下偏移裁切，放大女装主体；桌面居中正常展示 -->
       <NuxtImg
