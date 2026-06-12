@@ -238,11 +238,6 @@ const resetPage = () => {
 }
 watch(activeCategoryId, resetPage)
 
-// ========== 新增：切换页码自动滚动到页面顶部 ==========
-watch(currentPage, () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-})
-
 useHead({
   title: 'All Wholesale Products | Southeast Asia Women\'s Apparel Supplier - SeakApparel',
   meta: [
