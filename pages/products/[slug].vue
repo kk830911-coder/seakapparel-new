@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, nextTick, watch } from 'vue'
+import { ref, computed, nextTick, watch, onMounted } from 'vue'
 import { useRoute, useHead, useFetch } from '#imports'
 
 const route = useRoute()
@@ -36,16 +36,10 @@ const getThumb300 = (url) => {
   return clean
 }
 
-// ========== 修复接口查询：取消精准fields过滤，改用白名单populate，避免接口返回空数据 ==========
-const { data: responseData, pending } = await useFetch(() => `${strapiUrl}/api/products`, {
-  query: { 
-    populate: ['image','images','description'],
-    'filters[slug][$eq]': route.params.slug
-  },
-  initialCache: true,
-  cache: true,
-  staleIfError: 600000
-})
+// 状态分离
+const responseData = ref(null)
+const pending = ref(false)
+const fetchError = ref(null)
 
 // 统一兼容取值函数，解决顶层/attributes双层数据读取失效
 const getAttr = (field) => {
@@ -56,10 +50,50 @@ const getAttr = (field) => {
 }
 
 const product = computed(() => {
+  if (!responseData.value) return null
   const res = responseData.value
-  if (!res || !Array.isArray(res.data)) return null
+  if (!Array.isArray(res.data)) return null
   if (res.data.length > 0) return res.data[0]
   return null
+})
+
+// 封装接口请求方法，切换slug重新调用
+const fetchProductBySlug = async (slug) => {
+  if (!slug) return
+  pending.value = true
+  fetchError.value = null
+  try {
+    const { data, error } = await useFetch(`${strapiUrl}/api/products`, {
+      query: { 
+        populate: ['image','images','description'],
+        'filters[slug][$eq]': slug
+      },
+      initialCache: false,
+      cache: false,
+      timeout: 12000
+    })
+    if (error.value) throw error.value
+    responseData.value = data.value
+  } catch (err) {
+    fetchError.value = err
+    console.error('接口请求失败：', err)
+  } finally {
+    pending.value = false
+  }
+}
+
+// 路由变化/页面挂载时拉取商品
+watch(() => route.params.slug, (newSlug) => {
+  // 重置图片状态
+  activeImageIndex.value = 0
+  previewIndex.value = 0
+  previewOpen.value = false
+  imgPreviewKey.value++
+  fetchProductBySlug(newSlug)
+}, { immediate: true })
+
+onMounted(() => {
+  fetchProductBySlug(route.params.slug)
 })
 
 const activeImageIndex = ref(0)
@@ -209,14 +243,6 @@ const scrollThumbRight = () => {
   thumbScrollRef.value.scrollBy({ left: 120, behavior: 'smooth' })
 }
 
-// ========== 监听路由slug切换，重置所有图片状态，消除切商品闪现旧图 ==========
-watch(() => route.params.slug, () => {
-  activeImageIndex.value = 0
-  previewIndex.value = 0
-  previewOpen.value = false
-  imgPreviewKey.value++
-})
-
 // ========== 弹窗打开锁定页面滚动，解决移动端滚动穿透 ==========
 if (process.client) {
   watch(previewOpen, (val) => {
@@ -244,11 +270,15 @@ useHead(() => {
 <template>
   <!-- 页面外层无左右边距，手机贴屏 -->
   <div class="max-w-7xl mx-auto py-12">
-    <!-- 新增加载中状态，Render后端冷启动时显示loading -->
-    <div v-if="pending" class="text-center py-20 text-blue-500">
-      Loading product details...
+    <!-- 加载中状态 -->
+    <div v-if="pending" class="text-center py-20 text-blue-500 text-lg">
+      Loading product details, please wait...
     </div>
-
+    <!-- 接口请求失败提示 -->
+    <div v-else-if="fetchError" class="text-center py-20 text-orange-500 bg-orange-50 rounded-none">
+      Failed to load product data, server connection timeout. Please refresh later.
+    </div>
+    <!-- 无商品匹配提示 -->
     <div v-else-if="!product" class="text-center py-20 text-red-500 bg-red-50 rounded-none">
       Product detail not found. Please refresh the page or back to list.
     </div>
