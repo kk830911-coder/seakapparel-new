@@ -8,6 +8,18 @@ const route = useRoute()
 const isLocal = process.dev 
 const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
+// ========== 【前置定义所有ref变量，解决初始化顺序报错】 ==========
+const activeImageIndex = ref(0)
+const previewOpen = ref(false)
+const previewIndex = ref(0)
+const imgPreviewKey = ref(0)
+const thumbScrollRef = ref(null)
+
+// 状态分离
+const responseData = ref(null)
+const pending = ref(false)
+const fetchError = ref(null)
+
 // 新增：纯净无参图片地址，剥离所有query，交给NuxtImage全局配置自动处理avif/尺寸/画质
 const getCleanImageUrl = (rawUrl) => {
   const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&c_fill&q=75&f_auto'
@@ -35,11 +47,6 @@ const getThumb300 = (url) => {
   }
   return clean
 }
-
-// 状态分离
-const responseData = ref(null)
-const pending = ref(false)
-const fetchError = ref(null)
 
 // 统一兼容取值函数，解决顶层/attributes双层数据读取失效
 const getAttr = (field) => {
@@ -84,7 +91,7 @@ const fetchProductBySlug = async (slug) => {
 
 // 路由变化/页面挂载时拉取商品
 watch(() => route.params.slug, (newSlug) => {
-  // 重置图片状态
+  // 重置图片状态（现在activeImageIndex已提前定义，不会报错）
   activeImageIndex.value = 0
   previewIndex.value = 0
   previewOpen.value = false
@@ -95,14 +102,6 @@ watch(() => route.params.slug, (newSlug) => {
 onMounted(() => {
   fetchProductBySlug(route.params.slug)
 })
-
-const activeImageIndex = ref(0)
-// 原图弹窗状态
-const previewOpen = ref(false)
-// 弹窗内图片索引，和外部同步
-const previewIndex = ref(0)
-// 弹窗图片独立key，每次打开强制销毁图片组件
-const imgPreviewKey = ref(0)
 
 const imagesList = computed(() => {
   const data = product.value
@@ -233,7 +232,6 @@ const renderStrapiRichTextNodes = (nodes) => {
 const descriptionNodes = computed(() => renderStrapiRichTextNodes(getAttr('description')))
 
 // 缩略图滚动容器，补全空滚动函数逻辑（函数名完全不变）
-const thumbScrollRef = ref(null)
 const scrollThumbLeft = () => {
   if (!thumbScrollRef.value) return
   thumbScrollRef.value.scrollBy({ left: -120, behavior: 'smooth' })
