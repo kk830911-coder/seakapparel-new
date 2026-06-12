@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useHead } from '#imports'
 
 // 1. 全局 SEO 头信息设置（提升谷歌收录和社交卡片分享）
@@ -34,6 +34,25 @@ const toggleMenu = () => {
 // 返回顶部
 const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+// 3. 自主可控的 Cookie 弹窗逻辑（完全免费，本地存储）
+const showCookieBanner = ref(false)
+
+onMounted(() => {
+  // 检查用户之前是否点击过接受
+  const isCookieAccepted = localStorage.getItem('seak_cookie_accepted')
+  if (!isCookieAccepted) {
+    // 如果没点过，1.5秒后优雅滑出弹窗
+    setTimeout(() => {
+      showCookieBanner.value = true
+    }, 1500)
+  }
+})
+
+const acceptCookies = () => {
+  localStorage.setItem('seak_cookie_accepted', 'true')
+  showCookieBanner.value = false
 }
 </script>
 
@@ -157,4 +176,50 @@ const scrollToTop = () => {
         </NuxtLink>
         <button 
           @click="scrollToTop"
-          class="w-9 h-9 flex items-center justify-center transition-all duration-300
+          class="w-9 h-9 flex items-center justify-center transition-all duration-300 hover:brightness-110 group"
+          style="background: linear-gradient(135deg, #ffb347 0%, #ff8c28 100%);"
+        >
+          <svg width="18" height="18" fill="#fff" viewBox="0 0 24 24" class="transition-transform duration-300 group-hover:scale-110">
+            <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <transition
+      enter-active-class="transition ease-out duration-500 transform"
+      enter-from-class="translate-y-full opacity-0"
+      enter-to-class="translate-y-0 opacity-100"
+      leave-active-class="transition ease-in duration-300 transform"
+      leave-from-class="translate-y-0 opacity-100"
+      leave-to-class="translate-y-full opacity-0"
+    >
+      <div v-if="showCookieBanner" class="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 shadow-2xl z-[1000] py-4 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div class="text-sm text-slate-600 max-w-4xl text-center md:text-left leading-relaxed">
+            We use cookies to measure and improve our site and service, to assist our marketing campaigns and to provide personalised content. By clicking "Accept Cookies", you agree to our data collection. For more information, please see our <NuxtLink to="/privacy-policy" class="text-[#9d25da] hover:underline font-medium">Privacy Policy</NuxtLink>.
+          </div>
+          <div class="flex items-center gap-4 flex-shrink-0">
+            <button @click="showCookieBanner = false" class="text-xs text-slate-400 hover:text-slate-600 font-medium transition">Decline</button>
+            <button 
+              @click="acceptCookies" 
+              class="bg-slate-900 text-white text-xs md:text-sm font-semibold px-5 py-2 rounded-lg hover:bg-slate-800 transition duration-300 shadow-sm"
+            >
+              Accept Cookies
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
+  </div>
+</template>
+
+<style>
+html {
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  padding: 0;
+}
+</style>
