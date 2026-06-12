@@ -1,59 +1,98 @@
 <script setup>
-import { computed } from 'vue'
-import { useRoute, useHead, useFetch } from '#imports'
+import { ref, onMounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
+const responseData = ref(null)
+const loading = ref(true)
+const fetchError = ref(false)
+
+// 路由参数改为 slug
 const postSlug = route.params.slug
 
-// 后端域名声明
+// 拿到单篇博客的完整数据对象（筛选接口返回数组，取第一条）
+const post = computed(() => {
+  const res = responseData.value
+  if (res && Array.isArray(res.data) && res.data.length > 0) {
+    return res.data[0]
+  }
+  return null
+})
+
+// 后端域名置顶统一声明，和产品/博客列表逻辑一致
 const isLocal = process.dev
 const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
-// 1. 使用 useFetch 替代 onMounted，支持服务端渲染(SSR)以获取更好的 SEO 和首屏速度
-const { data: responseData, pending: loading, error: fetchError } = await useFetch(`${strapiUrl}/api/blogs`, {
-  query: { 
-    'filters[slug][$eq]': postSlug,
-    'populate': '*'
-  },
-  key: `blog-${postSlug}`
-})
-
-const post = computed(() => responseData.value?.data?.[0] || null)
-
-// 图片地址清洗：自动移除查询参数，交给 NuxtImg 全局配置处理 AVIF/WebP
+// 新增：纯净无参图片地址，剥离全部query，交给NuxtImage全局配置自动avif
 const getCleanImageUrl = (rawUrl) => {
   const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1200&h=514&c_fill&q=75&f_auto'
   if (!rawUrl) return fallback
-  return rawUrl.startsWith('/') ? `${strapiUrl}${rawUrl}` : rawUrl.split('?')[0]
+  // 本地Strapi路径补全域名
+  if (rawUrl.startsWith('/')) return `${strapiUrl}${rawUrl}`
+  // Cloudinary剥离全部查询参数
+  return rawUrl.split('?')[0]
 }
 
-// 适配 Strapi 封面图数据结构
+// 统一大图裁切压缩，格式由nuxt.config全局avif配置自动处理
+const getOptimizedUrl = (url) => {
+  const clean = getCleanImageUrl(url)
+  if (clean.includes('res.cloudinary.com')) {
+    return `${clean}?w=1200&h=514&c_fill&q=75&f_auto`
+  }
+  return clean
+}
+
+// 适配 Strapi 的主封面图获取逻辑 + 补全后端域名修复404
 const getImageUrl = (postItem) => {
   if (!postItem) return ''
   const coverData = postItem.cover || postItem.attributes?.cover
   if (!coverData) return ''
-  
-  if (coverData.url) return coverData.url
-  if (coverData.data?.attributes?.url) return coverData.data.attributes.url
+  if (coverData.url) {
+    return coverData.url.startsWith('/') ? `${strapiUrl}${coverData.url}` : coverData.url
+  }
+  if (coverData.data?.attributes?.url) {
+    const raw = coverData.data.attributes.url
+    return raw.startsWith('/') ? `${strapiUrl}${raw}` : raw
+  }
   return ''
 }
 
-// 富文本渲染逻辑
+// 针对 Strapi Rich Text (Blocks) 富文本的处理函数
+// 如果你后续安装了 @strapi/blocks-react-renderer 的 vue 版本可以替换，这里用原生方法安全解析
 const renderBlocks = (content) => {
-  if (!content) return []
-  if (typeof content === 'string') return [content]
+  if (!content) return ''
+  if (typeof content === 'string') return content // 如果是普通字符串直接返回
   
+  // 如果是 Strapi 的 Blocks 数组结构，将其安全组合为文本
   if (Array.isArray(content)) {
     return content.map(block => {
-      if (block.type === 'paragraph' || block.type === 'heading') {
+      if (block.type === 'paragraph') {
+        return block.children?.map(child => child.text).join('') || ''
+      }
+      if (block.type === 'heading') {
         return block.children?.map(child => child.text).join('') || ''
       }
       return ''
     }).filter(Boolean)
   }
-  return []
+  return ''
 }
 
+onMounted(async () => {
+  try {
+    // 改用 slug 筛选接口，populate 完整拉取封面、分类数据
+    const res = await $fetch(`${strapiUrl}/api/blogs?filters[slug][$eq]=${postSlug}&populate=*`)
+    console.log('详情页收到的原始数据:', res)
+    responseData.value = res
+  } catch (err) {
+    console.error('Client fetch blog detail failed:', err)
+    fetchError.value = true
+  } finally {
+    loading.value = false
+  }
+})
+
+// 动态设置页面 SEO 标题
 useHead({
   title: computed(() => `${post.value?.title || post.value?.attributes?.title || 'Blog Detail'} | SeakApparel`)
 })
@@ -91,12 +130,15 @@ useHead({
       </p>
 
       <div v-if="getImageUrl(post)" class="w-full aspect-[21/9] rounded-xl overflow-hidden mb-10 bg-gray-100">
+        <!-- 替换为NuxtImg，自动全局AVIF转换 -->
         <NuxtImg 
           :src="getCleanImageUrl(getImageUrl(post))"
-          sizes="(max-width: 1200px) 100vw, 1200px"
+          width="1200"
+          height="514"
+          sizes="1200px"
           class="w-full h-full object-cover"
           alt="Blog Detail Cover"
-          loading="eager"
+          loading="lazy"
         />
       </div>
 
@@ -116,6 +158,7 @@ useHead({
 </template>
 
 <style scoped>
+/* 自定义富文本的一些间距和样式排版优化 */
 .prose p {
   margin-bottom: 1.5rem;
   color: #374151;
