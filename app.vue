@@ -1,10 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { useHead, useRoute, useRuntimeConfig } from '#imports'
-
-const route = useRoute()
-const runtimeConfig = useRuntimeConfig()
-const baseSiteUrl = runtimeConfig.public?.siteUrl || 'https://www.seakapparel.com'
+import { useHead } from '#imports'
 
 // 1. 全局 SEO 头信息设置（提升谷歌收录和社交卡片分享）
 useHead({
@@ -21,15 +17,10 @@ useHead({
     // Open Graph (用于 WhatsApp, Facebook 等社交软件分享时显示漂亮卡片)
     { property: 'og:title', content: "Southeast Asia Women's Apparel Wholesale | SeakApparel" },
     { property: 'og:description', content: 'Factory direct supply, low MOQ, and professional OEM/ODM services for Southeast Asia fashion buyers.' },
-    { property: 'og:image', content: 'https://www.seakapparel.com/og-image.jpg' },
-    { property: 'og:type', content: 'website' }
+    { property: 'og:image', content: 'https://www.seakapparel.com/og-image.jpg' }
   ],
   link: [
-    // 动态canonical链接，解决分页/筛选参数造成重复内容SEO惩罚
-    { 
-      rel: 'canonical', 
-      href: route.fullPath === '/' ? baseSiteUrl : `${baseSiteUrl}${route.fullPath}` 
-    }
+    { rel: 'canonical', href: 'https://www.seakapparel.com' }
   ]
 })
 
