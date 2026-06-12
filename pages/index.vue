@@ -103,65 +103,65 @@ onUnmounted(() => stopPlay())
 
 <template>
   <div>
-     <!-- 顶部轮播横幅 桌面1920*750，移动端加高裁切放大图片 -->
-    <section
-      class="relative w-full overflow-hidden"
-      @mouseenter="stopPlay"
-      @mouseleave="autoPlay"
+    <!-- 顶部轮播横幅 桌面1920*750，移动端加高裁切放大图片 -->
+<section
+  class="relative w-full overflow-hidden"
+  @mouseenter="stopPlay"
+  @mouseleave="autoPlay"
+>
+  <div
+    class="flex w-full transition-transform duration-700 ease-in-out"
+    :style="{ transform: `translateX(-${currentIndex * 100}%)` }"
+  >
+    <!-- 高度分层：手机h-[50vh]最小320px，平板md:h-[42vh]，桌面原比例max-h-[750px] -->
+    <div
+      v-for="img in bannerList"
+      :key="img"
+      class="relative min-w-full h-[50vh] min-h-[320px] md:h-[42vh] lg:h-[calc(100vw*750/1920)] lg:max-h-[750px]"
     >
-      <div
-        class="flex w-full transition-transform duration-700 ease-in-out"
-        :style="{ transform: `translateX(-${currentIndex * 100}%)` }"
-      >
-        <div
-          v-for="img in bannerList"
-          :key="img"
-          <!-- 高度分层：手机h-[50vh]最小320px，平板h-[42vh]，桌面原比例max-h-[750px] -->
-          class="relative min-w-full h-[50vh] min-h-[320px] md:h-[42vh] lg:h-[calc(100vw*750/1920)] lg:max-h-[750px]"
-        >
-          <NuxtImg
-            :src="img"
-            format="avif"
-            fallbackFormat="webp"
-            <!-- object-position：移动端向下偏移裁切，放大女装主体；桌面居中正常展示 -->
-            class="w-full h-full object-cover md:object-center object-[center_25%]"
-            alt="SeakApparel Wholesale Banner"
-            loading="lazy"
-          />
-        </div>
-      </div>
+      <!-- object-position：移动端向下偏移裁切，放大女装主体；桌面居中正常展示 -->
+      <NuxtImg
+        :src="img"
+        format="avif"
+        fallbackFormat="webp"
+        class="w-full h-full object-cover md:object-center object-[center,25%]"
+        alt="SeakApparel Wholesale Banner"
+        loading="lazy"
+      />
+    </div>
+  </div>
 
-      <!-- 左右切换箭头：半透明紫色 -->
-      <button
-        @click="prevSlide"
-        class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-white text-xl transition-colors"
-        style="background-color: rgba(157, 37, 218, 0.4);"
-        @mouseover="$event.target.style.backgroundColor='rgba(157, 37, 218, 0.7)'"
-        @mouseout="$event.target.style.backgroundColor='rgba(157, 37, 218, 0.4)'"
-      >
-        ‹
-      </button>
-      <button
-        @click="nextSlide"
-        class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-white text-xl transition-colors"
-        style="background-color: rgba(157, 37, 218, 0.4);"
-        @mouseover="$event.target.style.backgroundColor='rgba(157, 37, 218, 0.7)'"
-        @mouseout="$event.target.style.backgroundColor='rgba(157, 37, 218, 0.4)'"
-      >
-        ›
-      </button>
+  <!-- 左右切换箭头：半透明紫色 -->
+  <button
+    @click="prevSlide"
+    class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-white text-xl transition-colors"
+    style="background-color: rgba(157, 37, 218, 0.4);"
+    @mouseover="$event.target.style.backgroundColor='rgba(157, 37, 218, 0.7)'"
+    @mouseout="$event.target.style.backgroundColor='rgba(157, 37, 218, 0.4)'"
+  >
+    ‹
+  </button>
+  <button
+    @click="nextSlide"
+    class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-white text-xl transition-colors"
+    style="background-color: rgba(157, 37, 218, 0.4);"
+    @mouseover="$event.target.style.backgroundColor='rgba(157, 37, 218, 0.7)'"
+    @mouseout="$event.target.style.backgroundColor='rgba(157, 37, 218, 0.4)'"
+  >
+    ›
+  </button>
 
-      <!-- 底部圆点指示器 -->
-      <div class="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
-        <button
-          v-for="(item, idx) in bannerList"
-          :key="idx"
-          @click="switchSlide(idx)"
-          class="w-3 h-3 rounded-full transition-colors"
-          :class="currentIndex === idx ? 'bg-white' : 'bg-white/40'"
-        ></button>
-      </div>
-    </section>
+  <!-- 底部圆点指示器 -->
+  <div class="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
+    <button
+      v-for="(item, idx) in bannerList"
+      :key="idx"
+      @click="switchSlide(idx)"
+      class="w-3 h-3 rounded-full transition-colors"
+      :class="currentIndex === idx ? 'bg-white' : 'bg-white/40'"
+    ></button>
+  </div>
+</section>
 
     <!-- 轮播下方紫色文字区块 -->
     <section class="text-white py-20 px-6 text-center" style="background-color: #9d25da;">
