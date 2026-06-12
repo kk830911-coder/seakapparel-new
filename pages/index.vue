@@ -198,7 +198,7 @@ onUnmounted(() => stopPlay())
     <section class="max-w-[1400px] mx-auto px-[5px] md:px-4 pb-16">
       <div class="bg-white rounded-xl shadow-lg p-6 md:p-10">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-          <!-- 左侧：缩小单行标题 + 工厂图 + 联系方式模块 -->
+          <!-- 左侧：缩小单行标题 + 工厂图 + 联系方式模块（手机保留） -->
           <div class="lg:col-span-3 flex flex-col gap-6">
             <h2 class="text-2xl font-bold text-center whitespace-nowrap" style="color:#9d25da;">Seak Apparel</h2>
             <NuxtImg
@@ -225,8 +225,8 @@ onUnmounted(() => stopPlay())
             </div>
           </div>
 
-          <!-- 中间主体介绍文字 -->
-          <div class="lg:col-span-6 text-gray-600 text-lg leading-relaxed space-y-6 flex flex-col justify-center">
+          <!-- 中间主体介绍文字：手机隐藏，电脑显示 -->
+          <div class="hidden lg:block lg:col-span-6 text-gray-600 text-lg leading-relaxed space-y-6 flex flex-col justify-center">
             <p>
               <span class="font-bold" style="color:#9d25da;">Hubei Seak Apparel Co., Ltd.</span> is a women's wear intelligent manufacturing enterprise integrating R&D design, flexible production and cross-border e-commerce operation. We provide full-process ODM/OEM clothing services, including European & American fast fashion development, women's clothing processing and FOB label production. Our product line covers women's dresses, cotton coats, down jackets, skirts, blouses, jumpsuits and all other categories.
             </p>
@@ -235,8 +235,8 @@ onUnmounted(() => stopPlay())
             </p>
           </div>
 
-          <!-- 右侧文字 -->
-          <div class="lg:col-span-3 text-gray-600 text-lg leading-relaxed flex flex-col justify-center">
+          <!-- 右侧文字：手机隐藏，电脑显示 -->
+          <div class="hidden lg:block lg:col-span-3 text-gray-600 text-lg leading-relaxed flex flex-col justify-center">
             <p>
               Our factory is located in Xiantao City, Hubei Province. We own a 5000m² intelligent workshop and 1000m² standard warehouse, equipped with more than 50 imported machines and digital pattern rooms. Our professional team of over 100 staff strictly follows ISO quality standards. Adhering to the philosophy of "Quality First, Customer Supreme", we realize efficient conversion between fashion trends and consumer demands through precise market research and flexible production systems.
             </p>
