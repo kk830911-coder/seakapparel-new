@@ -5,8 +5,27 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxtjs/tailwindcss',
     '@nuxtjs/sitemap',
-    'nuxt-schema-org'
+    'nuxt-schema-org',
+    '@nuxtjs/i18n' // ✅ 已为您添加 i18n 多语言模块
   ],
+
+  // ✅ 多语言精细化配置（严格对照您的 Strapi 后台语种）
+  i18n: {
+    strategy: 'prefix_except_default', // 默认英语不用前缀，其他语言自动加前缀（如 /th-TH）
+    defaultLocale: 'en', // 对应 Strapi 默认的 English (en)
+    locales: [
+      { code: 'en', iso: 'en', name: 'English' },
+      { code: 'th-TH', iso: 'th-TH', name: 'ไทย' },
+      { code: 'vi-VN', iso: 'vi-VN', name: 'Tiếng Việt' },
+      { code: 'id-ID', iso: 'id-ID', name: 'Bahasa Indonesia' },
+      { code: 'ms-MY', iso: 'ms-MY', name: 'Bahasa Melayu' }
+    ],
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_redirected',
+      redirectOn: 'root',
+    }
+  },
 
   app: {
     head: {
@@ -21,7 +40,6 @@ export default defineNuxtConfig({
         { name: 'description', content: "Seak Apparel is a premier B2B women's clothing wholesale supplier for Southeast Asia. High-quality dresses, tops, and skirts at factory direct prices. Bulk orders only." }
       ],
       script: [
-        // ✅ 帮您把刚才不小心删掉的 script 数组头补回来了
         // GA4 全局跟踪代码配置
         {
           src: 'https://www.googletagmanager.com/gtag/js?id=G-H794JGCTR0',
