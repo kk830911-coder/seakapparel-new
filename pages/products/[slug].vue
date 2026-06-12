@@ -29,7 +29,28 @@ const product = computed(() => {
   return null
 })
 
-// === 动态注入谷歌 SEO Meta 标签 ===
+// 状态管理
+const activeImageIndex = ref(0)
+const previewOpen = ref(false)
+const previewIndex = ref(0)
+const imgPreviewKey = ref(0)
+
+const imagesList = computed(() => {
+  const data = product.value
+  if (!data) return []
+  let list = []
+  const imgData = data.image || data.attributes?.image
+  const imagesData = data.images || data.attributes?.images
+  if (imgData) Array.isArray(imgData) ? list.push(...imgData) : list.push(imgData)
+  if (imagesData && Array.isArray(imagesData)) list.push(...imagesData)
+  
+  return list.map(img => (typeof img === 'string' ? img : (img.url || img.attributes?.url))).filter(Boolean)
+})
+
+const currentMainImageUrl = computed(() => imagesList.value[activeImageIndex.value] || '')
+const previewImageUrl = computed(() => imagesList.value[previewIndex.value] || '')
+
+// === 移到所有变量和计算属性初始化之后的：动态注入谷歌 SEO Meta 标签 ===
 useSeoMeta({
   title: () => {
     const title = product.value?.title || product.value?.attributes?.title || 'Women\'s Clothing Wholesale'
@@ -51,31 +72,11 @@ useSeoMeta({
     return `Buy wholesale ${title} at direct factory price ($${price}). High-quality B2B apparel supply for fashion boutiques in Southeast Asia.`
   },
   ogImage: () => {
+    // 确保这里的计算属性已经在上方完全定义好
     return currentMainImageUrl.value ? getCleanImageUrl(currentMainImageUrl.value) : 'https://www.seakapparel.com/og-image.jpg'
   },
   twitterCard: 'summary_large_image',
 })
-
-// 状态管理
-const activeImageIndex = ref(0)
-const previewOpen = ref(false)
-const previewIndex = ref(0)
-const imgPreviewKey = ref(0)
-
-const imagesList = computed(() => {
-  const data = product.value
-  if (!data) return []
-  let list = []
-  const imgData = data.image || data.attributes?.image
-  const imagesData = data.images || data.attributes?.images
-  if (imgData) Array.isArray(imgData) ? list.push(...imgData) : list.push(imgData)
-  if (imagesData && Array.isArray(imagesData)) list.push(...imagesData)
-  
-  return list.map(img => (typeof img === 'string' ? img : (img.url || img.attributes?.url))).filter(Boolean)
-})
-
-const currentMainImageUrl = computed(() => imagesList.value[activeImageIndex.value] || '')
-const previewImageUrl = computed(() => imagesList.value[previewIndex.value] || '')
 
 // 切换逻辑
 const nextImage = () => { if (imagesList.value.length > 1) activeImageIndex.value = (activeImageIndex.value + 1) % imagesList.value.length }
