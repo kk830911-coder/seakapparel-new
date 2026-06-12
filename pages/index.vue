@@ -254,7 +254,8 @@ onUnmounted(() => stopPlay())
 
         alt="SeakApparel Wholesale Banner"
 
-        loading="lazy"
+        preload
+        fetchpriority="high"
 
       />
 
@@ -405,19 +406,13 @@ onUnmounted(() => stopPlay())
             <h2 class="text-2xl font-bold text-center whitespace-nowrap" style="color:#9d25da;">Seak Apparel</h2>
 
             <NuxtImg
-
               src="/gongchang.jpg"
-
               format="avif"
-
               fallbackFormat="webp"
-
+              sizes="(max-width: 768px) 95vw, 350px"
               alt="Seak Apparel Factory Building"
-
               class="w-full rounded-md shadow-md"
-
               loading="lazy"
-
             />
 
             <!-- 联系信息卡片 -->
@@ -513,22 +508,15 @@ onUnmounted(() => stopPlay())
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
 
         <div class="relative overflow-hidden rounded-lg">
-
-          <NuxtImg
-
-            src="/gongchang_01.jpg"
-
-            format="avif"
-
-            fallbackFormat="webp"
-
-            alt="Source Factory"
-
-            class="w-full h-64 object-cover"
-
-            loading="lazy"
-
-          />
+        <NuxtImg
+          src="/gongchang_01.jpg"
+          format="avif"
+          fallbackFormat="webp"
+          sizes="(max-width: 768px) 95vw, (max-width: 1200px) 33vw, 450px"
+          alt="Source Factory"
+          class="w-full h-64 object-cover"
+          loading="lazy"
+        />
 
           <div class="absolute bottom-0 left-0 right-0 py-2 text-center text-white font-medium tracking-wider z-10" style="background-color:rgba(157, 37, 218, 0.85)">Source Factory</div>
 
@@ -653,19 +641,13 @@ onUnmounted(() => stopPlay())
       <div class="relative overflow-hidden rounded-lg mb-4">
 
         <NuxtImg
-
           src="/gongchang_07.jpg"
-
           format="avif"
-
           fallbackFormat="webp"
-
+          sizes="(max-width: 768px) 100vw, 1400px"
           alt="5000+ Production Workshop"
-
-          class="w-full h-[800px] object-cover"
-
+          class="w-full h-[300px] md:h-[800px] object-cover"
           loading="lazy"
-
         />
 
         <div class="absolute top-6 left-1/2 -translate-x-1/2 py-2 px-6 text-center text-white font-bold text-xl z-10" style="background-color:rgba(157, 37, 218, 0.9)">
@@ -814,23 +796,15 @@ onUnmounted(() => stopPlay())
 
             <!-- 恢复NuxtImg，依靠nuxt.config全局format自动AVIF -->
 
-            <NuxtImg
-
-              :src="getCleanImageUrl(item)"
-
-              width="600"
-
-              height="600"
-
-              sizes="(max-width: 768px) 300px, 600px"
-
-              class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-
-              alt="product"
-
-              loading="lazy"
-
-            />
+          <NuxtImg
+            :src="getCleanImageUrl(item)"
+            width="600"
+            height="600"
+            sizes="(max-width: 640px) 180px, (max-width: 1024px) 300px, 400px"
+            class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+            alt="product"
+            loading="lazy"
+          />
 
           </NuxtLink>
 
