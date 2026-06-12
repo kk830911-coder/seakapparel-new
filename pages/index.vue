@@ -531,7 +531,7 @@ onUnmounted(() => stopPlay())
             format="avif"
 
             fallbackFormat="webp"
-
+            sizes="(max-width: 768px) 95vw, (max-width: 1200px) 33vw, 450px"
             alt="Design & Sample Making"
 
             class="w-full h-64 object-cover"
@@ -553,7 +553,7 @@ onUnmounted(() => stopPlay())
             format="avif"
 
             fallbackFormat="webp"
-
+            sizes="(max-width: 768px) 95vw, (max-width: 1200px) 33vw, 450px"
             alt="Ironing Area"
 
             class="w-full h-64 object-cover"
@@ -575,7 +575,7 @@ onUnmounted(() => stopPlay())
             format="avif"
 
             fallbackFormat="webp"
-
+           sizes="(max-width: 768px) 95vw, (max-width: 1200px) 33vw, 450px"
             alt="Cutting Area"
 
             class="w-full h-64 object-cover"
@@ -597,7 +597,7 @@ onUnmounted(() => stopPlay())
             format="avif"
 
             fallbackFormat="webp"
-
+            sizes="(max-width: 768px) 95vw, (max-width: 1200px) 33vw, 450px"
             alt="Sewing Workshop"
 
             class="w-full h-64 object-cover"
@@ -619,7 +619,7 @@ onUnmounted(() => stopPlay())
             format="avif"
 
             fallbackFormat="webp"
-
+            sizes="(max-width: 768px) 95vw, (max-width: 1200px) 33vw, 450px"
             alt="Packaging Area"
 
             class="w-full h-64 object-cover"
