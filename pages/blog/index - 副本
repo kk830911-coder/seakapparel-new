@@ -1,34 +1,71 @@
 <script setup>
-import { computed } from 'vue'
-import { useFetch, useHead } from '#imports'
+import { ref, onMounted, computed } from 'vue'
 
+// 后端域名置顶统一声明，和产品页逻辑完全一致
 const isLocal = process.dev
 const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
-// 使用 useFetch 替代 onMounted，利用 SSR 提升首屏加载速度
-const { data: responseData, pending, error } = await useFetch(`${strapiUrl}/api/blogs`, {
-  query: { populate: '*' },
-  key: 'blogs-list'
-})
+const responseData = ref(null)
+const loading = ref(true)
+const fetchError = ref(false)
 
+// 拿到博客数组数据
 const blogs = computed(() => responseData.value?.data || [])
 
-// 纯净图片处理：交给 NuxtImage 全局配置处理 avif/画质
+// 新增：获取纯净无参数图片地址，剥离全部query，交给NuxtImage全局配置处理avif
 const getCleanImageUrl = (rawUrl) => {
-  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=75&f_auto'
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=375&c_fill&q=75&f_auto'
   if (!rawUrl) return fallback
-  return rawUrl.startsWith('/') ? `${strapiUrl}${rawUrl}` : rawUrl.split('?')[0]
+  // 本地Strapi路径补全域名
+  if (rawUrl.startsWith('/')) return `${strapiUrl}${rawUrl}`
+  // Cloudinary剥离全部查询参数
+  return rawUrl.split('?')[0]
 }
 
-// 兼容 Strapi 的各种图片数据结构
-const getImageUrl = (item) => {
-  const coverData = item.cover || item.attributes?.cover
-  if (!coverData) return null
-  
-  if (coverData.url) return coverData.url
-  if (coverData.data?.attributes?.url) return coverData.data.attributes.url
-  return null
+// 统一图片裁切压缩，格式由nuxt.config全局avif配置控制
+const getOptimizedUrl = (url) => {
+  const clean = getCleanImageUrl(url)
+  if (clean.includes('res.cloudinary.com')) {
+    return `${clean}?w=600&h=375&c_fill&q=75&f_auto`
+  }
+  return clean
 }
+
+// 适配 Strapi 的封面图片 cover 获取逻辑 + 补全后端域名修复404
+const getImageUrl = (item) => {
+  const defaultImg = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f'
+  if (!item) return defaultImg
+  
+  // 兼容 Strapi v4 (普通格式或带 attributes 格式) 
+  const coverData = item.cover || item.attributes?.cover
+  if (!coverData) return defaultImg
+
+  // 如果 cover 直接带 url (REST API 展开后)
+  if (coverData.url) {
+    return coverData.url.startsWith('/') ? `${strapiUrl}${coverData.url}` : coverData.url
+  }
+  // 如果是标准的 Strapi 媒体嵌套格式 data.attributes.url
+  if (coverData.data?.attributes?.url) {
+    const raw = coverData.data.attributes.url
+    return raw.startsWith('/') ? `${strapiUrl}${raw}` : raw
+  }
+  
+  return defaultImg
+}
+
+onMounted(async () => {
+  try {
+    // 请求 blogs 接口，并使用 populate=* 展开 cover 图片和分类数据
+    const res = await $fetch(`${strapiUrl}/api/blogs?populate=*`)
+    console.log('博客列表页收到的原始数据:', res)
+    responseData.value = res
+  } catch (err) {
+    console.error('Client fetch blogs failed:', err)
+    fetchError.value = true
+  } finally {
+    loading.value = false
+  }
+})
 
 useHead({ title: 'Latest Blogs & Fashion News | SeakApparel' })
 </script>
@@ -37,12 +74,12 @@ useHead({ title: 'Latest Blogs & Fashion News | SeakApparel' })
   <div class="max-w-7xl mx-auto px-4 py-12">
     <h1 class="text-3xl font-bold mb-10 border-l-4 border-blue-600 pl-3">Latest Blogs & Fashion News</h1>
     
-    <div v-if="pending" class="text-center py-20 text-gray-500">
+    <div v-if="loading" class="text-center py-20 text-gray-500">
       <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mb-4"></div>
       <p>Loading blogs...</p>
     </div>
 
-    <div v-else-if="error" class="text-center py-10 text-red-500 bg-red-50 rounded-xl">
+    <div v-else-if="fetchError" class="text-center py-10 text-red-500 bg-red-50 rounded-xl">
       Failed to connect backend server. Please refresh.
     </div>
 
@@ -56,13 +93,16 @@ useHead({ title: 'Latest Blogs & Fashion News | SeakApparel' })
         :key="item.id" 
         class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between border border-gray-100"
       >
+        <!-- 跳转改用slug链接 -->
         <NuxtLink 
           :to="`/blog/${item.slug || item.attributes?.slug}`" 
           class="aspect-[16/10] overflow-hidden block bg-gray-50 relative"
         >
           <NuxtImg
             :src="getCleanImageUrl(getImageUrl(item))"
-            sizes="(max-width: 768px) 100vw, 400px"
+            width="600"
+            height="375"
+            sizes="600px"
             class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
             alt="Blog Cover Image"
             loading="lazy"
