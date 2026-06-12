@@ -2,6 +2,7 @@
   <div class="max-w-7xl mx-auto px-2 py-12">
     <h1 class="text-3xl font-bold mb-10 border-l-4 border-blue-600 pl-3">All Wholesale Products</h1>
 
+    <!-- 分类筛选栏 -->
     <div class="flex flex-wrap gap-2 mb-8">
       <button
         @click="activeCategoryId = null"
@@ -38,6 +39,7 @@
       No products found.
     </div>
 
+    <!-- 商品网格，使用筛选后的 filteredProducts -->
     <div v-else class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2">
       <div
         v-for="item in pageProducts"
@@ -45,14 +47,15 @@
         class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between border border-gray-100"
       >
         <NuxtLink
-          :to="`/products/${item.slug || item.attributes?.slug || item.id}`"
+          :to="`/products/${item.slug || item.attributes?.slug}`"
           target="_blank"
           class="aspect-square overflow-hidden block bg-gray-50 relative"
         >
           <NuxtImg
-            provider="cloudinary"
             :src="getCleanImageUrl(item)"
-            sizes="sm:100vw md:50vw lg:300px"
+            width="600"
+            height="600"
+            sizes="(max-width: 768px) 300px, 600px"
             class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
             :alt="`${item.title || item.attributes?.title || 'Wholesale Women Clothing'} - SeakApparel`"
             loading="lazy"
@@ -60,9 +63,10 @@
         </NuxtLink>
 
         <div class="p-1 flex-1 flex flex-col justify-between">
+          <!-- 标题左右5px间距 -->
           <div class="px-[5px]">
             <NuxtLink
-              :to="`/products/${item.slug || item.attributes?.slug || item.id}`"
+              :to="`/products/${item.slug || item.attributes?.slug}`"
               target="_blank"
               class="block"
             >
@@ -71,13 +75,14 @@
           </div>
 
           <div class="mt-4">
+            <!-- 价格左5px / 起批量右5px -->
             <div class="flex justify-between text-sm mb-3">
               <span class="text-red-600 text-lg font-bold pl-[5px]">¥{{ item.price || item.attributes?.price }}</span>
               <span class="text-gray-500 self-center pr-[5px]">MOQ: {{ item.moq || item.attributes?.moq || 10 }} pcs</span>
             </div>
 
             <NuxtLink
-              :to="`/products/${item.slug || item.attributes?.slug || item.id}`"
+              :to="`/products/${item.slug || item.attributes?.slug}`"
               class="block w-full text-white text-center py-2 rounded transition-colors font-medium text-sm"
               style="background-color: #ff4000;"
             >
@@ -88,6 +93,7 @@
       </div>
     </div>
 
+    <!-- 分页（基于筛选后商品计算） -->
     <div v-if="totalPage > 1" class="flex justify-center items-center gap-3 mt-12">
       <button
         @click="currentPage--"
@@ -121,56 +127,133 @@
 </template>
 
 <script setup>
+import { ref, onMounted, computed, watch } from 'vue'
+
+// 先定义后端域名，所有函数直接读取，无window全局
 const isLocal = process.dev
 const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
+// 分页配置：固定每页12条
 const pageSize = 12
 const currentPage = ref(1)
+
+// 分类相关
+const categoryList = ref([])
 const activeCategoryId = ref(null)
 
-// 1. 使用 useFetch 获取商品与分类数据
-const { data: responseData, pending: loading, error: fetchError } = await useFetch(`${strapiUrl}/api/products?populate=*`)
-const { data: catRes } = await useFetch(`${strapiUrl}/api/categories`)
+// 商品数据
+const responseData = ref(null)
+const loading = ref(true)
+const fetchError = ref(false)
 
-const categoryList = computed(() => catRes.value?.data || [])
+const allProducts = computed(() => {
+  if (!responseData.value?.data) return []
+  return responseData.value.data
+})
 
-// 2. 筛选与分页逻辑
-const allProducts = computed(() => responseData.value?.data || [])
-
+// 根据选中分类筛选商品
 const filteredProducts = computed(() => {
-  if (activeCategoryId.value === null) return allProducts.value
-  return allProducts.value.filter(item => {
+  const list = allProducts.value
+  if (activeCategoryId.value === null) return list
+  // 匹配商品关联的分类id（Strapi标准关联字段category.id）
+  return list.filter(item => {
     const cat = item.category || item.attributes?.category
-    return cat?.id === activeCategoryId.value
+    return cat && cat.id === activeCategoryId.value
   })
 })
 
-const totalPage = computed(() => Math.ceil(filteredProducts.value.length / pageSize))
-
-const pageProducts = computed(() => {
-  const start = (currentPage.value - 1) * pageSize
-  return filteredProducts.value.slice(start, start + pageSize)
+// 筛选后商品总页数
+const totalPage = computed(() => {
+  const list = filteredProducts.value
+  if (!Array.isArray(list) || list.length === 0) return 0
+  return Math.ceil(list.length / pageSize)
 })
 
-// 3. 简化后的图片处理
-const getCleanImageUrl = (item) => {
-  let url = item?.image?.url || 
-            (Array.isArray(item?.image) && item.image[0]?.url) || 
-            item?.attributes?.image?.data?.attributes?.url || ''
+// 当前分页切片：严格截取 0~12 / 12~24 区间，每页最多12条
+const pageProducts = computed(() => {
+  const list = filteredProducts.value
+  const start = (currentPage.value - 1) * pageSize
+  const end = start + pageSize
+  return list.slice(start, end)
+})
 
-  if (!url) return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f'
-  return url.startsWith('/') ? `${strapiUrl}${url}` : url.split('?')[0]
+// 新增：获取纯净无参数图片地址，剥离全部query，交给NuxtImage全局配置处理格式、尺寸、画质
+const getCleanImageUrl = (item) => {
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=75&f_auto'
+  let url = ''
+
+  if (item?.image?.url) url = item.image.url
+  else if (Array.isArray(item?.image) && item.image[0]?.url) url = item.image[0].url
+  else if (item?.attributes?.image?.data?.attributes?.url) url = item.attributes.image.data.attributes.url
+
+  if (!url) return fallback
+
+  // 本地Strapi图片补全域名
+  if (url.startsWith('/')) return `${strapiUrl}${url}`
+
+  // Cloudinary地址剥离全部查询参数，只保留基础路径
+  return url.split('?')[0]
 }
 
-// 4. 监听与交互
-watch(activeCategoryId, () => currentPage.value = 1)
-watch(currentPage, () => window.scrollTo({ top: 0, behavior: 'smooth' }))
+// 生成300px缩略图srcset，仅保留裁切压缩，移除自定义格式参数（全局nuxt.config统一avif）
+const getThumb300 = (url) => {
+  if (!url || !url.includes('res.cloudinary.com')) return url
+  const cleanUrl = url.split('?')[0]
+  return `${cleanUrl}?w=300&h=300&c_fill&q=75&f_auto`
+}
+
+// 生成600px商品主图，仅裁切+画质，格式由nuxt.config全局format自动控制avif
+const getOptimizedUrl = (url) => {
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=75&f_auto'
+  if (!url) return fallback
+
+  if (url.includes('res.cloudinary.com')) {
+    const cleanUrl = url.split('?')[0]
+    return `${cleanUrl}?w=600&h=600&c_fill&q=75&f_auto`
+  }
+  return url
+}
+
+onMounted(async () => {
+  try {
+    // 1. 获取分类列表
+    const catRes = await $fetch(`${strapiUrl}/api/categories`)
+    categoryList.value = catRes.data || []
+
+    // 2. 获取全部商品（带分类关联 populate=category）
+    const res = await $fetch(`${strapiUrl}/api/products?populate=*`)
+    console.log('列表页收到的原始数据:', res)
+    responseData.value = res
+  } catch (err) {
+    console.error('Fetch failed:', err)
+    fetchError.value = true
+  } finally {
+    loading.value = false
+  }
+})
+
+// 切换分类时重置到第一页
+const resetPage = () => {
+  currentPage.value = 1
+}
+watch(activeCategoryId, resetPage)
+
+// ========== 新增：切换页码自动滚动到页面顶部 ==========
+watch(currentPage, () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+})
 
 useHead({
   title: 'All Wholesale Products | Southeast Asia Women\'s Apparel Supplier - SeakApparel',
   meta: [
-    { name: 'description', content: 'Browse our latest collection of wholesale women\'s apparel. SeakApparel offers high-quality fashion, factory direct pricing, low MOQ, and reliable shipping.' },
-    { name: 'keywords', content: 'women clothing wholesale, southeast asia apparel supplier, bulk clothing vendor' }
+    {
+      name: 'description',
+      content: 'Browse our latest collection of wholesale women\'s apparel. SeakApparel offers high-quality fashion, factory direct pricing, low MOQ, and reliable shipping for clothing vendors and boutique owners across Southeast Asia.'
+    },
+    {
+      name: 'keywords',
+      content: 'women clothing wholesale, southeast asia apparel supplier, bulk clothing vendor, wholesale dresses, boutique clothing supplier'
+    }
   ]
 })
 </script>
