@@ -103,7 +103,7 @@ onUnmounted(() => stopPlay())
 
 <template>
   <div>
-  <!-- 顶部轮播横幅 桌面1920*750，移动端缩小至原高度1/5 -->
+  <!-- 顶部轮播横幅 桌面1920*750，移动端高度调整为20vh -->
 <section
   class="relative w-full overflow-hidden"
   @mouseenter="stopPlay"
@@ -113,11 +113,11 @@ onUnmounted(() => stopPlay())
     class="flex w-full transition-transform duration-700 ease-in-out"
     :style="{ transform: `translateX(-${currentIndex * 100}%)` }"
   >
-    <!-- 手机端 h-[10vh] 为原50vh的1/5，最低兜底160px；平板/桌面保持原有高度不变 -->
+    <!-- 手机端 h-[20vh]，最低兜底220px；平板/桌面高度不变 -->
     <div
       v-for="img in bannerList"
       :key="img"
-      class="relative min-w-full h-[10vh] min-h-[160px] md:h-[42vh] lg:h-[calc(100vw*750/1920)] lg:max-h-[750px]"
+      class="relative min-w-full h-[20vh] min-h-[220px] md:h-[42vh] lg:h-[calc(100vw*750/1920)] lg:max-h-[750px]"
     >
       <!-- 移动端图片向下裁切25%，聚焦女装主体；桌面完整居中显示 -->
       <NuxtImg
