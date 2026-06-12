@@ -11,13 +11,18 @@
   },
   "dependencies": {
     "@nuxt/image": "^2.0.0",
+    "@nuxtjs/seo": "^5.2.6",
     "@nuxtjs/sitemap": "^8.0.15",
     "@nuxtjs/strapi": "^2.2.0",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "nuxt": "^4.4.7",
+    "nuxt-og-image": "^6.6.0",
     "nuxt-schema-org": "^6.2.1",
     "snarkdown": "^2.0.0",
     "vue": "^3.5.35",
     "vue-router": "^5.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.0"
   }
 }
