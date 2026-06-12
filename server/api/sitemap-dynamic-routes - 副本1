@@ -3,30 +3,31 @@ export default defineEventHandler(async () => {
   const STRAPI_BASE_URL = 'https://seak-backend.onrender.com'
   
   try {
-    // 💡 1. 调整请求：明确拉取 slug 字段，而非 documentId。
-    // 如果你在 Strapi 后端中产品用的是 slug，博客也用的是 slug，请保持一致
+    // 💡 1. 调整请求，明确拉取 documentId
     const [productsResponse, blogsResponse] = await Promise.all([
-      $fetch(`${STRAPI_BASE_URL}/api/products?fields[0]=slug`),
-      $fetch(`${STRAPI_BASE_URL}/api/blogs?fields[0]=slug`)
+      $fetch(`${STRAPI_BASE_URL}/api/products?fields[0]=documentId`),
+      $fetch(`${STRAPI_BASE_URL}/api/blogs?fields[0]=documentId`)
     ])
 
     const routes = []
 
-    // 💡 2. 解析产品数据：统一使用具有 SEO 价值的 slug
+    // 💡 2. 解析产品数据：统一使用 documentId
     const products = (productsResponse as any)?.data || []
     products.forEach((item: any) => {
-      const prodSlug = item.slug || item.attributes?.slug
-      if (prodSlug) {
-        routes.push(`/products/${prodSlug}`)
+      const prodId = item.documentId || item.attributes?.documentId || item.id
+      if (prodId) {
+        routes.push(`/products/${prodId}`)
       }
     })
 
-    // 💡 3. 解析博客数据：统一使用 slug
+    // 💡 3. 解析博客数据：【强制】仅使用 documentId
     const blogs = (blogsResponse as any)?.data || []
     blogs.forEach((item: any) => {
-      const blogSlug = item.slug || item.attributes?.slug
-      if (blogSlug) {
-        routes.push(`/blog/${blogSlug}`)
+      // 直接提取 documentId，摒弃 slug 逻辑
+      const blogId = item.documentId || item.attributes?.documentId || item.id
+      
+      if (blogId) {
+        routes.push(`/blog/${blogId}`)
       }
     })
 
