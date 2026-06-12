@@ -5,7 +5,8 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/image',
     '@nuxtjs/tailwindcss',
-    '@nuxtjs/sitemap'
+    '@nuxtjs/sitemap',
+    'nuxt-schema-org'
   ],
 
   site: {
