@@ -39,10 +39,10 @@ const imagesList = computed(() => {
   const data = product.value
   if (!data) return []
   let list = []
-  const imgData = data.image || data.attributes?.image
-  const imagesData = data.images || data.attributes?.images
-  if (imgData) Array.isArray(imgData) ? list.push(...imgData) : list.push(imgData)
-  if (imagesData && Array.isArray(imagesData)) list.push(...imagesData)
+  const images = data.image || data.attributes?.image
+  const extraImages = data.images || data.attributes?.images
+  if (images) Array.isArray(images) ? list.push(...images) : list.push(images)
+  if (extraImages && Array.isArray(extraImages)) list.push(...extraImages)
   
   return list.map(img => (typeof img === 'string' ? img : (img.url || img.attributes?.url))).filter(Boolean)
 })
@@ -94,12 +94,9 @@ const handleTouchEnd = (e, next, prev) => {
 
 <template>
   <div class="max-w-7xl mx-auto py-12">
-    <div v-if="!product" class="text-center py-20 text-red-500 bg-red-50 rounded-none">
-      Product detail not found.
-    </div>
-
+    <div v-if="!product" class="text-center py-20 text-red-500 bg-red-50">Product not found.</div>
     <div v-else class="space-y-12">
-      <div class="grid md:grid-cols-2 gap-12 bg-white md:p-6 md:px-10 rounded-none shadow-sm border border-gray-100">
+      <div class="grid md:grid-cols-2 gap-12 bg-white md:p-6 md:px-10 shadow-sm border border-gray-100">
         <div class="space-y-4">
           <div class="rounded-none overflow-hidden shadow-sm bg-gray-50 aspect-square border relative group cursor-zoom-in"
                @touchstart="handleTouchStart" @touchend="e => handleTouchEnd(e, nextImage, prevImage)" @click="openPreview">
@@ -116,11 +113,11 @@ const handleTouchEnd = (e, next, prev) => {
         </div>
 
         <div class="flex flex-col justify-between">
-          <div class="pl-[5px] pr-[5px]">
+          <div>
             <h1 class="text-3xl font-bold text-gray-900 mt-3">{{ product.title || product.attributes?.title }}</h1>
             <div class="bg-gray-50 p-4 space-y-3 my-6">
-              <div class="flex justify-between border-b pb-2"><span class="text-gray-500 text-sm">Price</span><span class="text-2xl font-extrabold text-blue-600">${{ product.price || product.attributes?.price }}</span></div>
-              <div class="flex justify-between"><span class="text-gray-500 text-sm">Minimum Order Quantity</span><span class="font-semibold">{{ product.moq || product.attributes?.moq || 10 }} pcs</span></div>
+              <div class="flex justify-between border-b pb-2"><span class="text-gray-500">Price</span><span class="text-2xl font-extrabold text-blue-600">${{ product.price || product.attributes?.price }}</span></div>
+              <div class="flex justify-between"><span class="text-gray-500">MOQ</span><span class="font-semibold">{{ product.moq || product.attributes?.moq || 10 }} pcs</span></div>
             </div>
           </div>
           <a :href="`https://wa.me/+8613800000000?text=Interested: ${product.title}`" target="_blank" class="block w-full bg-green-600 text-white text-center py-4 font-bold">💬 Inquiry via WhatsApp</a>
@@ -148,16 +145,6 @@ const handleTouchEnd = (e, next, prev) => {
       <NuxtImg :key="imgPreviewKey" :src="getCleanImageUrl(previewImageUrl)" class="max-w-[95vw] max-h-[90vh] object-contain" />
       <button @click.stop="nextPreview" class="absolute right-4 text-white text-4xl">❯</button>
       <button @click.stop="closePreview" class="absolute top-4 right-4 text-white text-3xl">✕</button>
-      <div class="absolute bottom-6 text-white text-sm bg-black/50 px-4 py-2 rounded">
-        {{ previewIndex + 1 }} / {{ imagesList.length }}
-      </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.scrollbar-thin::-webkit-scrollbar { height: 5px; }
-.scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-.markdown-body :deep(h1), .markdown-body :deep(h2), .markdown-body :deep(h3) { font-weight: 700; margin: 1.5rem 0 0.75rem; }
-.markdown-body :deep(p) { margin-bottom: 0.75rem; }
-</style>
