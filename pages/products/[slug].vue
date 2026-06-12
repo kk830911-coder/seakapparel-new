@@ -3,38 +3,29 @@ import { ref, computed, nextTick } from 'vue'
 import { useRoute, useHead, useFetch } from '#imports'
 
 const route = useRoute()
-
-// 1. 获取后端 URL
 const isLocal = process.dev 
 const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
-// 2. 数据获取：添加 key 缓存，确保路由跳转时能正确重新渲染
+// 1. 获取商品数据
 const { data: responseData } = await useFetch(`${strapiUrl}/api/products`, {
-  query: { 
-    populate: '*',
-    'filters[slug][$eq]': route.params.slug
-  },
+  query: { populate: '*', 'filters[slug][$eq]': route.params.slug },
   key: `product-${route.params.slug}`
 })
 
 const product = computed(() => responseData.value?.data?.[0] || null)
 
-// 动态设置页面 SEO
+// SEO 动态设置
 useHead({
-  title: computed(() => (product.value ? `${product.value.title || product.value.attributes?.title} | SeakApparel` : 'Loading...')),
-  meta: [
-    { name: 'description', content: computed(() => product.value?.description || 'View our wholesale product details.') }
-  ]
+  title: computed(() => (product.value ? `${product.value.title || product.value.attributes?.title} | SeakApparel` : 'Loading...'))
 })
 
-// 图片处理：统一剥离查询参数
+// 图片处理
 const getCleanImageUrl = (rawUrl) => {
-  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&c_fill&q=75&f_auto'
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=75&f_auto'
   if (!rawUrl) return fallback
   return rawUrl.startsWith('/') ? `${strapiUrl}${rawUrl}` : rawUrl.split('?')[0]
 }
 
-// 轮播与弹窗状态
 const activeImageIndex = ref(0)
 const previewOpen = ref(false)
 const previewIndex = ref(0)
@@ -43,116 +34,80 @@ const imgPreviewKey = ref(0)
 const imagesList = computed(() => {
   const p = product.value
   if (!p) return []
-  const rawImages = p.image || p.attributes?.image || []
-  const list = Array.isArray(rawImages) ? rawImages : [rawImages]
+  const raw = p.image || p.attributes?.image || []
+  const list = Array.isArray(raw) ? raw : [raw]
   return list.map(img => (typeof img === 'string' ? img : (img.url || img.attributes?.url))).filter(Boolean)
 })
 
-const currentMainImageUrl = computed(() => imagesList.value[activeImageIndex.value] || '')
-const previewImageUrl = computed(() => imagesList.value[previewIndex.value] || '')
-
-// 交互逻辑
+// 切换逻辑
 const nextImage = () => { if (imagesList.value.length > 1) activeImageIndex.value = (activeImageIndex.value + 1) % imagesList.value.length }
 const prevImage = () => { if (imagesList.value.length > 1) activeImageIndex.value = (activeImageIndex.value - 1 + imagesList.value.length) % imagesList.value.length }
 
+const nextPreview = () => { previewIndex.value = (previewIndex.value + 1) % imagesList.value.length; imgPreviewKey.value++ }
+const prevPreview = () => { previewIndex.value = (previewIndex.value - 1 + imagesList.value.length) % imagesList.value.length; imgPreviewKey.value++ }
+
 const openPreview = async () => {
   previewIndex.value = activeImageIndex.value
-  imgPreviewKey.value++
-  await nextTick()
   previewOpen.value = true
   document.body.style.overflow = 'hidden'
 }
-const closePreview = () => {
-  previewOpen.value = false
-  document.body.style.overflow = ''
+const closePreview = () => { previewOpen.value = false; document.body.style.overflow = '' }
+
+// 触摸滑动
+let touchStartX = 0
+const handleTouchEnd = (e, callbackNext, callbackPrev) => {
+  const diff = e.changedTouches[0].screenX - touchStartX
+  if (Math.abs(diff) > 50) diff < 0 ? callbackNext() : callbackPrev()
 }
 
 // 富文本渲染
 const renderStrapiRichTextNodes = (nodes) => {
   if (!nodes || !Array.isArray(nodes)) return []
-  return nodes.map(node => {
-    if (node.type === 'image') return { type: 'image', url: getCleanImageUrl(node.image?.url), alt: node.image?.alternativeText || 'Product' }
-    if (node.type === 'text') return { type: 'text', content: node.text }
-    return { type: 'block', tag: node.type, children: renderStrapiRichTextNodes(node.children || []) }
-  })
+  return nodes.map(n => ({
+    type: n.type === 'image' ? 'image' : (n.type === 'text' ? 'text' : 'block'),
+    url: n.image?.url ? getCleanImageUrl(n.image.url) : null,
+    content: n.text,
+    tag: n.type,
+    children: renderStrapiRichTextNodes(n.children || [])
+  }))
 }
 const descriptionNodes = computed(() => renderStrapiRichTextNodes(product.value?.description || product.value?.attributes?.description))
-
-// 触摸滑动逻辑
-let touchStartX = 0
-const handleTouchEnd = (e) => {
-  const diff = e.changedTouches[0].screenX - touchStartX
-  if (Math.abs(diff) > 50) diff < 0 ? nextImage() : prevImage()
-}
 </script>
 
 <template>
   <div class="max-w-7xl mx-auto py-12">
-    <div v-if="!product" class="text-center py-20 text-red-500 bg-red-50 rounded-none">
-      Product detail not found.
-    </div>
-
+    <div v-if="!product" class="text-center py-20 text-red-500">Product not found.</div>
     <div v-else class="space-y-12">
-      <div class="grid md:grid-cols-2 gap-12 bg-white md:p-6 md:px-10 rounded-none shadow-sm border border-gray-100">
+      <div class="grid md:grid-cols-2 gap-12 bg-white md:p-6 p-2 rounded-none border">
         <div class="space-y-4">
-          <div class="rounded-none overflow-hidden shadow-sm bg-gray-50 aspect-square border relative group cursor-zoom-in" 
+          <div class="aspect-square bg-gray-50 relative group cursor-zoom-in" 
                @touchstart="e => touchStartX = e.changedTouches[0].screenX" 
-               @touchend="handleTouchEnd" 
+               @touchend="e => handleTouchEnd(e, nextImage, prevImage)" 
                @click="openPreview">
-            <NuxtImg
-              provider="cloudinary"
-              :src="getCleanImageUrl(currentMainImageUrl)"
-              sizes="600px"
-              fetchpriority="high"
-              class="w-full h-full object-cover"
-              :alt="product.title || 'Product Image'"
-            />
+            <NuxtImg :src="getCleanImageUrl(imagesList[activeImageIndex])" class="w-full h-full object-cover" />
+            <button v-if="imagesList.length > 1" @click.stop="prevImage" class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 text-white w-10 h-10 rounded-full hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100">❮</button>
+            <button v-if="imagesList.length > 1" @click.stop="nextImage" class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 text-white w-10 h-10 rounded-full hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100">❯</button>
           </div>
-          <div v-if="imagesList.length > 1" class="flex gap-2 overflow-x-auto pb-2 scrollbar-thin w-full">
-            <button v-for="(url, index) in imagesList" :key="index" @click="activeImageIndex = index" class="w-14 h-14 border-2 flex-shrink-0" :class="activeImageIndex === index ? 'border-blue-600' : 'border-gray-200'">
-              <NuxtImg :src="getCleanImageUrl(url)" width="300" height="300" class="w-full h-full object-cover" loading="lazy" />
+          <div class="flex gap-2 overflow-x-auto">
+            <button v-for="(url, i) in imagesList" :key="i" @click="activeImageIndex = i" class="w-14 h-14 border-2" :class="activeImageIndex === i ? 'border-blue-600' : 'border-gray-200'">
+              <NuxtImg :src="getCleanImageUrl(url)" class="w-full h-full object-cover" />
             </button>
           </div>
         </div>
 
-        <div class="flex flex-col justify-between">
-          <div class="pl-[5px] pr-[5px]">
-            <h1 class="text-3xl font-bold text-gray-900 mt-3 mb-4 leading-tight">{{ product.title || product.attributes?.title }}</h1>
-            <div class="bg-gray-50 p-4 space-y-3 my-6">
-              <div class="flex justify-between border-b pb-2"><span class="text-gray-500 text-sm">Price</span><span class="text-2xl font-extrabold text-blue-600">${{ product.price || product.attributes?.price }}</span></div>
-              <div class="flex justify-between"><span class="text-gray-500 text-sm">MOQ</span><span class="font-semibold">{{ product.moq || product.attributes?.moq || 10 }} pcs</span></div>
-            </div>
-          </div>
-          <a :href="`https://wa.me/+8613800000000?text=Hi, I am interested in: ${product.title}`" target="_blank" class="block w-full bg-green-600 text-white text-center py-4 font-bold hover:bg-green-700 transition-colors">💬 Inquiry via WhatsApp</a>
-        </div>
-      </div>
-
-      <div class="bg-white p-6 rounded-none shadow-sm border border-gray-100">
-        <h3 class="text-lg font-bold border-l-4 border-blue-600 pl-3 mb-4">Product Description</h3>
-        <div class="markdown-body text-gray-600 text-sm bg-slate-50 p-6">
-          <template v-for="(node, idx) in descriptionNodes" :key="idx">
-            <div v-if="node.type === 'image'" class="my-6"><NuxtImg :src="node.url" sizes="800px" class="max-w-full" /></div>
-            <component v-else-if="node.type === 'block'" :is="node.tag === 'paragraph' ? 'p' : node.tag" class="markdown-block">
-              <template v-for="(child, cIdx) in node.children" :key="cIdx">
-                <NuxtImg v-if="child.type === 'image'" :src="child.url" class="my-6 max-w-full" />
-                <span v-else>{{ child.content }}</span>
-              </template>
-            </component>
-          </template>
+        <div class="flex flex-col">
+          <h1 class="text-3xl font-bold mb-4">{{ product.title || product.attributes?.title }}</h1>
+          <div class="bg-gray-50 p-4 mb-6 text-xl font-bold text-blue-600">${{ product.price || product.attributes?.price }}</div>
+          <a :href="`https://wa.me/+8613800000000?text=Interested in: ${product.title}`" target="_blank" class="w-full bg-green-600 text-white text-center py-4 font-bold">💬 Inquiry via WhatsApp</a>
         </div>
       </div>
     </div>
 
-    <div v-if="previewOpen" class="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center p-4" @click="closePreview">
-      <NuxtImg :src="getCleanImageUrl(previewImageUrl)" class="max-w-[98vw] max-h-[90vh] object-contain" />
+    <div v-if="previewOpen" class="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center" @click="closePreview" @touchstart="e => touchStartX = e.changedTouches[0].screenX" @touchend="e => handleTouchEnd(e, nextPreview, prevPreview)">
+      <button @click.stop="prevPreview" class="absolute left-4 text-white text-4xl z-10">❮</button>
+      <NuxtImg :key="imgPreviewKey" :src="getCleanImageUrl(imagesList[previewIndex])" class="max-w-[95vw] max-h-[90vh] object-contain" />
+      <button @click.stop="nextPreview" class="absolute right-4 text-white text-4xl z-10">❯</button>
       <button @click.stop="closePreview" class="absolute top-4 right-4 text-white text-3xl">✕</button>
     </div>
   </div>
 </template>
-
-<style scoped>
-.scrollbar-thin::-webkit-scrollbar { height: 5px; }
-.scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-.markdown-body :deep(h1), .markdown-body :deep(h2), .markdown-body :deep(h3) { font-weight: 700; margin: 1.5rem 0 0.75rem; }
-.markdown-body :deep(p) { margin-bottom: 0.75rem; }
-</style>
