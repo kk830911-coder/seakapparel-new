@@ -103,7 +103,7 @@ onUnmounted(() => stopPlay())
 
 <template>
   <div>
-     <!-- 顶部轮播横幅 桌面1920*750，移动端加高裁切放大图片 -->
+    <!-- 顶部轮播横幅 适配1920*750标准横幅尺寸 -->
     <section
       class="relative w-full overflow-hidden"
       @mouseenter="stopPlay"
@@ -116,15 +116,13 @@ onUnmounted(() => stopPlay())
         <div
           v-for="img in bannerList"
           :key="img"
-          <!-- 高度分层：手机h-[50vh]最小320px，平板h-[42vh]，桌面原比例max-h-[750px] -->
-          class="relative min-w-full h-[50vh] min-h-[320px] md:h-[42vh] lg:h-[calc(100vw*750/1920)] lg:max-h-[750px]"
+          class="relative min-w-full h-[calc(100vw*750/1920)] max-h-[750px]"
         >
           <NuxtImg
             :src="img"
             format="avif"
             fallbackFormat="webp"
-            <!-- object-position：移动端向下偏移裁切，放大女装主体；桌面居中正常展示 -->
-            class="w-full h-full object-cover md:object-center object-[center_25%]"
+            class="w-full h-full object-cover object-center"
             alt="SeakApparel Wholesale Banner"
             loading="lazy"
           />
