@@ -163,18 +163,18 @@ onUnmounted(() => stopPlay())
   </div>
 </section>
 
-    <!-- 轮播下方紫色文字区块 -->
-    <section class="text-white py-20 px-6 text-center" style="background-color: #9d25da;">
-      <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold mb-4">Southeast Asia Women's Apparel Wholesale</h1>
-      <p class="text-gray-300 max-w-2xl mx-auto mb-8 text-lg">Factory Direct Supply | Low MOQ | OEM & ODM Custom Service</p>
-      <NuxtLink
-        to="/products"
-        target="_blank"
-        class="inline-block bg-[#ff4000] hover:bg-[#e03800] px-7 py-3 rounded-lg font-medium transition-colors text-base tracking-wide"
-      >
-        Browse All Products
-      </NuxtLink>
-    </section>
+<!-- 轮播下方紫色文字区块，移动端减少上下空白 -->
+<section class="text-white py-10 md:py-20 px-6 text-center" style="background-color: #9d25da;">
+  <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold mb-4">Southeast Asia Women's Apparel Wholesale</h1>
+  <p class="text-gray-300 max-w-2xl mx-auto mb-8 text-lg">Factory Direct Supply | Low MOQ | OEM & ODM Custom Service</p>
+  <NuxtLink
+    to="/products"
+    target="_blank"
+    class="inline-block bg-[#ff4000] hover:bg-[#e03800] px-7 py-3 rounded-lg font-medium transition-colors text-base tracking-wide"
+  >
+    Browse All Products
+  </NuxtLink>
+</section>
 
     <!-- 三大优势区块 移到工厂介绍上方，宽度和工厂版块统一max-w-[1400px] -->
     <section class="max-w-[1400px] mx-auto px-4 py-16">
