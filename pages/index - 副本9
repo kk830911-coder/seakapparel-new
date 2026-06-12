@@ -163,8 +163,8 @@ onUnmounted(() => stopPlay())
   </div>
 </section>
 
-<!-- 轮播下方紫色文字区块，移动端左右5px边距、上下留白缩减 -->
-<section class="text-white py-10 md:py-20 px-[5px] md:px-6 text-center" style="background-color: #9d25da;">
+<!-- 轮播下方紫色文字区块，移动端减少上下空白 -->
+<section class="text-white py-10 md:py-20 px-6 text-center" style="background-color: #9d25da;">
   <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold mb-4">Southeast Asia Women's Apparel Wholesale</h1>
   <p class="text-gray-300 max-w-2xl mx-auto mb-8 text-lg">Factory Direct Supply | Low MOQ | OEM & ODM Custom Service</p>
   <NuxtLink
@@ -176,8 +176,8 @@ onUnmounted(() => stopPlay())
   </NuxtLink>
 </section>
 
-    <!-- 三大优势区块：手机左右5px边距，大屏保留px-4 -->
-    <section class="max-w-[1400px] mx-auto px-[5px] md:px-4 py-16">
+    <!-- 三大优势区块 移到工厂介绍上方，宽度和工厂版块统一max-w-[1400px] -->
+    <section class="max-w-[1400px] mx-auto px-4 py-16">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="bg-white p-6 rounded-xl shadow">
           <h3 class="text-xl font-bold text-blue-600 mb-2">Low MOQ Support</h3>
@@ -194,8 +194,8 @@ onUnmounted(() => stopPlay())
       </div>
     </section>
 
-    <!-- 工厂介绍板块：手机左右5px边距 -->
-    <section class="max-w-[1400px] mx-auto px-[5px] md:px-4 pb-16">
+    <!-- 工厂介绍板块 卡片容器 -->
+    <section class="max-w-[1400px] mx-auto px-4 pb-16">
       <div class="bg-white rounded-xl shadow-lg p-6 md:p-10">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           <!-- 左侧：缩小单行标题 + 工厂图 + 联系方式模块 -->
@@ -245,8 +245,8 @@ onUnmounted(() => stopPlay())
       </div>
     </section>
 
-    <!-- 源头工厂实景展示区域：手机左右5px边距 -->
-    <section class="max-w-[1400px] mx-auto px-[5px] md:px-4 pb-16">
+    <!-- 新增：源头工厂实景展示区域 完全匹配图片布局 英文翻译 -->
+    <section class="max-w-[1400px] mx-auto px-4 pb-16">
       <div class="text-center mb-10">
         <h2 class="text-[clamp(2.2rem,5vw,3.8rem)] font-bold" style="color:#9d25da;">Source Factory / On-site Display</h2>
         <div class="w-40 h-[2px] mx-auto mt-3 mb-4" style="background-color:#9d25da;"></div>
@@ -372,7 +372,7 @@ onUnmounted(() => stopPlay())
       </div>
     </section>
 
-    <!-- 热销产品推荐版块：原有手机5px边距保留，无需改动 -->
+    <!-- 热销产品推荐版块：手机左右边距5px，卡片间距5px，卡片内边距5px -->
     <section class="max-w-[1400px] mx-auto px-[5px] lg:px-4 pb-16">
       <div class="flex items-center justify-between mb-10 px-[5px]">
         <h2 class="text-[clamp(1.8rem,4vw,2.8rem)] font-bold" style="color:#9d25da;">Hot Selling Products</h2>
@@ -435,8 +435,8 @@ onUnmounted(() => stopPlay())
       </div>
     </section>
 
-    <!-- 定制流程板块：手机左右5px边距 -->
-    <section class="py-16 px-[5px] md:px-4" style="background-color:#9d25da;">
+    <!-- 新增：定制流程板块 紫色背景 完全还原图片布局 全英文 -->
+    <section class="py-16 px-4" style="background-color:#9d25da;">
       <div class="max-w-[1400px] mx-auto">
         <!-- 标题区域 -->
         <div class="text-center mb-12">
