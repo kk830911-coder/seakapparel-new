@@ -21,14 +21,7 @@ export default defineNuxtConfig({
       meta: [
         { name: 'description', content: 'Seak Apparel is a premier B2B women\'s clothing wholesale supplier for Southeast Asia. High-quality dresses, tops, and skirts at factory direct prices. Bulk orders only.' }
       ],
-      script: [
-        {
-          id: 'Cookiebot',
-          src: 'https://consent.cookiebot.com/uc.js',
-          'data-cbid': 'f1730657-c6ea-4296-848d-64d34b61b386',
-          'data-blockingmode': 'auto',
-          type: 'text/javascript'
-        },
+      
         // GA4 全局跟踪代码配置
         {
           src: 'https://www.googletagmanager.com/gtag/js?id=G-H794JGCTR0',
