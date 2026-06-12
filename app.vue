@@ -60,7 +60,11 @@ const acceptCookies = () => {
   <div class="bg-gray-50 min-h-screen flex flex-col font-sans">
     <header class="bg-white shadow-sm sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between relative">
-        <NuxtLink to="/" class="text-2xl font-bold tracking-wide" style="color:#9d25da;">Seak-Apparel</NuxtLink>
+        <!-- 此处新增Logo，仅这一行修改，其余代码不动 -->
+        <NuxtLink to="/" class="flex items-center gap-2 text-2xl font-bold tracking-wide" style="color:#9d25da;">
+          <NuxtImg src="/logo.png" alt="Seak-Apparel Logo" class="h-9 w-auto" loading="eager" />
+          Seak-Apparel
+        </NuxtLink>
         
         <nav class="hidden md:flex gap-8 font-medium text-gray-700">
           <NuxtLink to="/" active-class="text-[#9d25da] border-b-2 border-[#9d25da] pb-1">Home</NuxtLink>
