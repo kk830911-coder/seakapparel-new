@@ -36,28 +36,29 @@ const getThumb300 = (url) => {
   return clean
 }
 
-// ========== 接口优化：替换populate:* 精准拉取字段，开启缓存，减少请求体积 ==========
-const { data: responseData } = await useFetch(() => `${strapiUrl}/api/products`, {
+// ========== 修复接口查询：取消精准fields过滤，改用白名单populate，避免接口返回空数据 ==========
+const { data: responseData, pending } = await useFetch(() => `${strapiUrl}/api/products`, {
   query: { 
-    fields: ['title','price','moq','slug'],
-    populate: {
-      image: { fields: ['url','alternativeText'] },
-      images: { fields: ['url','alternativeText'] },
-      description: { populate: 'image' }
-    },
+    populate: ['image','images','description'],
     'filters[slug][$eq]': route.params.slug
   },
   initialCache: true,
   cache: true,
-  staleIfError: 300000
+  staleIfError: 600000
 })
+
+// 统一兼容取值函数，解决顶层/attributes双层数据读取失效
+const getAttr = (field) => {
+  const item = product.value
+  if (!item) return null
+  // 优先读取顶层字段，不存在再读attributes
+  return item[field] ?? item.attributes?.[field] ?? null
+}
 
 const product = computed(() => {
   const res = responseData.value
-  // 筛选接口返回 { data: [商品数组] }，取第一条匹配slug的商品
-  if (res && Array.isArray(res.data) && res.data.length > 0) {
-    return res.data[0]
-  }
+  if (!res || !Array.isArray(res.data)) return null
+  if (res.data.length > 0) return res.data[0]
   return null
 })
 
@@ -73,8 +74,10 @@ const imagesList = computed(() => {
   const data = product.value
   if (!data) return []
   let list = []
-  if (data.image) Array.isArray(data.image) ? list.push(...data.image) : list.push(data.image)
-  if (data.images && Array.isArray(data.images)) list.push(...data.images)
+  const mainImg = getAttr('image')
+  const galleryImg = getAttr('images')
+  if (mainImg) Array.isArray(mainImg) ? list.push(...mainImg) : list.push(mainImg)
+  if (galleryImg && Array.isArray(galleryImg)) list.push(...galleryImg)
   
   return list.map(img => {
     const url = typeof img === 'string' ? img : (img.url || img.attributes?.url)
@@ -163,10 +166,9 @@ const previewTouchEnd = (e) => {
   }
 }
 
-// ✅ 富文本图片渲染改造：返回渲染节点数组，模板用v-for渲染NuxtImg，自动avif
-const renderStrapiRichTextNodes = (nodes, depth = 0) => {
-  // 增加递归深度限制，超长富文本不会栈溢出
-  if (!nodes || !Array.isArray(nodes) || depth > 10) return []
+// ✅ 富文本图片渲染简化，去除深度递归风险
+const renderStrapiRichTextNodes = (nodes) => {
+  if (!nodes || !Array.isArray(nodes)) return []
   const result = []
   for (const node of nodes) {
     if (node.type === 'image') {
@@ -183,8 +185,7 @@ const renderStrapiRichTextNodes = (nodes, depth = 0) => {
         content: node.text
       })
     } else {
-      // 段落/标题等容器节点，递归读取子内容
-      const childNodes = node.children ? renderStrapiRichTextNodes(node.children, depth + 1) : []
+      const childNodes = node.children ? renderStrapiRichTextNodes(node.children) : []
       result.push({
         type: 'block',
         tag: node.type,
@@ -195,7 +196,7 @@ const renderStrapiRichTextNodes = (nodes, depth = 0) => {
   return result
 }
 
-const descriptionNodes = computed(() => renderStrapiRichTextNodes(product.value?.description || product.value?.attributes?.description))
+const descriptionNodes = computed(() => renderStrapiRichTextNodes(getAttr('description')))
 
 // 缩略图滚动容器，补全空滚动函数逻辑（函数名完全不变）
 const thumbScrollRef = ref(null)
@@ -224,9 +225,9 @@ if (process.client) {
   })
 }
 
-// ========== 基础SEO Meta，不改动页面原有任何模板内容 ==========
+// ========== 基础SEO Meta ==========
 useHead(() => {
-  const title = product.value?.title || product.value?.attributes?.title || 'Product'
+  const title = getAttr('title') || 'Product'
   const mainImg = imagesList.value[0] || getCleanImageUrl('')
   return {
     title: `${title} | SEAK Apparel Wholesale`,
@@ -243,8 +244,12 @@ useHead(() => {
 <template>
   <!-- 页面外层无左右边距，手机贴屏 -->
   <div class="max-w-7xl mx-auto py-12">
-    
-    <div v-if="!product" class="text-center py-20 text-red-500 bg-red-50 rounded-none">
+    <!-- 新增加载中状态，Render后端冷启动时显示loading -->
+    <div v-if="pending" class="text-center py-20 text-blue-500">
+      Loading product details...
+    </div>
+
+    <div v-else-if="!product" class="text-center py-20 text-red-500 bg-red-50 rounded-none">
       Product detail not found. Please refresh the page or back to list.
     </div>
 
@@ -265,7 +270,7 @@ useHead(() => {
               height="600"
               sizes="600px"
               class="w-full h-full object-cover transition-all duration-300"
-              :alt="product.title || 'Product Image'"
+              :alt="getAttr('title') || 'Product Image'"
               loading="lazy"
             />
             
@@ -330,20 +335,20 @@ useHead(() => {
             </span>
             
             <h1 class="text-3xl font-bold text-gray-900 mt-3 mb-4 leading-tight">
-              {{ product.title || product.attributes?.title }}
+              {{ getAttr('title') }}
             </h1>
             
             <div class="bg-gray-50 p-4 rounded-none space-y-3 my-6">
               <div class="flex justify-between items-center border-b border-gray-200 pb-2">
                 <span class="text-gray-500 text-sm">Wholesale Price</span>
                 <span class="text-2xl font-extrabold text-blue-600">
-                  ${{ product.price || product.attributes?.price }}
+                  ${{ getAttr('price') ?? 0 }}
                 </span>
               </div>
               <div class="flex justify-between items-center pt-1">
                 <span class="text-gray-500 text-sm">Minimum Order Quantity</span>
                 <span class="text-gray-800 font-semibold">
-                  {{ product.moq || product.attributes?.moq || 10 }} pcs
+                  {{ getAttr('moq') ?? 10 }} pcs
                 </span>
               </div>
             </div>
@@ -352,7 +357,7 @@ useHead(() => {
           <div class="mt-4 pt-4 border-t border-gray-100 pl-[5px] pr-[5px]">
             <!-- WhatsApp链接号码完全保留你原硬编码，无任何修改 -->
             <a 
-              :href="`https://wa.me/+8613800000000?text=Hi, I am interested in your product: ${product.title || product.attributes?.title}`"
+              :href="`https://wa.me/+8613800000000?text=Hi, I am interested in your product: ${getAttr('title')}`"
               target="_blank"
               class="block w-full bg-green-600 text-white text-center py-4 rounded-none font-bold hover:bg-green-700 transition-colors shadow-sm text-base tracking-wide"
             >
@@ -440,7 +445,7 @@ useHead(() => {
           :src="getCleanImageUrl(previewImageUrl)"
           sizes="100vw"
           class="max-w-[98vw] max-h-[90vh] w-auto h-auto object-contain block"
-          :alt="product.title || 'Preview'"
+          :alt="getAttr('title') || 'Preview'"
           loading="lazy"
         />
       </div>
