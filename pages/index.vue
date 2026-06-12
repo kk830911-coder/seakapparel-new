@@ -394,7 +394,7 @@ onUnmounted(() => stopPlay())
       </div>
 
       <!-- 核心：手机2列，电脑4列，电脑间隙固定15px，手机间隙5px -->
-      <div v-else class="grid grid-cols-2 lg:grid-cols-4 gap-[10px] lg:gap-[15px]">
+      <div v-else class="grid grid-cols-2 lg:grid-cols-4 gap-[8px] lg:gap-[15px]">
         <div
           v-for="item in hotProducts"
           :key="item.documentId || item.id"
