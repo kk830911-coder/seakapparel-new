@@ -14,6 +14,7 @@ const bannerList = ref([
 const currentIndex = ref(0)
 let timer = null
 
+// 自动轮播逻辑
 const autoPlay = () => {
   timer = setInterval(() => {
     currentIndex.value = (currentIndex.value + 1) % bannerList.value.length
@@ -36,26 +37,11 @@ const switchSlide = (idx) => {
   autoPlay()
 }
 
+// 后端配置
 const isLocal = process.dev
 const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
 
-// 核心优化：统一清洗图片地址，剥离 query 参数
-const getCleanImageUrl = (url) => {
-  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=75&f_auto'
-  if (!url) return fallback
-  if (url.startsWith('/')) return `${strapiUrl}${url}`
-  return url.split('?')[0]
-}
-
-// 提取产品图片逻辑
-const getProductImageUrl = (item) => {
-  let url = ''
-  if (item?.image?.url) url = item.image.url
-  else if (Array.isArray(item?.image) && item.image[0]?.url) url = item.image[0].url
-  else if (item?.attributes?.image?.data?.attributes?.url) url = item.attributes.image.data.attributes.url
-  return getCleanImageUrl(url)
-}
-
+// 获取热销产品
 const hotProducts = ref([])
 const hotLoading = ref(false)
 const getHotProducts = async () => {
@@ -70,6 +56,20 @@ const getHotProducts = async () => {
   }
 }
 
+// 图片优化逻辑：统一处理，移除冗余参数，由 NuxtImg 全局配置
+const getCleanImageUrl = (item) => {
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&c_fill&q=75&f_auto'
+  let url = ''
+
+  if (item?.image?.url) url = item.image.url
+  else if (Array.isArray(item?.image) && item.image[0]?.url) url = item.image[0].url
+  else if (item?.attributes?.image?.data?.attributes?.url) url = item.attributes.image.data.attributes.url
+
+  if (!url) return fallback
+  if (url.startsWith('/')) return `${strapiUrl}${url}`
+  return url.split('?')[0]
+}
+
 onMounted(() => {
   autoPlay()
   getHotProducts()
@@ -82,11 +82,11 @@ onUnmounted(() => stopPlay())
     <section class="relative w-full overflow-hidden" @mouseenter="stopPlay" @mouseleave="autoPlay">
       <div class="flex w-full transition-transform duration-700 ease-in-out" :style="{ transform: `translateX(-${currentIndex * 100}%)` }">
         <div v-for="img in bannerList" :key="img" class="relative min-w-full h-[20vh] min-h-[220px] md:h-[42vh] lg:h-[calc(100vw*750/1920)] lg:max-h-[750px]">
-          <NuxtImg :src="img" class="w-full h-full object-cover md:object-center object-[center,25%]" alt="Banner" loading="lazy" />
+          <NuxtImg :src="img" class="w-full h-full object-cover md:object-center object-[center,25%]" alt="SeakApparel Wholesale Banner" loading="lazy" />
         </div>
       </div>
-      <button @click="prevSlide" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-white text-xl bg-[rgba(157,37,218,0.4)] hover:bg-[rgba(157,37,218,0.7)] transition-colors">‹</button>
-      <button @click="nextSlide" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-white text-xl bg-[rgba(157,37,218,0.4)] hover:bg-[rgba(157,37,218,0.7)] transition-colors">›</button>
+      <button @click="prevSlide" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-white text-xl transition-colors" style="background-color: rgba(157, 37, 218, 0.4);" @mouseover="$event.target.style.backgroundColor='rgba(157, 37, 218, 0.7)'" @mouseout="$event.target.style.backgroundColor='rgba(157, 37, 218, 0.4)'">‹</button>
+      <button @click="nextSlide" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-white text-xl transition-colors" style="background-color: rgba(157, 37, 218, 0.4);" @mouseover="$event.target.style.backgroundColor='rgba(157, 37, 218, 0.7)'" @mouseout="$event.target.style.backgroundColor='rgba(157, 37, 218, 0.4)'">›</button>
       <div class="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
         <button v-for="(item, idx) in bannerList" :key="idx" @click="switchSlide(idx)" class="w-3 h-3 rounded-full transition-colors" :class="currentIndex === idx ? 'bg-white' : 'bg-white/40'"></button>
       </div>
@@ -111,7 +111,7 @@ onUnmounted(() => stopPlay())
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           <div class="lg:col-span-3 flex flex-col gap-6">
             <h2 class="text-2xl font-bold text-center whitespace-nowrap" style="color:#9d25da;">Seak Apparel</h2>
-            <NuxtImg src="/gongchang.jpg" alt="Factory" class="w-full rounded-md shadow-md" loading="lazy" />
+            <NuxtImg src="/gongchang.jpg" alt="Seak Apparel Factory Building" class="w-full rounded-md shadow-md" loading="lazy" />
             <div class="bg-gray-50 p-4 rounded-lg mt-auto">
               <h4 class="text-lg font-semibold mb-3 text-gray-800">Contact Information</h4>
               <p class="mb-2">WhatsApp: +86 18271971983</p>
@@ -120,7 +120,7 @@ onUnmounted(() => stopPlay())
             </div>
           </div>
           <div class="hidden lg:block lg:col-span-6 text-gray-600 text-lg leading-relaxed space-y-6">
-            <p><span class="font-bold" style="color:#9d25da;">Hubei Seak Apparel Co., Ltd.</span> is a women's wear intelligent manufacturing enterprise...</p>
+            <p><span class="font-bold" style="color:#9d25da;">Hubei Seak Apparel Co., Ltd.</span> is a women's wear intelligent manufacturing enterprise integrating R&D design, flexible production and cross-border e-commerce operation...</p>
           </div>
           <div class="hidden lg:block lg:col-span-3 text-gray-600 text-lg leading-relaxed">
             <p>Our factory is located in Xiantao City, Hubei Province. We own a 5000m² intelligent workshop...</p>
@@ -129,23 +129,5 @@ onUnmounted(() => stopPlay())
       </div>
     </section>
 
-    <section class="max-w-[1400px] mx-auto px-[5px] md:px-4 pb-16">
-        <NuxtImg src="/gongchang_01.jpg" alt="Factory" class="w-full h-64 object-cover" loading="lazy" />
-        </section>
-
-    <section class="max-w-[1400px] mx-auto px-[5px] lg:px-4 pb-16">
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-[8px] lg:gap-[15px]">
-        <div v-for="item in hotProducts" :key="item.id" class="bg-white rounded-xl shadow overflow-hidden">
-          <NuxtLink :to="`/products/${item.slug || item.attributes?.slug}`" target="_blank" class="aspect-square overflow-hidden block relative">
-            <NuxtImg 
-              :src="getProductImageUrl(item)" 
-              sizes="(max-width: 768px) 300px, 600px" 
-              class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" 
-              loading="lazy" 
-            />
-          </NuxtLink>
-        </div>
-      </div>
-    </section>
-  </div>
+    </div>
 </template>
