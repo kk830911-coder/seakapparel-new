@@ -29,33 +29,6 @@ const product = computed(() => {
   return null
 })
 
-// === 动态注入谷歌 SEO Meta 标签 ===
-useSeoMeta({
-  title: () => {
-    const title = product.value?.title || product.value?.attributes?.title || 'Women\'s Clothing Wholesale'
-    return `${title} - Southeast Asia Clothing Wholesale Supplier | Seak Apparel`
-  },
-  ogTitle: () => {
-    const title = product.value?.title || product.value?.attributes?.title || 'Women\'s Clothing Wholesale'
-    return `${title} - Seak Apparel`
-  },
-  description: () => {
-    const title = product.value?.title || product.value?.attributes?.title || 'Latest item'
-    const price = product.value?.price || product.value?.attributes?.price || ''
-    const moq = product.value?.moq || product.value?.attributes?.moq || 10
-    return `Wholesale ${title} from Seak Apparel. Bulk factory price: $${price} per piece, minimum order quantity: ${moq} pcs. Premium apparel supplier tailored for Southeast Asia buyers.`
-  },
-  ogDescription: () => {
-    const title = product.value?.title || product.value?.attributes?.title || 'Latest item'
-    const price = product.value?.price || product.value?.attributes?.price || ''
-    return `Buy wholesale ${title} at direct factory price ($${price}). High-quality B2B apparel supply for fashion boutiques in Southeast Asia.`
-  },
-  ogImage: () => {
-    return currentMainImageUrl.value ? getCleanImageUrl(currentMainImageUrl.value) : 'https://www.seakapparel.com/og-image.jpg'
-  },
-  twitterCard: 'summary_large_image',
-})
-
 // 状态管理
 const activeImageIndex = ref(0)
 const previewOpen = ref(false)
