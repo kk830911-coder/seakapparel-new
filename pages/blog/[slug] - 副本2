@@ -1,18 +1,9 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute, useHead, useFetch } from '#imports'
-// 引入 markdown-it 解析器
-import MarkdownIt from 'markdown-it'
 
 const route = useRoute()
 const postSlug = route.params.slug
-
-// 初始化 Markdown 解析器
-const md = new MarkdownIt({
-  html: true,        // 允许解析内容中的 HTML
-  linkify: true,     // 自动将链接转换为可点击链接
-  typographer: true
-})
 
 // 后端域名声明
 const isLocal = process.dev
@@ -47,28 +38,20 @@ const getImageUrl = (postItem) => {
   return ''
 }
 
-// 【完美排版核心逻辑】：将大模型生成的各种格式的正文转换为漂亮的网页 HTML
-const renderMarkdownContent = (content) => {
-  if (!content) return '<p>No content available.</p>'
+// 富文本渲染逻辑
+const renderBlocks = (content) => {
+  if (!content) return []
+  if (typeof content === 'string') return [content]
   
-  // 情况 A：如果 Dify 发送的是新版 Strapi Blocks (JSON 数组)
   if (Array.isArray(content)) {
-    // 提取出里面的纯文本，并保留换行，再由 markdown-it 解析
-    const textContent = content.map(block => {
+    return content.map(block => {
       if (block.type === 'paragraph' || block.type === 'heading') {
         return block.children?.map(child => child.text).join('') || ''
       }
       return ''
-    }).join('\n\n')
-    return md.render(textContent)
+    }).filter(Boolean)
   }
-  
-  // 情况 B：如果传入的是纯 Markdown 字符串文本，直接完美解析
-  if (typeof content === 'string') {
-    return md.render(content)
-  }
-  
-  return '<p>No content available.</p>'
+  return []
 }
 
 useHead({
@@ -117,55 +100,24 @@ useHead({
         />
       </div>
 
-      <div 
-        class="prose max-w-none text-gray-700 leading-relaxed text-lg"
-        v-html="renderMarkdownContent(post.content || post.attributes?.content)"
-      ></div>
+      <div class="prose max-w-none text-gray-700 leading-relaxed text-lg space-y-6">
+        <template v-if="Array.isArray(post.content || post.attributes?.content)">
+          <p v-for="(paragraph, index) in renderBlocks(post.content || post.attributes?.content)" :key="index">
+            {{ paragraph }}
+          </p>
+        </template>
+        
+        <template v-else>
+          <p>{{ post.content || post.attributes?.content || 'No content available.' }}</p>
+        </template>
+      </div>
     </article>
   </div>
 </template>
 
 <style scoped>
-/* 针对解析生成的 HTML 标签做美化加持，防止样式丢失，让排版瞬间高级 */
-:deep(.prose) h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #111827;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-}
-:deep(.prose) h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
-}
-:deep(.prose) p {
+.prose p {
   margin-bottom: 1.5rem;
   color: #374151;
-  line-height: 1.75;
-}
-:deep(.prose) ul {
-  list-style-type: disc;
-  padding-left: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-:deep(.prose) li {
-  margin-bottom: 0.5rem;
-}
-:deep(.prose) table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1.5rem 0;
-}
-:deep(.prose) th, :deep(.prose) td {
-  border: 1px solid #e5e7eb;
-  padding: 0.75rem;
-  text-align: left;
-}
-:deep(.prose) th {
-  background-color: #f9fafb;
-  font-weight: 600;
 }
 </style>
