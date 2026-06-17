@@ -1,0 +1,105 @@
+<script setup>
+import { computed } from 'vue'
+import { useFetch, useHead } from '#imports'
+
+const isLocal = process.dev
+const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onrender.com'
+
+// 使用 useFetch 替代 onMounted，利用 SSR 提升首屏加载速度
+const { data: responseData, pending, error } = await useFetch(`${strapiUrl}/api/blogs`, {
+  query: { populate: '*' },
+  key: 'blogs-list'
+})
+
+const blogs = computed(() => responseData.value?.data || [])
+
+// 纯净图片处理：交给 NuxtImage 全局配置处理 avif/画质
+const getCleanImageUrl = (rawUrl) => {
+  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=75&f_auto'
+  if (!rawUrl) return fallback
+  return rawUrl.startsWith('/') ? `${strapiUrl}${rawUrl}` : rawUrl.split('?')[0]
+}
+
+// 兼容 Strapi 的各种图片数据结构
+const getImageUrl = (item) => {
+  const coverData = item.cover || item.attributes?.cover
+  if (!coverData) return null
+  
+  if (coverData.url) return coverData.url
+  if (coverData.data?.attributes?.url) return coverData.data.attributes.url
+  return null
+}
+
+useHead({ title: 'Latest Blogs & Fashion News | SeakApparel' })
+</script>
+
+<template>
+  <div class="max-w-7xl mx-auto px-4 py-12">
+    <h1 class="text-3xl font-bold mb-10 border-l-4 border-blue-600 pl-3">Latest Blogs & Fashion News</h1>
+    
+    <div v-if="pending" class="text-center py-20 text-gray-500">
+      <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mb-4"></div>
+      <p>Loading blogs...</p>
+    </div>
+
+    <div v-else-if="error" class="text-center py-10 text-red-500 bg-red-50 rounded-xl">
+      Failed to connect backend server. Please refresh.
+    </div>
+
+    <div v-else-if="blogs.length === 0" class="text-center py-20 text-gray-500 bg-gray-50 rounded-xl">
+      No blogs found.
+    </div>
+
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div 
+        v-for="item in blogs" 
+        :key="item.id" 
+        class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between border border-gray-100"
+      >
+        <NuxtLink 
+          :to="`/blog/${item.slug || item.attributes?.slug}`" 
+          class="aspect-[16/10] overflow-hidden block bg-gray-50 relative"
+        >
+          <NuxtImg
+            :src="getCleanImageUrl(getImageUrl(item))"
+            sizes="(max-width: 768px) 100vw, 400px"
+            class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+            alt="Blog Cover Image"
+            loading="lazy"
+          />
+        </NuxtLink>
+
+        <div class="p-5 flex-1 flex flex-col justify-between">
+          <div>
+            <span 
+              v-if="item.blog_category || item.attributes?.blog_category?.data" 
+              class="text-xs font-semibold text-blue-600 tracking-wider uppercase mb-2 block"
+            >
+              {{ item.blog_category?.name || item.attributes?.blog_category?.data?.attributes?.name || 'Trends' }}
+            </span>
+
+            <h3 class="font-bold text-xl text-gray-800 line-clamp-2 hover:text-blue-600 transition-colors">
+              <NuxtLink :to="`/blog/${item.slug || item.attributes?.slug}`">
+                {{ item.title || item.attributes?.title }}
+              </NuxtLink>
+            </h3>
+
+            <p class="text-sm text-gray-500 line-clamp-3 mt-2 leading-relaxed">
+              {{ item.description || item.attributes?.description || 'Click to read full story...' }}
+            </p>
+          </div>
+          
+          <div class="mt-5 pt-4 border-t border-gray-100 flex justify-between items-center">
+            <span class="text-xs text-gray-400">June 2026</span>
+            <NuxtLink 
+              :to="`/blog/${item.slug || item.attributes?.slug}`" 
+              class="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+            >
+              Read Full Article →
+            </NuxtLink>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
