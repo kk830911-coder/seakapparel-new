@@ -33,7 +33,7 @@ const blogs = computed(() => responseData.value?.data || [])
 // 获取翻页元数据（总页数、总条数等）
 const pagination = computed(() => responseData.value?.meta?.pagination || { page: 1, pageCount: 1 })
 
-// 日期格式化逻辑，将内置的 publishedAt 转换为具体的年-月-日
+// 【修改点 1】：日期格式化逻辑，将内置的 publishedAt 转换为具体的年-月-日
 const formatDate = (item) => {
   if (!item) return ''
   const publishedAt = item.publishedAt || item.attributes?.publishedAt
@@ -47,40 +47,35 @@ const formatDate = (item) => {
   return `${year}-${month}-${day}`
 }
 
-// 兼容 Strapi 的各种图片数据结构（获取上传的 cover 媒体对象 url）
+// 纯净图片处理：交给 NuxtImage 全局配置处理 avif/画质
+// 修改点：支持动态设定图片总数，以后加图只改一个数字即可
+const getCleanImageUrl = (rawUrl, item) => {
+  if (!rawUrl) {
+    // 1. 📢 以后你增加了新图片，只需要把下面这个数字改成你 public/cover 下实际的图片总数即可！
+    // 比如以后你加到了 10 张图，把 4 改成 10 就行，名字必须保持 1.jpg, 2.jpg... 这样的规律
+    const totalCoversCount = 4 
+    
+    // 2. 自动动态生成图片数组，无需手动一行行写路径
+    const defaultCovers = Array.from({ length: totalCoversCount }, (_, i) => `/cover/${i + 1}.jpg`)
+    
+    // 3. 基于文章的 id 或固定属性做取模运算，确保同一篇文章永远分配到同一张随机图
+    const seed = item?.id || (item?.title?.length || 0)
+    const randomIndex = Math.abs(seed) % defaultCovers.length
+    
+    return defaultCovers[randomIndex]
+  }
+  
+  return rawUrl.startsWith('/') ? `${strapiUrl}${rawUrl}` : rawUrl.split('?')[0]
+}
+
+// 兼容 Strapi 的各种图片数据结构
 const getImageUrl = (item) => {
-  if (!item) return null
   const coverData = item.cover || item.attributes?.cover
   if (!coverData) return null
   
-  if (typeof coverData === 'string') return coverData
   if (coverData.url) return coverData.url
   if (coverData.data?.attributes?.url) return coverData.data.attributes.url
   return null
-}
-
-// 【核心修改点】：三级阶梯式图片清洗逻辑
-const getCleanImageUrl = (item) => {
-  if (!item) return '/cover/1.jpg'
-
-  // 1. 优先采用 Strapi 后台上传的 cover 媒体图片
-  const mediaUrl = getImageUrl(item)
-  
-  // 2. 如果没有媒体图片，次优先选用 cover_url 文本框字段存储的外链网址
-  const fallbackUrl = mediaUrl || item.cover_url || item.attributes?.cover_url
-
-  // 3. 如果前两者都有值，进行相对路径补全或防污染切割；如果没有，则使用本地随机默认图
-  if (fallbackUrl) {
-    return fallbackUrl.startsWith('/') ? `${strapiUrl}${fallbackUrl}` : fallbackUrl.split('?')[0]
-  }
-
-  // 4. 两个字段都为空时的【最终兜底方案】：调用本地默认随机图片
-  const totalCoversCount = 4 
-  const defaultCovers = Array.from({ length: totalCoversCount }, (_, i) => `/cover/${i + 1}.jpg`)
-  const seed = item.id || (item.title?.length || 0) || (item.attributes?.title?.length || 0)
-  const randomIndex = Math.abs(seed) % defaultCovers.length
-  
-  return defaultCovers[randomIndex]
 }
 
 useHead({ title: 'Latest Blogs & Fashion News | SeakApparel' })
@@ -116,7 +111,7 @@ useHead({ title: 'Latest Blogs & Fashion News | SeakApparel' })
             class="w-full md:w-64 lg:w-72 aspect-square overflow-hidden block bg-gray-50 relative flex-shrink-0"
           >
             <NuxtImg
-              :src="getCleanImageUrl(item)"
+              :src="getCleanImageUrl(getImageUrl(item), item)"
               sizes="(max-width: 768px) 100vw, 300px"
               class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
               alt="Blog Cover Image"
