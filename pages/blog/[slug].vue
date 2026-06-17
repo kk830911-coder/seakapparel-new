@@ -9,8 +9,8 @@ const postSlug = route.params.slug
 
 // 初始化 Markdown 解析器
 const md = new MarkdownIt({
-  html: true,        // 允许解析内容中的 HTML
-  linkify: true,     // 自动将链接转换为可点击链接
+  html: true,         // 允许解析内容中的 HTML
+  linkify: true,      // 自动将链接转换为可点击链接
   typographer: true
 })
 
@@ -47,41 +47,6 @@ const formatDate = (postItem) => {
   const day = String(date.getDate()).padStart(2, '0')
   
   return `${year}-${month}-${day}`
-}
-
-// 【修改点 1】：图片地址清洗：智能识别本地相对路径与第三方网络绝对路径，防止 Unsplash 参数被切断
-const getCleanImageUrl = (rawUrl) => {
-  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1200&h=514&c_fill&q=75&f_auto'
-  if (!rawUrl) return fallback
-  
-  // 如果是本地上传的相对路径，拼上后端域名
-  if (rawUrl.startsWith('/')) {
-    return `${strapiUrl}${rawUrl}`
-  }
-  
-  // 如果是 Dify 发过来的第三方高清网络绝对路径，直接原样返回，不切除任何参数
-  return rawUrl
-}
-
-// 【修改点 2】：智能封面提取：优先读取 cover_url (Text 链接)，其次兼容读取 cover (Media 媒体文件)
-const getImageUrl = (postItem) => {
-  if (!postItem) return ''
-  
-  // 提取属性域，兼容 Strapi v4 的不同包裹结构
-  const attrs = postItem.attributes || postItem
-
-  // 1. 优先读取：Dify 全自动工作流发过来的网络图片链接
-  if (attrs.cover_url) return attrs.cover_url
-
-  // 2. 兜底读取：Strapi 本地媒体库上传的图片字段
-  const coverData = attrs.cover
-  if (coverData) {
-    if (coverData.url) return coverData.url
-    if (coverData.data?.url) return coverData.data.url
-    if (coverData.data?.attributes?.url) return coverData.data.attributes.url
-  }
-  
-  return ''
 }
 
 // 【完美排版核心逻辑】：将大模型生成的各种格式的正文转换为漂亮的网页 HTML
@@ -131,7 +96,7 @@ useHead({
     <article v-else class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden p-6 md:p-10">
       <div class="flex items-center gap-4 text-sm text-gray-400 mb-4">
         <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-medium text-xs">
-          {{ post.blog_category?.name || post.attributes?.blog_category?.data?.attributes?.name || 'Trends' }}
+          {{ post.blog_category || post.attributes?.blog_category || 'New Products' }}
         </span>
         <span v-if="formatDate(post)">{{ formatDate(post) }}</span>
       </div>
@@ -143,16 +108,6 @@ useHead({
       <p class="text-gray-600 italic border-l-4 border-gray-200 pl-4 py-1 mb-8 bg-gray-50 text-base rounded-r">
         {{ post.description || post.attributes?.description }}
       </p>
-
-      <div v-if="getImageUrl(post)" class="w-full aspect-[21/9] rounded-xl overflow-hidden mb-10 bg-gray-100">
-        <NuxtImg 
-          :src="getCleanImageUrl(getImageUrl(post))"
-          sizes="(max-width: 1200px) 100vw, 1200px"
-          class="w-full h-full object-cover"
-          alt="Blog Detail Cover"
-          loading="eager"
-        />
-      </div>
 
       <div 
         class="prose max-w-none text-gray-700 leading-relaxed text-lg"
