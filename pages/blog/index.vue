@@ -108,10 +108,9 @@ useHead({ title: 'Latest Blogs & Fashion News | SeakApparel' })
           <div class="p-6 flex-1 flex flex-col justify-between">
             <div>
               <span 
-                v-if="item.blog_category || item.attributes?.blog_category?.data" 
                 class="text-xs font-semibold text-blue-600 tracking-wider uppercase mb-2 block"
               >
-                {{ item.blog_category?.name || item.attributes?.blog_category?.data?.attributes?.name || 'Trends' }}
+                {{ item.blog_category || item.attributes?.blog_category || 'New Products' }}
               </span>
 
               <h3 class="font-bold text-xl text-gray-800 line-clamp-2 hover:text-blue-600 transition-colors">
