@@ -48,19 +48,17 @@ const formatDate = (item) => {
 }
 
 // 纯净图片处理：交给 NuxtImage 全局配置处理 avif/画质
-// 修改点：当没有封面时，传入 item 的唯一标识计算出一个固定的随机本地图片
+// 修改点：支持动态设定图片总数，以后加图只改一个数字即可
 const getCleanImageUrl = (rawUrl, item) => {
   if (!rawUrl) {
-    // 1. 定义你在 public/cover 文件夹下准备好的默认图片文件名（请根据你的实际文件名和后缀修改）
-    const defaultCovers = [
-      '/cover/1.jpg',
-      '/cover/2.jpg',
-      '/cover/3.jpg',
-      '/cover/4.jpg',
-      '/cover/5.jpg'
-    ]
+    // 1. 📢 以后你增加了新图片，只需要把下面这个数字改成你 public/cover 下实际的图片总数即可！
+    // 比如以后你加到了 10 张图，把 4 改成 10 就行，名字必须保持 1.jpg, 2.jpg... 这样的规律
+    const totalCoversCount = 4 
     
-    // 2. 基于文章的 id 或固定属性做取模运算，确保同一篇文章永远分配到同一张随机图
+    // 2. 自动动态生成图片数组，无需手动一行行写路径
+    const defaultCovers = Array.from({ length: totalCoversCount }, (_, i) => `/cover/${i + 1}.jpg`)
+    
+    // 3. 基于文章的 id 或固定属性做取模运算，确保同一篇文章永远分配到同一张随机图
     const seed = item?.id || (item?.title?.length || 0)
     const randomIndex = Math.abs(seed) % defaultCovers.length
     
