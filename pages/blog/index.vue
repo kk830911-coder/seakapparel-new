@@ -9,7 +9,8 @@ const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onre
 const currentPage = ref(1)
 
 // 使用 useFetch 替代 onMounted，利用 SSR 提升首屏加载速度
-const { data: responseData, pending, error } = await useFetch(`${strapiUrl}/api/blogs`, {
+// 增加了 sort 排序、pagination 翻页控制，并且将 key 与页码绑定，支持无缝翻页
+const { data: responseData, pending, error, refresh } = await useFetch(`${strapiUrl}/api/blogs`, {
   query: computed(() => ({
     populate: '*',
     sort: 'publishedAt:desc',
@@ -32,7 +33,7 @@ const blogs = computed(() => responseData.value?.data || [])
 // 获取翻页元数据（总页数、总条数等）
 const pagination = computed(() => responseData.value?.meta?.pagination || { page: 1, pageCount: 1 })
 
-// 日期格式化逻辑，将内置的 publishedAt 转换为具体的年-月-日
+// 【修改点 1】：日期格式化逻辑，将内置的 publishedAt 转换为具体的年-月-日
 const formatDate = (item) => {
   if (!item) return ''
   const publishedAt = item.publishedAt || item.attributes?.publishedAt
@@ -88,7 +89,6 @@ useHead({ title: 'Latest Blogs & Fashion News | SeakApparel' })
         <div 
           v-for="item in blogs" 
           :key="item.id" 
-          /* 【修改点 1】：在 md 屏幕以上转为 flex 横向排列 */
           class="bg-white rounded-xl shadow overflow-hidden flex flex-col md:flex-row border border-gray-100"
         >
           <NuxtLink 
