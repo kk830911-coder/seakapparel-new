@@ -9,8 +9,7 @@ const strapiUrl = isLocal ? 'http://localhost:1337' : 'https://seak-backend.onre
 const currentPage = ref(1)
 
 // 使用 useFetch 替代 onMounted，利用 SSR 提升首屏加载速度
-// 增加了 sort 排序、pagination 翻页控制，并且将 key 与页码绑定，支持无缝翻页
-const { data: responseData, pending, error, refresh } = await useFetch(`${strapiUrl}/api/blogs`, {
+const { data: responseData, pending, error } = await useFetch(`${strapiUrl}/api/blogs`, {
   query: computed(() => ({
     populate: '*',
     sort: 'publishedAt:desc',
@@ -33,7 +32,7 @@ const blogs = computed(() => responseData.value?.data || [])
 // 获取翻页元数据（总页数、总条数等）
 const pagination = computed(() => responseData.value?.meta?.pagination || { page: 1, pageCount: 1 })
 
-// 【修改点 1】：日期格式化逻辑，将内置的 publishedAt 转换为具体的年-月-日
+// 日期格式化逻辑，将内置的 publishedAt 转换为具体的年-月-日
 const formatDate = (item) => {
   if (!item) return ''
   const publishedAt = item.publishedAt || item.attributes?.publishedAt
@@ -85,26 +84,28 @@ useHead({ title: 'Latest Blogs & Fashion News | SeakApparel' })
     </div>
 
     <div v-else>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 gap-8">
         <div 
           v-for="item in blogs" 
           :key="item.id" 
-          class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between border border-gray-100"
+          /* 【修改点 1】：在 md 屏幕以上转为 flex 横向排列 */
+          class="bg-white rounded-xl shadow overflow-hidden flex flex-col md:flex-row border border-gray-100"
         >
           <NuxtLink 
             :to="`/blog/${item.slug || item.attributes?.slug}`" 
-            class="aspect-[16/10] overflow-hidden block bg-gray-50 relative"
+            target="_blank"
+            class="w-full md:w-64 lg:w-72 aspect-square overflow-hidden block bg-gray-50 relative flex-shrink-0"
           >
             <NuxtImg
               :src="getCleanImageUrl(getImageUrl(item))"
-              sizes="(max-width: 768px) 100vw, 400px"
+              sizes="(max-width: 768px) 100vw, 300px"
               class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
               alt="Blog Cover Image"
               loading="lazy"
             />
           </NuxtLink>
 
-          <div class="p-5 flex-1 flex flex-col justify-between">
+          <div class="p-6 flex-1 flex flex-col justify-between">
             <div>
               <span 
                 v-if="item.blog_category || item.attributes?.blog_category?.data" 
@@ -114,7 +115,7 @@ useHead({ title: 'Latest Blogs & Fashion News | SeakApparel' })
               </span>
 
               <h3 class="font-bold text-xl text-gray-800 line-clamp-2 hover:text-blue-600 transition-colors">
-                <NuxtLink :to="`/blog/${item.slug || item.attributes?.slug}`">
+                <NuxtLink :to="`/blog/${item.slug || item.attributes?.slug}`" target="_blank">
                   {{ item.title || item.attributes?.title }}
                 </NuxtLink>
               </h3>
@@ -128,6 +129,7 @@ useHead({ title: 'Latest Blogs & Fashion News | SeakApparel' })
               <span class="text-xs text-gray-400">{{ formatDate(item) || 'Recent' }}</span>
               <NuxtLink 
                 :to="`/blog/${item.slug || item.attributes?.slug}`" 
+                target="_blank"
                 class="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1"
               >
                 Read Full Article →
