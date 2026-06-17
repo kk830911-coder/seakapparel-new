@@ -93,14 +93,6 @@ const renderMarkdownContent = (content) => {
         paraHtml += '</p>'
         htmlResult += paraHtml
       }
-      // 4. 新增：完美处理图片区块 (Image)
-      else if (block.type === 'image') {
-        const imgUrl = block.image?.url || ''
-        const altText = block.image?.alternativeText || 'SeakApparel Wholesale'
-        if (imgUrl) {
-          htmlResult += `<div class="blog-image-wrapper"><img src="${imgUrl}" alt="${altText}" /></div>`
-        }
-      }
     })
     
     return htmlResult
@@ -200,20 +192,5 @@ useHead({
 :deep(.prose) th {
   background-color: #f9fafb;
   font-weight: 600;
-}
-
-/* 新增：正文嵌入图片的高级排版样式 */
-:deep(.prose) .blog-image-wrapper {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-  text-center: center;
-}
-:deep(.prose) .blog-image-wrapper img {
-  border-radius: 1rem;
-  max-height: 500px;
-  margin-left: auto;
-  margin-right: auto;
-  object-fit: cover;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 </style>
