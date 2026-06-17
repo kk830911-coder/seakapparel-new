@@ -53,49 +53,16 @@ const formatDate = (postItem) => {
 const renderMarkdownContent = (content) => {
   if (!content) return '<p>No content available.</p>'
   
-  // 情况 A：如果已经成功转换成了新版 Strapi Blocks (JSON 数组)
+  // 情况 A：如果 Dify 发送的是新版 Strapi Blocks (JSON 数组)
   if (Array.isArray(content)) {
-    let htmlResult = ''
-    
-    content.forEach(block => {
-      // 1. 处理二级标题 (H2)
-      if (block.type === 'heading' && block.level === 2) {
-        const text = block.children?.map(child => child.text).join('') || ''
-        htmlResult += `<h2>${text}</h2>`
-      } 
-      // 2. 处理无序列表 (List)
-      else if (block.type === 'list' && block.format === 'unordered') {
-        htmlResult += '<ul>'
-        block.children?.forEach(item => {
-          htmlResult += '<li>'
-          item.children?.forEach(child => {
-            // 如果声明了 bold: true，则包裹 strong 标签实现局部加粗
-            if (child.bold) {
-              htmlResult += `<strong>${child.text}</strong>`
-            } else {
-              htmlResult += child.text
-            }
-          })
-          htmlResult += '</li>'
-        })
-        htmlResult += '</ul>'
-      } 
-      // 3. 处理普通段落 (Paragraph)
-      else if (block.type === 'paragraph') {
-        let paraHtml = '<p>'
-        block.children?.forEach(child => {
-          if (child.bold) {
-            paraHtml += `<strong>${child.text}</strong>`
-          } else {
-            paraHtml += child.text
-          }
-        })
-        paraHtml += '</p>'
-        htmlResult += paraHtml
+    // 提取出里面的纯文本，并保留换行，再由 markdown-it 解析
+    const textContent = content.map(block => {
+      if (block.type === 'paragraph' || block.type === 'heading') {
+        return block.children?.map(child => child.text).join('') || ''
       }
-    })
-    
-    return htmlResult
+      return ''
+    }).join('\n\n')
+    return md.render(textContent)
   }
   
   // 情况 B：如果传入的是纯 Markdown 字符串文本，直接完美解析
@@ -144,7 +111,7 @@ useHead({
 
       <div 
         class="prose max-w-none text-gray-700 leading-relaxed text-lg"
-        v-vhtml="renderMarkdownContent(post.content || post.attributes?.content)"
+        v-html="renderMarkdownContent(post.content || post.attributes?.content)"
       ></div>
     </article>
   </div>
