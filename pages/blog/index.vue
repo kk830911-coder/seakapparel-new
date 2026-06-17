@@ -48,9 +48,25 @@ const formatDate = (item) => {
 }
 
 // 纯净图片处理：交给 NuxtImage 全局配置处理 avif/画质
-const getCleanImageUrl = (rawUrl) => {
-  const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=75&f_auto'
-  if (!rawUrl) return fallback
+// 修改点：当没有封面时，传入 item 的唯一标识计算出一个固定的随机本地图片
+const getCleanImageUrl = (rawUrl, item) => {
+  if (!rawUrl) {
+    // 1. 定义你在 public/cover 文件夹下准备好的默认图片文件名（请根据你的实际文件名和后缀修改）
+    const defaultCovers = [
+      '/cover/1.jpg',
+      '/cover/2.jpg',
+      '/cover/3.jpg',
+      '/cover/4.jpg',
+      '/cover/5.jpg'
+    ]
+    
+    // 2. 基于文章的 id 或固定属性做取模运算，确保同一篇文章永远分配到同一张随机图
+    const seed = item?.id || (item?.title?.length || 0)
+    const randomIndex = Math.abs(seed) % defaultCovers.length
+    
+    return defaultCovers[randomIndex]
+  }
+  
   return rawUrl.startsWith('/') ? `${strapiUrl}${rawUrl}` : rawUrl.split('?')[0]
 }
 
@@ -97,7 +113,7 @@ useHead({ title: 'Latest Blogs & Fashion News | SeakApparel' })
             class="w-full md:w-64 lg:w-72 aspect-square overflow-hidden block bg-gray-50 relative flex-shrink-0"
           >
             <NuxtImg
-              :src="getCleanImageUrl(getImageUrl(item))"
+              :src="getCleanImageUrl(getImageUrl(item), item)"
               sizes="(max-width: 768px) 100vw, 300px"
               class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
               alt="Blog Cover Image"
