@@ -144,7 +144,7 @@ useHead({
 
       <div 
         class="prose max-w-none text-gray-700 leading-relaxed text-lg"
-        v-vhtml="renderMarkdownContent(post.content || post.attributes?.content)"
+        v-html="renderMarkdownContent(post.content || post.attributes?.content)"
       ></div>
     </article>
   </div>
