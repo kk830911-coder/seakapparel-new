@@ -29,26 +29,6 @@ const { data: responseData, pending: loading, error: fetchError } = await useFet
 
 const post = computed(() => responseData.value?.data?.[0] || null)
 
-// 日期格式化核心逻辑：将 Strapi 复杂的 ISO 时间戳转换为 "YYYY-MM-DD" 具体的某一天
-const formatDate = (postItem) => {
-  if (!postItem) return ''
-  
-  // 兼容 Strapi v4 不同的解构层级获取内置的 publishedAt
-  const publishedAt = postItem.publishedAt || postItem.attributes?.publishedAt
-  
-  if (!publishedAt) return ''
-  
-  // 转换为本地时间戳对象
-  const date = new Date(publishedAt)
-  
-  // 格式化为：年-月-日
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  
-  return `${year}-${month}-${day}`
-}
-
 // 【修改点 1】：图片地址清洗：智能识别本地相对路径与第三方网络绝对路径，防止 Unsplash 参数被切断
 const getCleanImageUrl = (rawUrl) => {
   const fallback = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1200&h=514&c_fill&q=75&f_auto'
@@ -133,7 +113,7 @@ useHead({
         <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-medium text-xs">
           {{ post.blog_category?.name || post.attributes?.blog_category?.data?.attributes?.name || 'Trends' }}
         </span>
-        <span v-if="formatDate(post)">{{ formatDate(post) }}</span>
+        <span>June 2026</span>
       </div>
 
       <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
