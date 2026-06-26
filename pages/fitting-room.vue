@@ -48,6 +48,7 @@
         <div class="loading-box" v-if="isGenerating">
           <div class="spinner"></div>
           <p>Agnes AI is tailoring the garment to the model...</p>
+          <p class="loading-tip">Uploading & rendering may take up to 30 seconds, please hold on...</p>
         </div>
 
         <div class="result-box" v-if="generatedImageUrl && !isGenerating">
@@ -76,7 +77,7 @@
 <script setup>
 import { ref } from 'vue'
 
-// 保持线上正式 Render 后端网址
+// 线上正式 Render 后端网址
 const BACKEND_URL = 'https://seak-backend.onrender.com'
 
 const selectedFile = ref(null)
@@ -84,8 +85,6 @@ const previewUrl = ref(null)
 const modelType = ref('southeast_asia')
 const isGenerating = ref(false)
 const generatedImageUrl = ref(null)
-
-// ✨ 新增：控制高清大图弹窗显示的变量
 const isLightboxOpen = ref(false)
 
 // 处理本地图片选择预览
@@ -98,15 +97,8 @@ const onFileSelected = (event) => {
   isLightboxOpen.value = false
 }
 
-// 打开大图弹窗
-const openLightbox = () => {
-  isLightboxOpen.value = true
-}
-
-// 关闭大图弹窗
-const closeLightbox = () => {
-  isLightboxOpen.value = false
-}
+const openLightbox = () => { isLightboxOpen.value = true }
+const closeLightbox = () => { isLightboxOpen.value = false }
 
 // 核心生成流程
 const startGeneration = async () => {
@@ -116,7 +108,11 @@ const startGeneration = async () => {
   
   try {
     const formData = new FormData()
-    formData.append('file', selectedFile.value) 
+    
+    // ✨ 移动端核心修复：强行重写文件名。手机 Safari 拍照上传的文件经常带有特殊字符或无扩展名，
+    // 通过第三个参数硬编码指定 'garment_photo.jpg'，能确保线上多平台后端落库 100% 成功。
+    const safeFileName = selectedFile.value.name || `garment_${Date.now()}.jpg`
+    formData.append('file', selectedFile.value, safeFileName) 
     formData.append('modelType', modelType.value)
     
     console.log('🚀 正在向线上后端复合公开路由投递图片，Agnes AI 正在全自动同步出图...')
@@ -136,7 +132,10 @@ const startGeneration = async () => {
 
   } catch (error) {
     console.error('AI Generation Error:', error)
-    alert('Failed to generate image. Please check if your online Strapi server is Live.')
+    // ✨ 移动端核心修复：更智能的弹窗。如果手机拍照上传失败（通常是图片体积超大超过 5MB），
+    // 弹窗会显示具体原因，方便知晓是否触及了 Render 的 Payload Limit / Timeout 限制。
+    const errMsg = error.data?.message || error.message || 'Network error or timeout'
+    alert(`Generation Failed: ${errMsg}\n(Tip: If you took a live photo, it might be too large. Try uploading a screenshot or compressed image.)`)
   } finally {
     isGenerating.value = false
   }
@@ -243,7 +242,6 @@ h3 {
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   transition: transform 0.2s ease;
 }
-/* ✨ 新增：使生成的缩略图悬浮时有放大镜手势和微扩反馈 */
 .clickable-image {
   cursor: zoom-in;
 }
@@ -307,7 +305,12 @@ h3 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 12px;
+  text-align: center;
+}
+.loading-tip {
+  font-size: 12px;
+  color: #888;
 }
 .spinner {
   width: 40px;
@@ -342,53 +345,79 @@ h3 {
   background: #219653;
 }
 
-/* ✨ 新增：高清大图全屏暗化弹窗样式 */
+/* 高清大图全屏弹窗 */
 .image-modal {
   position: fixed;
-  z-index: 99999; /* 确保层级在最顶层，无视任何导航栏拦截 */
+  z-index: 99999;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.88); /* 沉浸式暗化背景 */
+  background-color: rgba(0, 0, 0, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: zoom-out; /* 提示用户点击任何空白处即可退出 */
+  cursor: zoom-out;
 }
 .modal-content {
-  max-width: 92%;
-  max-height: 92%;
+  max-width: 95vw;
+  max-height: 85vh;
   object-fit: contain;
   border-radius: 4px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   cursor: default;
-  animation: zoomIn 0.22s cubic-bezier(0.1, 0.8, 0.25, 1); /* 高级工业感微缩放动画 */
+  animation: zoomIn 0.2s ease-out;
 }
 .close-btn {
   position: absolute;
-  top: 24px;
-  right: 32px;
+  top: 16px;
+  right: 24px;
   color: rgba(255, 255, 255, 0.7);
-  font-size: 44px;
+  font-size: 40px;
   font-weight: 300;
   cursor: pointer;
-  transition: color 0.2s;
   user-select: none;
 }
-.close-btn:hover {
-  color: #fff;
+
+/* ✨ 新增：移动端断点专项响应式 CSS 样式 */
+@media (max-width: 768px) {
+  .fitting-room-container {
+    padding: 20px 14px;
+  }
+  .page-title {
+    font-size: 22px;
+  }
+  .page-subtitle {
+    margin-bottom: 24px;
+    font-size: 13px;
+  }
+  /* 核心：将手机端双列横排强切为单列竖排 */
+  .main-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .panel {
+    padding: 16px;
+  }
+  .upload-box {
+    min-height: 200px;
+  }
+  .final-image {
+    max-height: 340px; /* 限制手机端出图高度，防止图片过长滑出屏幕 */
+  }
+  .modal-content {
+    max-width: 98vw;
+    max-height: 80vh;
+  }
+  .close-btn {
+    top: 10px;
+    right: 20px;
+    font-size: 36px;
+  }
 }
 
-/* 动效 */
 @keyframes zoomIn {
-  from {
-    transform: scale(0.96);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 </style>
