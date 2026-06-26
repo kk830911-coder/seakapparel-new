@@ -51,7 +51,13 @@
         </div>
 
         <div class="result-box" v-if="generatedImageUrl && !isGenerating">
-          <img :src="generatedImageUrl" alt="AI Generated Model" class="final-image" />
+          <img 
+            :src="generatedImageUrl" 
+            alt="AI Generated Model" 
+            class="final-image clickable-image" 
+            @click="openLightbox"
+            title="Click to view high-res image"
+          />
           
           <button @click="downloadImage(generatedImageUrl)" class="btn-download">
             💾 Download High-Res Image
@@ -59,13 +65,18 @@
         </div>
       </div>
     </div>
+
+    <div v-if="isLightboxOpen" class="image-modal" @click="closeLightbox">
+      <span class="close-btn" @click="closeLightbox">&times;</span>
+      <img :src="generatedImageUrl" class="modal-content" @click.stop />
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 
-// ✨ 核心切换：本地测试完毕，直接切为你的线上正式 Render 后端网址
+// 保持线上正式 Render 后端网址
 const BACKEND_URL = 'https://seak-backend.onrender.com'
 
 const selectedFile = ref(null)
@@ -74,17 +85,34 @@ const modelType = ref('southeast_asia')
 const isGenerating = ref(false)
 const generatedImageUrl = ref(null)
 
+// ✨ 新增：控制高清大图弹窗显示的变量
+const isLightboxOpen = ref(false)
+
+// 处理本地图片选择预览
 const onFileSelected = (event) => {
   const file = event.target.files[0]
   if (!file) return
   selectedFile.value = file
   previewUrl.value = URL.createObjectURL(file)
   generatedImageUrl.value = null 
+  isLightboxOpen.value = false
 }
 
+// 打开大图弹窗
+const openLightbox = () => {
+  isLightboxOpen.value = true
+}
+
+// 关闭大图弹窗
+const closeLightbox = () => {
+  isLightboxOpen.value = false
+}
+
+// 核心生成流程
 const startGeneration = async () => {
   if (!selectedFile.value) return
   isGenerating.value = true
+  isLightboxOpen.value = false
   
   try {
     const formData = new FormData()
@@ -93,7 +121,6 @@ const startGeneration = async () => {
     
     console.log('🚀 正在向线上后端复合公开路由投递图片，Agnes AI 正在全自动同步出图...')
     
-    // 连通线上无冲突路径 /api/seak-ai/try-on
     const response = await $fetch(`${BACKEND_URL}/api/seak-ai/try-on`, {
       method: 'POST',
       body: formData
@@ -115,55 +142,253 @@ const startGeneration = async () => {
   }
 }
 
-// 强制跨域直接下载函数
-const downloadImage = async (imageUrl) => {
-  try {
-    const response = await fetch(imageUrl)
-    const blob = await response.blob()
-    const localBlobUrl = URL.createObjectURL(blob)
-    
+// 利用 Cloudinary 官方底层的 fl_attachment 强制下载
+const downloadImage = (imageUrl) => {
+  if (imageUrl && imageUrl.includes('/upload/')) {
+    const forcedDownloadUrl = imageUrl.replace('/upload/', '/upload/fl_attachment/')
     const tempLink = document.createElement('a')
-    tempLink.href = localBlobUrl
-    tempLink.download = `seak_ai_model_${Date.now()}.jpg`
+    tempLink.href = forcedDownloadUrl
+    tempLink.setAttribute('download', `seak_ai_model_${Date.now()}.jpg`)
     document.body.appendChild(tempLink)
     tempLink.click()
-    
     document.body.removeChild(tempLink)
-    URL.revokeObjectURL(localBlobUrl)
-  } catch (error) {
-    console.error('强制下载失败，启用新窗口打开兜底:', error)
+  } else {
     window.open(imageUrl, '_blank')
   }
 }
 </script>
 
 <style scoped>
-.fitting-room-container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; font-family: -apple-system, sans-serif; color: #1a1a1a; }
-.page-title { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
-.page-subtitle { color: #666; margin-bottom: 40px; }
-.main-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-.panel { background: #f9f9f9; border: 1px solid #eee; border-radius: 8px; padding: 24px; }
-.section { margin-bottom: 24px; }
-h3 { font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #333; }
-.upload-box { border: 2px dashed #ddd; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #fff; overflow: hidden; min-height: 260px; }
-.upload-box:hover { border-color: #1a1a1a; }
-.hidden-input { display: none; }
-.upload-label { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-.upload-placeholder { display: flex; flex-direction: column; align-items: center; color: #888; font-size: 14px; }
-.upload-placeholder .icon { font-size: 32px; margin-bottom: 8px; }
-.image-preview, .final-image { max-width: 100%; max-height: 260px; object-fit: contain; }
-.final-image { max-height: 400px; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-.model-selector { display: flex; flex-direction: column; gap: 10px; }
-.radio-card { border: 1px solid #ddd; padding: 14px; border-radius: 6px; display: flex; align-items: center; gap: 10px; cursor: pointer; background: #fff; transition: all 0.2s ease; }
-.radio-card.active { border-color: #1a1a1a; background: #fcfcfc; font-weight: 600; }
-.btn-generate { width: 100%; background: #1a1a1a; color: #fff; border: none; padding: 16px; font-size: 16px; font-weight: 600; border-radius: 6px; cursor: pointer; }
-.btn-generate:disabled { background: #ccc; cursor: not-allowed; }
-.result-panel { display: flex; flex-direction: column; min-height: 450px; }
-.result-placeholder { flex: 1; display: flex; align-items: center; justify-content: center; border: 1px dashed #ddd; color: #999; border-radius: 6px; }
-.loading-box { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
-.spinner { width: 40px; height: 40px; border: 3px solid #f3f3f3; border-top: 3px solid #1a1a1a; border-radius: 50%; animation: spin 1s linear infinite; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-.result-box { display: flex; flex-direction: column; align-items: center; gap: 20px; }
-.btn-download { display: inline-block; background: #27ae60; color: white; border: none; padding: 12px 24px; font-weight: 600; border-radius: 6px; cursor: pointer; }
-.btn-download:hover { background: #219653; }
+.fitting-room-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #1a1a1a;
+}
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+.page-subtitle {
+  color: #666;
+  margin-bottom: 40px;
+}
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+.panel {
+  background: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 24px;
+}
+.section {
+  margin-bottom: 24px;
+}
+h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #333;
+}
+.upload-box {
+  border: 2px dashed #ddd;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: #fff;
+  overflow: hidden;
+  min-height: 260px;
+}
+.upload-box:hover {
+  border-color: #1a1a1a;
+}
+.hidden-input {
+  display: none;
+}
+.upload-label {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #888;
+  font-size: 14px;
+}
+.upload-placeholder .icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+.image-preview {
+  max-width: 100%;
+  max-height: 260px;
+  object-fit: contain;
+}
+.final-image {
+  max-height: 400px;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease;
+}
+/* ✨ 新增：使生成的缩略图悬浮时有放大镜手势和微扩反馈 */
+.clickable-image {
+  cursor: zoom-in;
+}
+.clickable-image:hover {
+  transform: scale(1.01);
+}
+.model-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.radio-card {
+  border: 1px solid #ddd;
+  padding: 14px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  background: #fff;
+  transition: all 0.2s ease;
+}
+.radio-card.active {
+  border-color: #1a1a1a;
+  background: #fcfcfc;
+  font-weight: 600;
+}
+.btn-generate {
+  width: 100%;
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-generate:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+.result-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 450px;
+}
+.result-placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #ddd;
+  color: #999;
+  border-radius: 6px;
+}
+.loading-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #1a1a1a;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.result-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.btn-download {
+  display: inline-block;
+  background: #27ae60;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-download:hover {
+  background: #219653;
+}
+
+/* ✨ 新增：高清大图全屏暗化弹窗样式 */
+.image-modal {
+  position: fixed;
+  z-index: 99999; /* 确保层级在最顶层，无视任何导航栏拦截 */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.88); /* 沉浸式暗化背景 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out; /* 提示用户点击任何空白处即可退出 */
+}
+.modal-content {
+  max-width: 92%;
+  max-height: 92%;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  cursor: default;
+  animation: zoomIn 0.22s cubic-bezier(0.1, 0.8, 0.25, 1); /* 高级工业感微缩放动画 */
+}
+.close-btn {
+  position: absolute;
+  top: 24px;
+  right: 32px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 44px;
+  font-weight: 300;
+  cursor: pointer;
+  transition: color 0.2s;
+  user-select: none;
+}
+.close-btn:hover {
+  color: #fff;
+}
+
+/* 动效 */
+@keyframes zoomIn {
+  from {
+    transform: scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
 </style>
