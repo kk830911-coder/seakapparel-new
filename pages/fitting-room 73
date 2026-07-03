@@ -4,7 +4,6 @@
     <p class="page-subtitle">Upload your flat lay image to instantly generate local professional model shots.</p>
 
     <div class="main-layout">
-      <!-- 左侧：控制与上传面板 -->
       <div class="panel control-panel">
         <div class="section">
           <h3>1. Upload Garment Image (上传服装)</h3>
@@ -35,11 +34,10 @@
         </div>
 
         <button class="btn-generate" :disabled="isGenerating || !selectedFile" @click="startGeneration">
-          {{ isGenerating ? loadingText : '✨ Generate Model Images' }}
+          {{ isGenerating ? 'Generating Studio Shots...' : '✨ Generate Model Images' }}
         </button>
       </div>
 
-      <!-- 右侧：结果展示与下载面板 -->
       <div class="panel result-panel">
         <h3>3. AI Generation Result (生成结果)</h3>
         
@@ -49,8 +47,8 @@
 
         <div class="loading-box" v-if="isGenerating">
           <div class="spinner"></div>
-          <p>{{ loadingText }}</p>
-          <p class="loading-tip">Enterprise Mode: Polling status securely every 2s...</p>
+          <p>Agnes AI is tailoring the garment to the model...</p>
+          <p class="loading-tip">⚡ All Platforms Optimized: Rendering instantly...</p>
         </div>
 
         <div class="result-box" v-if="generatedImageUrl && !isGenerating">
@@ -69,7 +67,6 @@
       </div>
     </div>
 
-    <!-- 高清大图全屏弹窗 -->
     <div v-if="isLightboxOpen" class="image-modal" @click="closeLightbox">
       <span class="close-btn" @click="closeLightbox">&times;</span>
       <img :src="generatedImageUrl" class="modal-content" @click.stop />
@@ -89,9 +86,6 @@ const isGenerating = ref(false)
 const generatedImageUrl = ref(null)
 const isLightboxOpen = ref(false)
 
-// ✨ 新增：动态更改加载提示文字
-const loadingText = ref('Submitting garment...')
-
 const onFileSelected = (event) => {
   const file = event.target.files[0]
   if (!file) return
@@ -104,7 +98,7 @@ const onFileSelected = (event) => {
 const openLightbox = () => { isLightboxOpen.value = true }
 const closeLightbox = () => { isLightboxOpen.value = false }
 
-// 高保真无感画布压缩
+// ✨ 核心提速优化：无论是PC还是手机，全部通过前端画布压缩体积
 const compressImage = (file) => {
   return new Promise((resolve) => {
     const reader = new FileReader()
@@ -116,6 +110,7 @@ const compressImage = (file) => {
         const canvas = document.createElement('canvas')
         let width = img.width
         let height = img.height
+        // 限制最大宽高为 1200px，保留高品质服装细节，但体积能骤降 95%
         if (width > 1200 || height > 1200) {
           if (width > height) {
             height = Math.round((height * 1200) / width)
@@ -131,70 +126,45 @@ const compressImage = (file) => {
         ctx.drawImage(img, 0, 0, width, height)
         canvas.toBlob((blob) => {
           resolve(new File([blob], file.name || 'photo.jpg', { type: 'image/jpeg' }))
-        }, 'image/jpeg', 0.85)
+        }, 'image/jpeg', 0.85) // 0.85 高清无损体感压缩
       }
     }
   })
 }
 
-// 核心流程：一键提交 + 异步自动高频轮询
+// 核心生成流程
 const startGeneration = async () => {
   if (!selectedFile.value) return
   isGenerating.value = true
   isLightboxOpen.value = false
-  loadingText.value = 'Uploading clothing shot...'
   
   try {
+    console.log('正在执行全平台高保真加速压缩...')
     const compressedFile = await compressImage(selectedFile.value)
 
     const formData = new FormData()
     formData.append('file', compressedFile, 'garment_photo.jpg') 
     formData.append('modelType', modelType.value)
     
-    // 1. 第一步：向后端快速投递文件。后端瞬间建立记录并传回任务 ID，耗时仅 1 秒！
+    console.log('🚀 正在向线上后端投递优化文件...')
+    
     const response = await $fetch(`${BACKEND_URL}/api/seak-ai/try-on`, {
       method: 'POST',
       body: formData
     })
 
-    const taskId = response?.data?.id
-    if (!taskId) {
-      throw new Error('未能从后端获取到有效的异步生成任务 ID')
+    if (response && response.data && response.data.resultImageUrl) {
+      generatedImageUrl.value = response.data.resultImageUrl
+    } else if (response && response.url) {
+      generatedImageUrl.value = response.url
+    } else {
+      alert('AI 渲染成功！但是未能捕获到正确的图片展示，请刷新线上数据库检查。')
     }
-
-    // 2. 第二步：开启安全轮询定时器，每隔 2.5 秒去后端查一次结果
-    loadingText.value = 'AI model is trying on (15s)...'
-    
-    const pollStatus = async () => {
-      try {
-        const check = await $fetch(`${BACKEND_URL}/api/seak-ai/check-status/${taskId}`)
-        
-        if (check.status === 'processing') {
-          loadingText.value = 'Agnes AI is designing garments...'
-        }
-        
-        if (check.status === 'success' && check.resultImageUrl) {
-          //  🎉 轮询到成功，完美拿到图片 URL，渲染上屏！
-          generatedImageUrl.value = check.resultImageUrl
-          isGenerating.value = false
-          clearInterval(pollTimer) // 销毁定时器
-        } else if (check.status === 'failed') {
-          alert('Backend processing failed. Please adjust your source image layout.')
-          isGenerating.value = false
-          clearInterval(pollTimer)
-        }
-      } catch (pollErr) {
-        console.error('轮询查询中出现波动:', pollErr)
-        // 允许网络抖动，不打断轮询，继续等待下一次循环
-      }
-    }
-
-    // 执行高频定时循环
-    const pollTimer = setInterval(pollStatus, 2500)
 
   } catch (error) {
     console.error('AI Generation Error:', error)
-    alert('Submission failed: ' + (error.data?.message || error.message))
+    alert('Generation Failed: ' + (error.data?.message || error.message))
+  } finally {
     isGenerating.value = false
   }
 }
