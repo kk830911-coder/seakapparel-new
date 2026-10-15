@@ -98,7 +98,6 @@ useHead({
           <span class="text-gray-600">{{ activeCategoryName }}</span>
         </template>
       </nav>
-      <h1 class="text-3xl md:text-4xl font-heading font-bold text-navy">{{ pageTitle }}</h1>
     </div>
 
     <!-- Category Filter -->
