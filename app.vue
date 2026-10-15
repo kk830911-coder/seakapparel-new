@@ -115,8 +115,7 @@ const acceptCookies = () => {
         <NuxtLink to="/" class="flex items-center gap-2">
           <NuxtImg src="/logo.png" alt="SeakApparel Logo" class="h-10 w-auto" loading="eager" />
           <div class="flex flex-col">
-            <span class="text-xl font-heading font-bold text-navy leading-tight">SeakApparel</span>
-            <span class="text-[10px] text-gray-400 tracking-wider hidden sm:block">BY TONTON SPORTSWEAR</span>
+            <span class="text-lg font-heading font-bold text-navy leading-tight">Global Sportswear Customization Provider</span>
           </div>
         </NuxtLink>
 
