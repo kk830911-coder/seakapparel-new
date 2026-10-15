@@ -265,7 +265,6 @@ const acceptCookies = () => {
           <div>
             <div class="flex items-center gap-2 mb-4">
               <NuxtImg src="/logo.png" alt="TontonSports" class="h-8 w-auto brightness-200" />
-              <span class="text-white font-heading font-bold text-lg">TontonSports</span>
             </div>
             <p class="text-gray-400 leading-relaxed mb-4">Professional custom sportswear manufacturer since 2004. OEM/ODM services for teams, brands, and businesses worldwide.</p>
             <div class="flex gap-3">
