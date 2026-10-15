@@ -5,8 +5,22 @@ import { useRoute } from '#imports'
 const route = useRoute()
 const { strapiUrl } = useStrapi()
 
+// Optimize: Only populate necessary fields to reduce API response size
 const { data: responseData } = await useFetch(() => `${strapiUrl}/api/products`, {
-  query: { populate: '*', 'filters[slug][$eq]': route.params.slug, 'pagination[limit]': 1 },
+  query: {
+    'populate[image]': '*',
+    'filters[slug][$eq]': route.params.slug,
+    'pagination[limit]': 1,
+    'fields[0]': 'title',
+    'fields[1]': 'slug',
+    'fields[2]': 'price',
+    'fields[3]': 'moq',
+    'fields[4]': 'description',
+    'fields[5]': 'material',
+    'fields[6]': 'features',
+    'fields[7]': 'customization_options',
+    'fields[8]': 'sport_type'
+  },
   key: `product-${route.params.slug}`
 })
 
@@ -122,7 +136,7 @@ const handleTouchEnd = (e, next, prev) => {
         <!-- Image Gallery -->
         <div class="space-y-2 sm:space-y-3">
           <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group cursor-zoom-in" @touchstart="handleTouchStart" @touchend="e => handleTouchEnd(e, nextImage, prevImage)" @click="openPreview">
-            <img :src="getCleanImageUrl(currentMainImageUrl, strapiUrl)" class="w-full h-full object-cover" :alt="`${getTitle(product) || 'Product'} - SeakApparel`" loading="eager" />
+            <img :src="getCleanImageUrl(currentMainImageUrl, strapiUrl)" class="w-full h-full object-cover" :alt="`${getTitle(product) || 'Product'} - SeakApparel`" loading="eager" fetchpriority="high" />
             <button v-if="imagesList.length > 1" @click.stop="prevImage" class="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 bg-black/40 text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             </button>
@@ -133,7 +147,7 @@ const handleTouchEnd = (e, next, prev) => {
           </div>
           <div class="flex gap-1.5 sm:gap-2 overflow-x-auto pb-1 -mx-1 px-1">
             <button v-for="(url, i) in imagesList" :key="i" @click="activeImageIndex = i" class="w-12 h-12 sm:w-16 sm:h-16 rounded-lg border-2 flex-shrink-0 overflow-hidden transition-colors" :class="activeImageIndex === i ? 'border-brand' : 'border-gray-200 hover:border-gray-300'">
-              <img :src="getCleanImageUrl(url, strapiUrl)" width="64" height="64" class="w-full h-full object-cover" :alt="`${getTitle(product) || 'Product'} thumbnail ${i + 1}`" />
+              <img :src="getCleanImageUrl(url, strapiUrl)" width="64" height="64" class="w-full h-full object-cover" :alt="`${getTitle(product) || 'Product'} thumbnail ${i + 1}`" loading="lazy" />
             </button>
           </div>
         </div>

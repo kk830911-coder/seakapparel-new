@@ -45,6 +45,8 @@ export default defineNuxtConfig({
         { rel: 'alternate', hreflang: 'x-default', href: 'https://www.seakapparel.com/' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+        { rel: 'preconnect', href: 'https://seak-backend.onrender.com' },
+        { rel: 'preconnect', href: 'https://res.cloudinary.com' },
         { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@600;700;800;900&display=swap' }
       ],
       script: [
