@@ -4,7 +4,7 @@ useHead({
   meta: [
     { name: 'description', content: 'Full custom sportswear manufacturing process — from design mockup to delivery. Sublimation, screen print, embroidery. Free design service. Low MOQ 1 piece.' },
     { name: 'keywords', content: 'custom sportswear manufacturing, OEM ODM sportswear, sublimation printing, custom activewear design, sportswear sampling' },
-    { property: 'og:title', content: 'Custom Sportswear Manufacturing Process | SeakApparel' },
+    { property: 'og:title', content: 'Custom Sportswear Manufacturing Process | TontonSports' },
     { property: 'og:description', content: 'From design to delivery — full OEM/ODM sportswear manufacturing. Free mockup, low MOQ.' },
     { property: 'og:type', content: 'website' },
     { property: 'og:url', content: 'https://www.seakapparel.com/customization' }
@@ -18,7 +18,7 @@ useHead({
         "name": "Custom Sportswear Manufacturing",
         "provider": {
           "@type": "Organization",
-          "name": "SeakApparel"
+          "name": "TontonSports"
         },
         "description": "Full OEM/ODM custom sportswear manufacturing service including design, sampling, production, and global delivery.",
         "areaServed": ["North America", "Europe", "Australia", "South America"],

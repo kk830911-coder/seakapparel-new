@@ -43,7 +43,7 @@ useHead({
   meta: [
     { name: 'description', content: 'Expert insights on custom sportswear manufacturing — fabric guides, printing techniques, industry trends, and tips for launching your activewear brand.' },
     { name: 'keywords', content: 'sportswear blog, activewear manufacturing tips, custom sportswear guide, fabric technology, printing techniques' },
-    { property: 'og:title', content: 'Sportswear Industry Blog | SeakApparel' },
+    { property: 'og:title', content: 'Sportswear Industry Blog | TontonSports' },
     { property: 'og:description', content: 'Expert insights on custom sportswear manufacturing and industry trends.' },
     { property: 'og:type', content: 'website' },
     { property: 'og:url', content: 'https://www.seakapparel.com/blog' }
@@ -72,7 +72,7 @@ useHead({
       <div class="grid grid-cols-1 gap-8">
         <div v-for="item in blogs" :key="item.id" class="bg-white rounded-xl shadow overflow-hidden flex flex-col md:flex-row border border-gray-100">
           <NuxtLink :to="`/blog/${item.slug || item.attributes?.slug}`" class="w-full md:w-64 lg:w-72 aspect-square overflow-hidden block bg-gray-50 relative flex-shrink-0">
-            <img :src="getBlogImageUrl(item)" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" :alt="`${item.title || item.attributes?.title || 'Blog'} - SeakApparel`" loading="lazy" />
+            <img :src="getBlogImageUrl(item)" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" :alt="`${item.title || item.attributes?.title || 'Blog'} - TontonSports`" loading="lazy" />
           </NuxtLink>
           <div class="p-6 flex-1 flex flex-col justify-between">
             <div>

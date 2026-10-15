@@ -38,9 +38,9 @@ onMounted(async () => {
 })
 
 useHead({
-  title: computed(() => `${faqItem.value?.title || faqItem.value?.attributes?.title || 'FAQ Detail'} | SeakApparel`),
+  title: computed(() => `${faqItem.value?.title || faqItem.value?.attributes?.title || 'FAQ Detail'} | TontonSports`),
   meta: computed(() => [
-    { name: 'description', content: `Answer to: ${faqItem.value?.title || faqItem.value?.attributes?.title || 'FAQ question'} - SeakApparel` },
+    { name: 'description', content: `Answer to: ${faqItem.value?.title || faqItem.value?.attributes?.title || 'FAQ question'} - TontonSports` },
     { property: 'og:title', content: faqItem.value?.title || faqItem.value?.attributes?.title || 'FAQ Detail' },
     { property: 'og:type', content: 'article' }
   ]),

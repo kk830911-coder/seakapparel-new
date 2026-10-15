@@ -30,9 +30,9 @@ const submitForm = async () => {
 useHead({
   title: 'Contact Us | Get a Free Quote',
   meta: [
-    { name: 'description', content: 'Contact SeakApparel for custom sportswear inquiries. Get a free quote within 24 hours. WhatsApp, email, or fill out our inquiry form.' },
+    { name: 'description', content: 'Contact TontonSports for custom sportswear inquiries. Get a free quote within 24 hours. WhatsApp, email, or fill out our inquiry form.' },
     { name: 'keywords', content: 'contact sportswear manufacturer, get quote custom sportswear, sportswear supplier inquiry' },
-    { property: 'og:title', content: 'Contact SeakApparel | Get a Free Quote' },
+    { property: 'og:title', content: 'Contact TontonSports | Get a Free Quote' },
     { property: 'og:description', content: 'Get a free custom sportswear quote within 24 hours.' },
     { property: 'og:type', content: 'website' },
     { property: 'og:url', content: 'https://www.seakapparel.com/contact' }
@@ -43,8 +43,8 @@ useHead({
       innerHTML: JSON.stringify({
         "@context": "https://schema.org",
         "@type": "ContactPage",
-        "name": "Contact SeakApparel",
-        "description": "Contact SeakApparel for custom sportswear manufacturing inquiries",
+        "name": "Contact TontonSports",
+        "description": "Contact TontonSports for custom sportswear manufacturing inquiries",
         "url": "https://www.seakapparel.com/contact"
       })
     }

@@ -4,7 +4,7 @@ useHead({
   meta: [
     { name: 'description', content: 'Tonton Sportswear (Shenzhen) Co., Ltd. — Established 2004. 5,000m+ factory, 200+ workers, ISO9001/BSCI/WRAP certified. Serving 500+ brands in 60+ countries.' },
     { name: 'keywords', content: 'sportswear manufacturer China, activewear factory, ISO certified sportswear, Tonton Sportswear, OEM factory Shenzhen' },
-    { property: 'og:title', content: 'About SeakApparel | 20+ Years Sportswear Manufacturer' },
+    { property: 'og:title', content: 'About TontonSports | 20+ Years Sportswear Manufacturer' },
     { property: 'og:description', content: 'Established 2004. ISO certified factory serving 500+ brands in 60+ countries.' },
     { property: 'og:type', content: 'website' },
     { property: 'og:url', content: 'https://www.seakapparel.com/about' }
@@ -78,13 +78,13 @@ const milestones = [
           <div>
             <h2 class="text-3xl md:text-4xl font-heading font-bold text-navy mb-6">Our Story</h2>
             <div class="space-y-4 text-gray-600 leading-relaxed">
-              <p>Founded in 2004, <strong class="text-navy">Tonton Sportswear (Shenzhen) Co., Ltd.</strong> has grown from a small garment workshop into one of China's leading custom sportswear manufacturers. Operating under our brand <strong class="text-navy">SeakApparel</strong>, we specialize in OEM/ODM manufacturing for sports brands, teams, and businesses worldwide.</p>
+              <p>Founded in 2004, <strong class="text-navy">Tonton Sportswear (Shenzhen) Co., Ltd.</strong> has grown from a small garment workshop into one of China's leading custom sportswear manufacturers. Operating under our brand <strong class="text-navy">TontonSports</strong>, we specialize in OEM/ODM manufacturing for sports brands, teams, and businesses worldwide.</p>
               <p>Our 5,000m+ smart factory in Shenzhen's Longgang District houses over 200 skilled workers and 50+ imported production machines. With digital pattern rooms, automated cutting systems, and AI-assisted quality control, we deliver precision at scale — producing over 20,000 pieces monthly.</p>
               <p>We believe great sportswear starts with understanding the athlete. Whether you're launching a fitness brand, outfitting a sports team, or expanding your apparel line, our experienced design and production teams work closely with you at every step — from initial concept to final delivery.</p>
             </div>
           </div>
           <div class="relative">
-            <img src="/gongchang.jpg" alt="SeakApparel Factory Building" class="w-full rounded-xl shadow-lg" loading="lazy" />
+            <img src="/gongchang.jpg" alt="TontonSports Factory Building" class="w-full rounded-xl shadow-lg" loading="lazy" />
             <div class="absolute -bottom-4 -left-4 bg-brand text-white p-4 rounded-xl shadow-lg">
               <div class="text-2xl font-heading font-black">2004</div>
               <div class="text-sm">Established</div>

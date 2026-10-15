@@ -41,13 +41,13 @@ const currentMainImageUrl = computed(() => imagesList.value[activeImageIndex.val
 const previewImageUrl = computed(() => imagesList.value[previewIndex.value] || '')
 
 useSeoMeta({
-  title: () => `${getTitle(product.value) || 'Custom Sportswear'} | SeakApparel`,
-  ogTitle: () => `${getTitle(product.value) || 'Custom Sportswear'} - SeakApparel`,
+  title: () => `${getTitle(product.value) || 'Custom Sportswear'} | TontonSports`,
+  ogTitle: () => `${getTitle(product.value) || 'Custom Sportswear'} - TontonSports`,
   description: () => {
     const title = getTitle(product.value) || 'Custom sportswear'
     const price = getPrice(product.value) || ''
     const moq = getMoq(product.value)
-    return `Custom ${title} from SeakApparel. Factory price: $${price}, MOQ: ${moq} piece. OEM/ODM, free design, global shipping.`
+    return `Custom ${title} from TontonSports. Factory price: $${price}, MOQ: ${moq} piece. OEM/ODM, free design, global shipping.`
   },
   ogDescription: () => `Custom ${getTitle(product.value) || 'sportswear'} at factory direct price. OEM/ODM, low MOQ, ISO certified manufacturer.`,
   ogImage: () => currentMainImageUrl.value ? getCleanImageUrl(currentMainImageUrl.value, strapiUrl) : 'https://www.seakapparel.com/og-image.jpg',
@@ -62,15 +62,15 @@ useHead({
       "@context": "https://schema.org",
       "@type": "Product",
       "name": getTitle(product.value) || '',
-      "description": `Custom ${getTitle(product.value)} from SeakApparel. Professional OEM/ODM sportswear manufacturer.`,
+      "description": `Custom ${getTitle(product.value)} from TontonSports. Professional OEM/ODM sportswear manufacturer.`,
       "image": currentMainImageUrl.value ? getCleanImageUrl(currentMainImageUrl.value, strapiUrl) : '',
-      "brand": { "@type": "Brand", "name": "SeakApparel" },
+      "brand": { "@type": "Brand", "name": "TontonSports" },
       "offers": {
         "@type": "Offer",
         "priceCurrency": "USD",
         "price": getPrice(product.value) || 0,
         "availability": "https://schema.org/InStock",
-        "seller": { "@type": "Organization", "name": "SeakApparel" }
+        "seller": { "@type": "Organization", "name": "TontonSports" }
       }
     })
   }])
@@ -127,7 +127,7 @@ const handleTouchEnd = (e, next, prev) => {
         <!-- Image Gallery -->
         <div class="space-y-2 sm:space-y-3">
           <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group cursor-zoom-in" @touchstart="handleTouchStart" @touchend="e => handleTouchEnd(e, nextImage, prevImage)" @click="openPreview">
-            <img :src="getCleanImageUrl(currentMainImageUrl, strapiUrl)" class="w-full h-full object-cover" :alt="`${getTitle(product) || 'Product'} - SeakApparel`" loading="eager" fetchpriority="high" />
+            <img :src="getCleanImageUrl(currentMainImageUrl, strapiUrl)" class="w-full h-full object-cover" :alt="`${getTitle(product) || 'Product'} - TontonSports`" loading="eager" fetchpriority="high" />
             <button v-if="imagesList.length > 1" @click.stop="prevImage" class="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 bg-black/40 text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             </button>

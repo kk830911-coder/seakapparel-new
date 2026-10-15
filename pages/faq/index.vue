@@ -70,7 +70,7 @@ useHead({
         <span class="text-gray-600">FAQ</span>
       </nav>
       <h1 class="text-3xl md:text-4xl font-heading font-bold text-navy">Frequently Asked Questions</h1>
-      <p class="text-gray-500 mt-2">Everything you need to know about ordering custom sportswear from SeakApparel.</p>
+      <p class="text-gray-500 mt-2">Everything you need to know about ordering custom sportswear from TontonSports.</p>
     </div>
     <div v-if="loading" class="text-center py-20 text-gray-500">
       <div class="animate-spin inline-block w-8 h-8 border-4 border-brand border-t-transparent rounded-full mb-4"></div>

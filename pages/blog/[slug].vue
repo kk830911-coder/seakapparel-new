@@ -43,7 +43,7 @@ const renderMarkdownContent = (content) => {
         block.children?.forEach(child => { p += child.bold ? `<strong>${child.text}</strong>` : child.text })
         html += p + '</p>'
       } else if (block.type === 'image' && block.image?.url) {
-        html += `<div class="blog-image-wrapper"><img src="${block.image.url}" alt="${block.image.alternativeText || post.value?.title || 'SeakApparel Blog Image'}" /></div>`
+        html += `<div class="blog-image-wrapper"><img src="${block.image.url}" alt="${block.image.alternativeText || post.value?.title || 'TontonSports Blog Image'}" /></div>`
       }
     })
     return html
@@ -53,9 +53,9 @@ const renderMarkdownContent = (content) => {
 }
 
 useHead({
-  title: computed(() => `${post.value?.title || post.value?.attributes?.title || 'Blog Detail'} | SeakApparel`),
+  title: computed(() => `${post.value?.title || post.value?.attributes?.title || 'Blog Detail'} | TontonSports`),
   meta: computed(() => [
-    { name: 'description', content: post.value?.description || post.value?.attributes?.description || 'Read the full article on SeakApparel blog.' },
+    { name: 'description', content: post.value?.description || post.value?.attributes?.description || 'Read the full article on TontonSports blog.' },
     { property: 'og:title', content: post.value?.title || post.value?.attributes?.title || 'Blog Detail' },
     { property: 'og:description', content: post.value?.description || post.value?.attributes?.description || '' },
     { property: 'og:type', content: 'article' },
@@ -70,11 +70,11 @@ useHead({
       "description": post.value?.description || post.value?.attributes?.description || '',
       "author": {
         "@type": "Organization",
-        "name": "SeakApparel"
+        "name": "TontonSports"
       },
       "publisher": {
         "@type": "Organization",
-        "name": "SeakApparel",
+        "name": "TontonSports",
         "logo": {
           "@type": "ImageObject",
           "url": "https://www.seakapparel.com/logo.png"

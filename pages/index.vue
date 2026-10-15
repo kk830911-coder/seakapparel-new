@@ -4,9 +4,9 @@ import { ref, onMounted, onUnmounted } from 'vue'
 useHead({
   title: 'Custom Sportswear Manufacturer | OEM Activewear & Gym Wear',
   meta: [
-    { name: 'description', content: 'SeakApparel by Tonton Sportswear — 20+ years professional custom sportswear manufacturer. OEM/ODM activewear, gym wear, team uniforms. Low MOQ from 1 piece. ISO9001 & BSCI certified.' },
+    { name: 'description', content: 'TontonSports by Tonton Sportswear — 20+ years professional custom sportswear manufacturer. OEM/ODM activewear, gym wear, team uniforms. Low MOQ from 1 piece. ISO9001 & BSCI certified.' },
     { name: 'keywords', content: 'custom sportswear manufacturer, activewear OEM, gym wear supplier, custom athletic clothing, team uniform manufacturer' },
-    { property: 'og:title', content: 'Custom Sportswear Manufacturer | OEM Activewear | SeakApparel' },
+    { property: 'og:title', content: 'Custom Sportswear Manufacturer | OEM Activewear | TontonSports' },
     { property: 'og:description', content: '20+ years professional custom sportswear manufacturer. OEM/ODM, low MOQ 1pc, ISO certified. Global shipping.' },
     { property: 'og:type', content: 'website' },
     { property: 'og:url', content: 'https://www.seakapparel.com' }
@@ -17,7 +17,7 @@ useHead({
       innerHTML: JSON.stringify({
         "@context": "https://schema.org",
         "@type": "WebSite",
-        "name": "SeakApparel",
+        "name": "TontonSports",
         "url": "https://www.seakapparel.com",
         "description": "Professional Custom Sportswear Manufacturer Since 2004",
         "potentialAction": {
@@ -107,8 +107,8 @@ const advantages = [
 ]
 
 const testimonials = [
-  { name: 'Mike Johnson', country: 'United States', text: 'SeakApparel has been our go-to manufacturer for 3 years. The quality is consistent and the design team is incredibly responsive. Our basketball jersey line has never looked better.', rating: 5 },
-  { name: 'Sarah Williams', country: 'United Kingdom', text: 'Starting our fitness brand was daunting, but SeakApparel made it easy. Low MOQ let us test designs without huge investment. Now we order 2,000+ pieces per season.', rating: 5 },
+  { name: 'Mike Johnson', country: 'United States', text: 'TontonSports has been our go-to manufacturer for 3 years. The quality is consistent and the design team is incredibly responsive. Our basketball jersey line has never looked better.', rating: 5 },
+  { name: 'Sarah Williams', country: 'United Kingdom', text: 'Starting our fitness brand was daunting, but TontonSports made it easy. Low MOQ let us test designs without huge investment. Now we order 2,000+ pieces per season.', rating: 5 },
   { name: 'Thomas Mueller', country: 'Germany', text: 'Professional team, excellent communication, and fast turnaround. The sublimation quality on our cycling jerseys is outstanding. Highly recommended for European brands.', rating: 5 },
   { name: 'David Chen', country: 'Australia', text: 'We switched from another supplier and the difference is night and day. Better fabrics, sharper printing, and they actually care about getting the details right.', rating: 5 }
 ]
@@ -236,7 +236,7 @@ const testimonials = [
     <section class="bg-navy py-16 md:py-20">
       <div class="max-w-7xl mx-auto px-4">
         <div class="text-center mb-14">
-          <h2 class="text-3xl md:text-4xl font-heading font-bold text-white mb-3">Why Choose SeakApparel</h2>
+          <h2 class="text-3xl md:text-4xl font-heading font-bold text-white mb-3">Why Choose TontonSports</h2>
           <p class="text-gray-400 max-w-2xl mx-auto">We combine two decades of manufacturing expertise with modern technology to deliver sportswear that exceeds expectations.</p>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -268,7 +268,7 @@ const testimonials = [
         <div v-else class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div v-for="item in hotProducts" :key="item.documentId || item.id" class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 group border border-gray-100">
             <a :href="`/products/${getSlug(item)}`" target="_blank" rel="noopener noreferrer" class="aspect-square overflow-hidden block bg-gray-50 relative">
-              <img :src="getProductImageUrl(item, strapiUrl)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" :alt="`${getTitle(item) || 'Custom Sportswear'} - SeakApparel`" loading="lazy" />
+              <img :src="getProductImageUrl(item, strapiUrl)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" :alt="`${getTitle(item) || 'Custom Sportswear'} - TontonSports`" loading="lazy" />
             </a>
             <div class="p-2 sm:p-4">
               <a :href="`/products/${getSlug(item)}`" target="_blank" rel="noopener noreferrer" class="block">

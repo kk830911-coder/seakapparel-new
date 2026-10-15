@@ -17,24 +17,24 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: 'en' },
-      title: "Custom Sportswear Manufacturer | OEM Activewear & Gym Wear | SeakApparel",
-      titleTemplate: '%s | SeakApparel',
+      title: "Custom Sportswear Manufacturer | OEM Activewear & Gym Wear | TontonSports",
+      titleTemplate: '%s | TontonSports',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: "SeakApparel by Tonton Sportswear — 20+ years professional custom sportswear manufacturer. OEM/ODM activewear, gym wear, team uniforms. Low MOQ from 1 piece. ISO9001 & BSCI certified. Global shipping." },
+        { name: 'description', content: "TontonSports by Tonton Sportswear — 20+ years professional custom sportswear manufacturer. OEM/ODM activewear, gym wear, team uniforms. Low MOQ from 1 piece. ISO9001 & BSCI certified. Global shipping." },
         { name: 'keywords', content: 'custom sportswear manufacturer, activewear OEM, gym wear supplier, custom athletic clothing, private label sportswear, wholesale activewear, team uniform manufacturer, OEM sportswear China' },
-        { name: 'author', content: 'SeakApparel - Tonton Sportswear (Shenzhen) Co., Ltd.' },
+        { name: 'author', content: 'TontonSports - Tonton Sportswear (Shenzhen) Co., Ltd.' },
         { name: 'robots', content: 'index, follow' },
         { property: 'og:type', content: 'website' },
-        { property: 'og:site_name', content: 'SeakApparel' },
-        { property: 'og:title', content: 'Custom Sportswear Manufacturer | OEM Activewear | SeakApparel' },
+        { property: 'og:site_name', content: 'TontonSports' },
+        { property: 'og:title', content: 'Custom Sportswear Manufacturer | OEM Activewear | TontonSports' },
         { property: 'og:description', content: '20+ years professional custom sportswear manufacturer. OEM/ODM, low MOQ 1pc, ISO certified. Global shipping.' },
         { property: 'og:image', content: 'https://www.seakapparel.com/og-image.jpg' },
         { property: 'og:url', content: 'https://www.seakapparel.com' },
         { property: 'og:locale', content: 'en_US' },
         { name: 'twitter:card', content: 'summary_large_image' },
-        { name: 'twitter:title', content: 'Custom Sportswear Manufacturer | OEM Activewear | SeakApparel' },
+        { name: 'twitter:title', content: 'Custom Sportswear Manufacturer | OEM Activewear | TontonSports' },
         { name: 'twitter:description', content: '20+ years professional custom sportswear manufacturer. OEM/ODM, low MOQ 1pc, ISO certified.' },
         { name: 'twitter:image', content: 'https://www.seakapparel.com/og-image.jpg' }
       ],
@@ -66,7 +66,7 @@ export default defineNuxtConfig({
 
   site: {
     url: 'https://www.seakapparel.com',
-    name: 'SeakApparel',
+    name: 'TontonSports',
     description: 'Custom Sportswear Manufacturer - OEM/ODM Activewear, Low MOQ, ISO Certified',
     defaultLocale: 'en'
   },
@@ -83,7 +83,7 @@ export default defineNuxtConfig({
   schemaOrg: {
     identity: {
       type: 'Organization',
-      name: 'SeakApparel',
+      name: 'TontonSports',
       alternateName: 'Tonton Sportswear (Shenzhen) Co., Ltd.',
       url: 'https://www.seakapparel.com',
       logo: 'https://www.seakapparel.com/logo.png',
@@ -105,7 +105,7 @@ export default defineNuxtConfig({
         availableLanguage: ['English', 'Chinese']
       },
       sameAs: [
-        'https://www.facebook.com/SeakApparel'
+        'https://www.facebook.com/TontonSports'
       ]
     }
   },

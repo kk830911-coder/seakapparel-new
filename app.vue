@@ -9,7 +9,7 @@ useHead({
       innerHTML: JSON.stringify({
         "@context": "https://schema.org",
         "@type": "Organization",
-        "name": "SeakApparel",
+        "name": "TontonSports",
         "alternateName": "Tonton Sportswear (Shenzhen) Co., Ltd.",
         "url": "https://www.seakapparel.com",
         "logo": "https://www.seakapparel.com/logo.png",
@@ -31,7 +31,7 @@ useHead({
         },
         "areaServed": ["North America", "Europe", "Australia", "South America"],
         "knowsAbout": ["Custom Sportswear", "Activewear Manufacturing", "OEM", "ODM", "Team Uniforms"],
-        "sameAs": ["https://www.facebook.com/SeakApparel"]
+        "sameAs": ["https://www.facebook.com/TontonSports"]
       })
     }
   ]
@@ -115,7 +115,7 @@ const acceptCookies = () => {
     <div class="bg-white border-b border-gray-100">
       <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         <NuxtLink to="/" class="flex items-center gap-2 flex-shrink-0">
-          <NuxtImg src="/logo.png" alt="SeakApparel Logo" class="h-10 w-auto" loading="eager" />
+          <NuxtImg src="/logo.png" alt="TontonSports Logo" class="h-10 w-auto" loading="eager" />
           <div class="flex flex-col justify-center">
             <span class="text-base font-heading font-bold text-navy leading-tight">Global Sportswear</span>
             <span class="text-base font-heading font-bold text-brand leading-tight">OEM / ODM / OBM</span>
@@ -264,12 +264,12 @@ const acceptCookies = () => {
           <!-- Company -->
           <div>
             <div class="flex items-center gap-2 mb-4">
-              <NuxtImg src="/logo.png" alt="SeakApparel" class="h-8 w-auto brightness-200" />
-              <span class="text-white font-heading font-bold text-lg">SeakApparel</span>
+              <NuxtImg src="/logo.png" alt="TontonSports" class="h-8 w-auto brightness-200" />
+              <span class="text-white font-heading font-bold text-lg">TontonSports</span>
             </div>
             <p class="text-gray-400 leading-relaxed mb-4">Professional custom sportswear manufacturer since 2004. OEM/ODM services for teams, brands, and businesses worldwide.</p>
             <div class="flex gap-3">
-              <a href="https://www.facebook.com/SeakApparel" target="_blank" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition-colors" aria-label="Facebook">
+              <a href="https://www.facebook.com/TontonSports" target="_blank" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition-colors" aria-label="Facebook">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
               </a>
               <a href="#" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition-colors" aria-label="LinkedIn">

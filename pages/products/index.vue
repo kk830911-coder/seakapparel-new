@@ -77,7 +77,7 @@ useHead({
   title: computed(() => pageTitle.value),
   meta: computed(() => [
     { name: 'description', content: pageDescription.value },
-    { property: 'og:title', content: `${pageTitle.value} | SeakApparel` },
+    { property: 'og:title', content: `${pageTitle.value} | TontonSports` },
     { property: 'og:description', content: pageDescription.value },
     { property: 'og:type', content: 'website' },
     { property: 'og:url', content: activeCategorySlug.value ? `https://www.seakapparel.com/products?category=${activeCategorySlug.value}` : 'https://www.seakapparel.com/products' }
@@ -128,7 +128,7 @@ useHead({
     <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
       <div v-for="item in pageProducts" :key="item.id" class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 group border border-gray-100">
         <a :href="`/products/${getSlug(item) || item.id}`" target="_blank" rel="noopener noreferrer" class="aspect-square overflow-hidden block bg-gray-50 relative">
-          <img :src="getProductImageUrl(item, strapiUrl)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" :alt="`${getTitle(item) || 'Custom Sportswear'} - SeakApparel`" loading="lazy" />
+          <img :src="getProductImageUrl(item, strapiUrl)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" :alt="`${getTitle(item) || 'Custom Sportswear'} - TontonSports`" loading="lazy" />
           <div class="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity">
             <span class="bg-brand text-white text-xs font-medium px-2.5 py-1 rounded-full">View Details</span>
           </div>
