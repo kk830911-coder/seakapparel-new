@@ -162,7 +162,7 @@ const acceptCookies = () => {
     </div>
 
     <!-- Navigation Bar -->
-    <header class="bg-navy shadow-md">
+    <header class="bg-navy shadow-md hidden md:block">
       <div class="max-w-7xl mx-auto px-4 h-12 flex items-center justify-between">
         <nav class="hidden md:flex items-center gap-1 text-sm font-semibold text-white/90">
           <NuxtLink to="/" active-class="!text-white bg-brand" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">HOME</NuxtLink>
