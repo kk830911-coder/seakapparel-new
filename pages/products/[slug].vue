@@ -113,7 +113,7 @@ const handleTouchEnd = (e, next, prev) => {
       <span class="mx-2">/</span>
       <NuxtLink to="/products" class="hover:text-brand transition-colors">Products</NuxtLink>
       <span class="mx-2">/</span>
-      <span class="text-gray-600 truncate">{{ getTitle(product) || 'Product Detail' }}</span>
+      <span class="text-gray-600">Product Detail</span>
     </nav>
 
     <div v-if="!product" class="text-center py-20 text-red-500 bg-red-50 rounded-xl">
