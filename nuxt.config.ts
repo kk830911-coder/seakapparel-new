@@ -101,7 +101,7 @@ export default defineNuxtConfig({
         type: 'ContactPoint',
         telephone: '+86-18271971983',
         contactType: 'sales',
-        email: 'dean@sztonton.com',
+        email: 'Marc@tutesports.com',
         availableLanguage: ['English', 'Chinese']
       },
       sameAs: [

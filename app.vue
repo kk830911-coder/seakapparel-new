@@ -26,7 +26,7 @@ useHead({
           "@type": "ContactPoint",
           "telephone": "+86-18271971983",
           "contactType": "sales",
-          "email": "dean@sztonton.com",
+          "email": "Marc@tutesports.com",
           "availableLanguage": ["English", "Chinese"]
         },
         "areaServed": ["North America", "Europe", "Australia", "South America"],
@@ -97,9 +97,9 @@ const acceptCookies = () => {
           </span>
         </div>
         <div class="flex items-center gap-5">
-          <a href="mailto:dean@sztonton.com" class="flex items-center gap-1.5 hover:text-brand transition-colors">
+          <a href="mailto:Marc@tutesports.com" class="flex items-center gap-1.5 hover:text-brand transition-colors">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            dean@sztonton.com
+            Marc@tutesports.com
           </a>
           <a href="https://wa.me/8618271971983" target="_blank" class="flex items-center gap-1.5 hover:text-green-600 transition-colors">
             <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471.145-.575.297-.101.15-.39.54-.72 1.09-.134.212-.249.227-.46.082-.16-.074-.729-.27-1.393-.866-.515-.462-.862-1.029-.968-1.248-.099-.21.01-.325.083-.46.075-.134.15-.247.299-.492.099-.168.049-.312-.024-.439-.075-.126-.67-1.611-.916-2.206-.242-.59-.487-.511-.67-.52-.16-.008-.341-.01-.52-.01-.18 0-.47.07-.719.347-.248.277-.944.92-1.433 1.798-.49.878-.49 1.933.028 3.774.52 1.84 1.56 3.582 2.994 4.828 1.433 1.247 3.174 1.943 4.919 2.429.64.14 1.225.227 1.655.273.695.086 1.331.074 1.843-.04 1.05-.23 3.393-1.324 3.896-2.61.503-1.287.503-2.399.354-2.61-.149-.21-.54-.339-1.13-.59z"/></svg>
@@ -133,12 +133,12 @@ const acceptCookies = () => {
               <span class="text-xs text-gray-400">WhatsApp Number</span>
             </div>
           </a>
-          <a href="mailto:dean@sztonton.com" class="flex items-center gap-2.5 hover:text-brand transition-colors">
+          <a href="mailto:Marc@tutesports.com" class="flex items-center gap-2.5 hover:text-brand transition-colors">
             <span class="w-9 h-9 rounded-full border-2 border-brand flex items-center justify-center flex-shrink-0">
               <svg class="w-4.5 h-4.5 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             </span>
             <div class="flex flex-col">
-              <span class="text-sm font-semibold text-navy leading-tight">dean@sztonton.com</span>
+              <span class="text-sm font-semibold text-navy leading-tight">Marc@tutesports.com</span>
               <span class="text-xs text-gray-400">Email Address</span>
             </div>
           </a>
@@ -165,9 +165,9 @@ const acceptCookies = () => {
     <header class="bg-navy shadow-md">
       <div class="max-w-7xl mx-auto px-4 h-12 flex items-center justify-between">
         <nav class="hidden md:flex items-center gap-1 text-sm font-semibold text-white/90">
-          <NuxtLink to="/" active-class="!text-white bg-white/10" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">HOME</NuxtLink>
+          <NuxtLink to="/" active-class="!text-white bg-brand" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">HOME</NuxtLink>
           <div class="relative" @mouseenter="openDropdown" @mouseleave="closeDropdown">
-            <NuxtLink to="/products" active-class="!text-white bg-white/10" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1">
+            <NuxtLink to="/products" active-class="!text-white bg-brand" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1">
               PRODUCTS
               <svg class="w-3 h-3 transition-transform" :class="{ 'rotate-180': isProductsDropdownOpen }" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </NuxtLink>
@@ -185,10 +185,10 @@ const acceptCookies = () => {
               </div>
             </transition>
           </div>
-          <NuxtLink to="/customization" active-class="!text-white bg-white/10" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">CUSTOMIZATION</NuxtLink>
-          <NuxtLink to="/about" active-class="!text-white bg-white/10" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">ABOUT US</NuxtLink>
-          <NuxtLink to="/blog" active-class="!text-white bg-white/10" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">BLOG</NuxtLink>
-          <NuxtLink to="/contact" active-class="!text-white bg-white/10" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">CONTACT US</NuxtLink>
+          <NuxtLink to="/customization" active-class="!text-white bg-brand" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">CUSTOMIZATION</NuxtLink>
+          <NuxtLink to="/about" active-class="!text-white bg-brand" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">ABOUT US</NuxtLink>
+          <NuxtLink to="/blog" active-class="!text-white bg-brand" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">BLOG</NuxtLink>
+          <NuxtLink to="/contact" active-class="!text-white bg-brand" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">CONTACT US</NuxtLink>
         </nav>
 
         <NuxtLink to="/contact" class="hidden md:inline-flex items-center gap-2 bg-accent hover:bg-accent-dark text-white font-bold text-sm px-5 py-2 rounded transition-colors ml-auto">
@@ -332,7 +332,7 @@ const acceptCookies = () => {
               </li>
               <li class="flex items-center gap-2">
                 <svg class="w-4 h-4 text-brand-light flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                <a href="mailto:dean@sztonton.com" class="hover:text-white transition-colors">dean@sztonton.com</a>
+                <a href="mailto:Marc@tutesports.com" class="hover:text-white transition-colors">Marc@tutesports.com</a>
               </li>
               <li class="flex items-center gap-2">
                 <svg class="w-4 h-4 text-brand-light flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
@@ -368,7 +368,7 @@ const acceptCookies = () => {
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471.145-.575.297-.101.15-.39.54-.72 1.09-.134.212-.249.227-.46.082-.16-.074-.729-.27-1.393-.866-.515-.462-.862-1.029-.968-1.248-.099-.21.01-.325.083-.46.075-.134.15-.247.299-.492.099-.168.049-.312-.024-.439-.075-.126-.67-1.611-.916-2.206-.242-.59-.487-.511-.67-.52-.16-.008-.341-.01-.52-.01-.18 0-.47.07-.719.347-.248.277-.944.92-1.433 1.798-.49.878-.49 1.933.028 3.774.52 1.84 1.56 3.582 2.994 4.828 1.433 1.247 3.174 1.943 4.919 2.429.64.14 1.225.227 1.655.273.695.086 1.331.074 1.843-.04 1.05-.23 3.393-1.324 3.896-2.61.503-1.287.503-2.399.354-2.61-.149-.21-.54-.339-1.13-.59zm-4.92 6.53c-1.635 0-3.24-.437-4.64-1.266l-.33-.195-1.156.304.31-1.127-.214-.341c-.87-1.402-1.333-3.024-1.333-4.682 0-5.733 4.667-10.4 10.4-10.4 5.733 0 10.4 4.667 10.4 10.4 0 5.733-4.667 10.4-10.4 10.4z"/>
           </svg>
         </a>
-        <a href="mailto:dean@sztonton.com" class="w-10 h-10 flex items-center justify-center transition-all duration-300 hover:brightness-110 group" style="background: linear-gradient(135deg, #046BD2 0%, #0354A8 100%);" aria-label="Email">
+        <a href="mailto:Marc@tutesports.com" class="w-10 h-10 flex items-center justify-center transition-all duration-300 hover:brightness-110 group" style="background: linear-gradient(135deg, #046BD2 0%, #0354A8 100%);" aria-label="Email">
           <svg width="18" height="18" fill="#fff" viewBox="0 0 24 24" class="transition-transform duration-300 group-hover:scale-110">
             <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
           </svg>

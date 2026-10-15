@@ -17,7 +17,7 @@ const submitForm = async () => {
   if (!form.value.name || !form.value.email || !form.value.message) return
   formSubmitting.value = true
   try {
-    const mailtoLink = `mailto:dean@sztonton.com?subject=Inquiry from ${form.value.name} - ${form.value.company || 'Individual'}&body=Name: ${form.value.name}%0AEmail: ${form.value.email}%0ACompany: ${form.value.company || 'N/A'}%0APhone: ${form.value.phone || 'N/A'}%0AProduct Interest: ${form.value.product || 'N/A'}%0AQuantity: ${form.value.quantity || 'N/A'}%0A%0AMessage:%0A${form.value.message}`
+    const mailtoLink = `mailto:Marc@tutesports.com?subject=Inquiry from ${form.value.name} - ${form.value.company || 'Individual'}&body=Name: ${form.value.name}%0AEmail: ${form.value.email}%0ACompany: ${form.value.company || 'N/A'}%0APhone: ${form.value.phone || 'N/A'}%0AProduct Interest: ${form.value.product || 'N/A'}%0AQuantity: ${form.value.quantity || 'N/A'}%0A%0AMessage:%0A${form.value.message}`
     window.location.href = mailtoLink
     formSubmitted.value = true
   } catch (err) {
@@ -75,13 +75,13 @@ useHead({
               <div class="text-green-600 text-xs">+86 182 7197 1983</div>
             </div>
           </a>
-          <a href="mailto:dean@sztonton.com" class="flex items-center gap-3 p-4 rounded-xl bg-blue-50 border border-blue-100 hover:shadow-md transition-all group">
+          <a href="mailto:Marc@tutesports.com" class="flex items-center gap-3 p-4 rounded-xl bg-blue-50 border border-blue-100 hover:shadow-md transition-all group">
             <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
               <svg class="w-5 h-5 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             </div>
             <div>
               <div class="font-semibold text-blue-800 text-sm">Email</div>
-              <div class="text-blue-600 text-xs">dean@sztonton.com</div>
+              <div class="text-blue-600 text-xs">Marc@tutesports.com</div>
             </div>
           </a>
           <a href="tel:+8618271971983" class="flex items-center gap-3 p-4 rounded-xl bg-purple-50 border border-purple-100 hover:shadow-md transition-all group">
@@ -189,7 +189,7 @@ useHead({
                   <svg class="w-5 h-5 text-brand mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                   <div>
                     <div class="font-medium text-navy">Email</div>
-                    <a href="mailto:dean@sztonton.com" class="text-gray-500 hover:text-brand transition-colors">dean@sztonton.com</a>
+                    <a href="mailto:Marc@tutesports.com" class="text-gray-500 hover:text-brand transition-colors">Marc@tutesports.com</a>
                   </div>
                 </li>
                 <li class="flex items-start gap-3">
