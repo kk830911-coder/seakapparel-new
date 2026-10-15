@@ -5,21 +5,12 @@ import { useRoute } from '#imports'
 const route = useRoute()
 const { strapiUrl } = useStrapi()
 
-// Optimize: Only populate necessary fields to reduce API response size
+// Optimize: Use pagination limit to reduce response size
 const { data: responseData } = await useFetch(() => `${strapiUrl}/api/products`, {
   query: {
-    'populate[image]': '*',
+    populate: '*',
     'filters[slug][$eq]': route.params.slug,
-    'pagination[limit]': 1,
-    'fields[0]': 'title',
-    'fields[1]': 'slug',
-    'fields[2]': 'price',
-    'fields[3]': 'moq',
-    'fields[4]': 'description',
-    'fields[5]': 'material',
-    'fields[6]': 'features',
-    'fields[7]': 'customization_options',
-    'fields[8]': 'sport_type'
+    'pagination[limit]': 1
   },
   key: `product-${route.params.slug}`
 })
