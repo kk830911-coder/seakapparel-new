@@ -127,23 +127,23 @@ useHead({
     </div>
 
     <!-- Product Grid -->
-    <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
       <div v-for="item in pageProducts" :key="item.id" class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 group border border-gray-100">
-        <NuxtLink :to="`/products/${getSlug(item) || item.id}`" class="aspect-square overflow-hidden block bg-gray-50 relative">
+        <a :href="`/products/${getSlug(item) || item.id}`" target="_blank" rel="noopener noreferrer" class="aspect-square overflow-hidden block bg-gray-50 relative">
           <img :src="getProductImageUrl(item, strapiUrl)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" :alt="`${getTitle(item) || 'Custom Sportswear'} - SeakApparel`" loading="lazy" />
           <div class="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity">
             <span class="bg-brand text-white text-xs font-medium px-2.5 py-1 rounded-full">View Details</span>
           </div>
-        </NuxtLink>
-        <div class="p-3 flex flex-col">
-          <NuxtLink :to="`/products/${getSlug(item) || item.id}`" class="block">
-            <h3 class="text-sm font-medium text-gray-800 line-clamp-2 mb-2 group-hover:text-brand transition-colors">{{ getTitle(item) }}</h3>
-          </NuxtLink>
-          <div class="flex justify-between items-center mb-3">
-            <span class="text-brand font-bold">${{ getPrice(item) }}</span>
+        </a>
+        <div class="p-2 sm:p-3 flex flex-col">
+          <a :href="`/products/${getSlug(item) || item.id}`" target="_blank" rel="noopener noreferrer" class="block">
+            <h3 class="text-xs sm:text-sm font-medium text-gray-800 line-clamp-2 mb-2 group-hover:text-brand transition-colors">{{ getTitle(item) }}</h3>
+          </a>
+          <div class="flex justify-between items-center mb-2 sm:mb-3">
+            <span class="text-brand font-bold text-xs sm:text-sm">${{ getPrice(item) }}</span>
             <span class="text-gray-400 text-xs">MOQ: {{ getMoq(item) }} pc</span>
           </div>
-          <NuxtLink :to="`/products/${getSlug(item) || item.id}`" class="block w-full text-center text-xs font-medium text-brand border border-brand/20 hover:bg-brand hover:text-white py-2 rounded-lg transition-colors">Send Inquiry</NuxtLink>
+          <a :href="`/products/${getSlug(item) || item.id}`" target="_blank" rel="noopener noreferrer" class="block w-full text-center text-xs font-medium text-brand border border-brand/20 hover:bg-brand hover:text-white py-1.5 sm:py-2 rounded-lg transition-colors">Send Inquiry</a>
         </div>
       </div>
     </div>
