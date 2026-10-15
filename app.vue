@@ -109,22 +109,63 @@ const acceptCookies = () => {
       </div>
     </div>
 
-    <!-- Main Header -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-4 h-16 md:h-[68px] flex items-center justify-between">
-        <NuxtLink to="/" class="flex items-center gap-2">
+    <!-- Logo + Contact Row -->
+    <div class="bg-white border-b border-gray-100">
+      <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+        <NuxtLink to="/" class="flex items-center gap-2 flex-shrink-0">
           <NuxtImg src="/logo.png" alt="SeakApparel Logo" class="h-10 w-auto" loading="eager" />
           <div class="flex flex-col">
             <span class="text-lg font-heading font-bold text-navy leading-tight">Global Sportswear Customization Provider</span>
           </div>
         </NuxtLink>
 
-        <nav class="hidden lg:flex items-center gap-7 font-medium text-gray-600">
-          <NuxtLink to="/" active-class="!text-brand font-semibold" class="hover:text-brand transition-colors">Home</NuxtLink>
+        <div class="hidden md:flex items-center gap-6">
+          <a href="https://wa.me/8618271971983" target="_blank" class="flex items-center gap-2.5 hover:text-brand transition-colors">
+            <span class="w-9 h-9 rounded-full border-2 border-green-500 flex items-center justify-center flex-shrink-0">
+              <svg class="w-4.5 h-4.5 text-green-500" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471.145-.575.297-.101.15-.39.54-.72 1.09-.134.212-.249.227-.46.082-.16-.074-.729-.27-1.393-.866-.515-.462-.862-1.029-.968-1.248-.099-.21.01-.325.083-.46.075-.134.15-.247.299-.492.099-.168.049-.312-.024-.439-.075-.126-.67-1.611-.916-2.206-.242-.59-.487-.511-.67-.52-.16-.008-.341-.01-.52-.01-.18 0-.47.07-.719.347-.248.277-.944.92-1.433 1.798-.49.878-.49 1.933.028 3.774.52 1.84 1.56 3.582 2.994 4.828 1.433 1.247 3.174 1.943 4.919 2.429.64.14 1.225.227 1.655.273.695.086 1.331.074 1.843-.04 1.05-.23 3.393-1.324 3.896-2.61.503-1.287.503-2.399.354-2.61-.149-.21-.54-.339-1.13-.59z"/></svg>
+            </span>
+            <div class="flex flex-col">
+              <span class="text-sm font-semibold text-navy leading-tight">+86 182 7197 1983</span>
+              <span class="text-xs text-gray-400">WhatsApp Number</span>
+            </div>
+          </a>
+          <a href="mailto:dean@sztonton.com" class="flex items-center gap-2.5 hover:text-brand transition-colors">
+            <span class="w-9 h-9 rounded-full border-2 border-brand flex items-center justify-center flex-shrink-0">
+              <svg class="w-4.5 h-4.5 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </span>
+            <div class="flex flex-col">
+              <span class="text-sm font-semibold text-navy leading-tight">dean@sztonton.com</span>
+              <span class="text-xs text-gray-400">Email Address</span>
+            </div>
+          </a>
+          <div class="flex items-center gap-2.5">
+            <span class="w-9 h-9 rounded-full border-2 border-accent flex items-center justify-center flex-shrink-0">
+              <svg class="w-4.5 h-4.5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </span>
+            <div class="flex flex-col">
+              <span class="text-sm font-semibold text-navy leading-tight">Shenzhen, China</span>
+              <span class="text-xs text-gray-400">Location</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile menu button -->
+        <button @click="toggleMenu" class="md:hidden p-2 rounded-md text-gray-600 hover:text-brand hover:bg-gray-100 focus:outline-none transition-colors" aria-label="Toggle Menu">
+          <svg v-if="!isMenuOpen" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          <svg v-else class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="bg-navy sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 h-12 flex items-center justify-between">
+        <nav class="hidden md:flex items-center gap-1 text-sm font-semibold text-white/90">
+          <NuxtLink to="/" active-class="!text-white bg-white/10" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">HOME</NuxtLink>
           <div class="relative" @mouseenter="openDropdown" @mouseleave="closeDropdown">
-            <NuxtLink to="/products" active-class="!text-brand font-semibold" class="hover:text-brand transition-colors flex items-center gap-1">
-              Products
-              <svg class="w-3.5 h-3.5 transition-transform" :class="{ 'rotate-180': isProductsDropdownOpen }" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            <NuxtLink to="/products" active-class="!text-white bg-white/10" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1">
+              PRODUCTS
+              <svg class="w-3 h-3 transition-transform" :class="{ 'rotate-180': isProductsDropdownOpen }" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </NuxtLink>
             <transition
               enter-active-class="transition ease-out duration-150"
@@ -134,30 +175,33 @@ const acceptCookies = () => {
               leave-from-class="opacity-100 translate-y-0"
               leave-to-class="opacity-0 -translate-y-1"
             >
-              <div v-if="isProductsDropdownOpen" class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50">
+              <div v-if="isProductsDropdownOpen" class="absolute top-full left-0 mt-1 w-56 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50">
                 <NuxtLink to="/products" class="block px-4 py-2 text-sm text-gray-700 hover:bg-brand/5 hover:text-brand transition-colors font-medium border-b border-gray-100 mb-1">All Products</NuxtLink>
                 <NuxtLink v-for="cat in productCategories" :key="cat.slug" :to="`/products?category=${cat.slug}`" class="block px-4 py-2 text-sm text-gray-600 hover:bg-brand/5 hover:text-brand transition-colors">{{ cat.name }}</NuxtLink>
               </div>
             </transition>
           </div>
-          <NuxtLink to="/customization" active-class="!text-brand font-semibold" class="hover:text-brand transition-colors">Customization</NuxtLink>
-          <NuxtLink to="/about" active-class="!text-brand font-semibold" class="hover:text-brand transition-colors">About Us</NuxtLink>
-          <NuxtLink to="/blog" active-class="!text-brand font-semibold" class="hover:text-brand transition-colors">Blog</NuxtLink>
-          <NuxtLink to="/contact" active-class="!text-brand font-semibold" class="hover:text-brand transition-colors">Contact</NuxtLink>
+          <NuxtLink to="/customization" active-class="!text-white bg-white/10" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">CUSTOMIZATION</NuxtLink>
+          <NuxtLink to="/about" active-class="!text-white bg-white/10" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">ABOUT US</NuxtLink>
+          <NuxtLink to="/blog" active-class="!text-white bg-white/10" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">BLOG</NuxtLink>
+          <NuxtLink to="/contact" active-class="!text-white bg-white/10" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">CONTACT US</NuxtLink>
         </nav>
 
-        <div class="hidden lg:block">
-          <NuxtLink to="/contact" class="inline-flex items-center gap-2 bg-accent hover:bg-accent-dark text-white font-semibold px-5 py-2.5 rounded-lg transition-colors text-sm">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-            Get Free Quote
+        <NuxtLink to="/contact" class="hidden md:inline-flex items-center gap-2 bg-accent hover:bg-accent-dark text-white font-bold text-sm px-5 py-2 rounded transition-colors ml-auto">
+          GET QUOTE
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </NuxtLink>
+
+        <!-- Mobile: logo + CTA in nav bar -->
+        <div class="flex md:hidden items-center gap-3 w-full justify-between">
+          <NuxtLink to="/" class="flex items-center gap-2">
+            <NuxtImg src="/logo.png" alt="SeakApparel" class="h-7 w-auto" loading="eager" />
+            <span class="text-sm font-heading font-bold text-white">SeakApparel</span>
+          </NuxtLink>
+          <NuxtLink to="/contact" class="inline-flex items-center gap-1.5 bg-accent text-white font-bold text-xs px-3 py-1.5 rounded">
+            GET QUOTE
           </NuxtLink>
         </div>
-
-        <!-- Mobile menu button -->
-        <button @click="toggleMenu" class="lg:hidden p-2 rounded-md text-gray-600 hover:text-brand hover:bg-gray-100 focus:outline-none transition-colors" aria-label="Toggle Menu">
-          <svg v-if="!isMenuOpen" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-          <svg v-else class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
       </div>
 
       <!-- Mobile menu -->
@@ -169,7 +213,7 @@ const acceptCookies = () => {
         leave-from-class="opacity-100 translate-y-0"
         leave-to-class="opacity-0 -translate-y-2"
       >
-        <nav v-if="isMenuOpen" class="lg:hidden absolute top-full left-0 w-full bg-white border-b border-gray-200 shadow-lg py-4 px-6 flex flex-col gap-3 z-50 font-medium text-gray-700 max-h-[70vh] overflow-y-auto">
+        <nav v-if="isMenuOpen" class="md:hidden absolute top-full left-0 w-full bg-white border-b border-gray-200 shadow-lg py-4 px-6 flex flex-col gap-3 z-50 font-medium text-gray-700 max-h-[70vh] overflow-y-auto">
           <NuxtLink to="/" active-class="!text-brand font-semibold" @click="isMenuOpen = false" class="py-1">Home</NuxtLink>
           <div>
             <button @click="isMobileProductsOpen = !isMobileProductsOpen" class="flex items-center justify-between w-full py-1 text-left">
