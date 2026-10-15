@@ -99,7 +99,6 @@ useHead({
         </template>
       </nav>
       <h1 class="text-3xl md:text-4xl font-heading font-bold text-navy">{{ pageTitle }}</h1>
-      <p class="text-gray-500 mt-2">{{ activeCategoryName ? `High-quality custom ${activeCategoryName.toLowerCase()} for teams, brands, and businesses.` : 'High-quality custom athletic wear for teams, brands, and businesses worldwide.' }}</p>
     </div>
 
     <!-- Category Filter -->
