@@ -162,8 +162,8 @@ const acceptCookies = () => {
     </div>
 
     <!-- Navigation Bar -->
-    <header class="bg-navy shadow-md hidden md:block">
-      <div class="max-w-7xl mx-auto px-4 h-12 flex items-center justify-between">
+    <header class="bg-navy shadow-md">
+      <div class="max-w-7xl mx-auto px-4 h-12 flex items-center justify-between hidden md:flex">
         <nav class="hidden md:flex items-center gap-1 text-sm font-semibold text-white/90">
           <NuxtLink to="/" active-class="!text-white bg-brand" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">HOME</NuxtLink>
           <div class="relative" @mouseenter="openDropdown" @mouseleave="closeDropdown">
@@ -195,17 +195,6 @@ const acceptCookies = () => {
           GET QUOTE
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
         </NuxtLink>
-
-        <!-- Mobile: logo + CTA in nav bar -->
-        <div class="flex md:hidden items-center gap-3 w-full justify-between">
-          <NuxtLink to="/" class="flex items-center gap-2">
-            <NuxtImg src="/logo.png" alt="SeakApparel" class="h-7 w-auto" loading="eager" />
-            <span class="text-sm font-heading font-bold text-white">SeakApparel</span>
-          </NuxtLink>
-          <NuxtLink to="/contact" class="inline-flex items-center gap-1.5 bg-accent text-white font-bold text-xs px-3 py-1.5 rounded">
-            GET QUOTE
-          </NuxtLink>
-        </div>
       </div>
 
       <!-- Mobile menu -->
