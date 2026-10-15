@@ -84,7 +84,7 @@ const acceptCookies = () => {
 <template>
   <div class="bg-gray-50 min-h-screen flex flex-col font-body text-[#1A1A2E]">
     <!-- Top Info Bar -->
-    <div class="bg-navy text-white text-xs md:text-sm py-2 hidden md:block">
+    <div class="bg-gray-100 text-gray-600 text-xs md:text-sm py-2 hidden md:block">
       <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
         <div class="flex items-center gap-6">
           <span class="flex items-center gap-1.5">
@@ -97,11 +97,11 @@ const acceptCookies = () => {
           </span>
         </div>
         <div class="flex items-center gap-5">
-          <a href="mailto:dean@sztonton.com" class="flex items-center gap-1.5 hover:text-brand-light transition-colors">
+          <a href="mailto:dean@sztonton.com" class="flex items-center gap-1.5 hover:text-brand transition-colors">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             dean@sztonton.com
           </a>
-          <a href="https://wa.me/8618271971983" target="_blank" class="flex items-center gap-1.5 hover:text-green-400 transition-colors">
+          <a href="https://wa.me/8618271971983" target="_blank" class="flex items-center gap-1.5 hover:text-green-600 transition-colors">
             <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471.145-.575.297-.101.15-.39.54-.72 1.09-.134.212-.249.227-.46.082-.16-.074-.729-.27-1.393-.866-.515-.462-.862-1.029-.968-1.248-.099-.21.01-.325.083-.46.075-.134.15-.247.299-.492.099-.168.049-.312-.024-.439-.075-.126-.67-1.611-.916-2.206-.242-.59-.487-.511-.67-.52-.16-.008-.341-.01-.52-.01-.18 0-.47.07-.719.347-.248.277-.944.92-1.433 1.798-.49.878-.49 1.933.028 3.774.52 1.84 1.56 3.582 2.994 4.828 1.433 1.247 3.174 1.943 4.919 2.429.64.14 1.225.227 1.655.273.695.086 1.331.074 1.843-.04 1.05-.23 3.393-1.324 3.896-2.61.503-1.287.503-2.399.354-2.61-.149-.21-.54-.339-1.13-.59z"/></svg>
             WhatsApp
           </a>
@@ -116,12 +116,14 @@ const acceptCookies = () => {
       <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         <NuxtLink to="/" class="flex items-center gap-2 flex-shrink-0">
           <NuxtImg src="/logo.png" alt="SeakApparel Logo" class="h-10 w-auto" loading="eager" />
-          <div class="flex flex-col">
-            <span class="text-lg font-heading font-bold text-navy leading-tight">Global Sportswear Customization Provider</span>
+          <div class="flex flex-col justify-center">
+            <span class="text-base font-heading font-bold text-navy leading-tight">Global Sportswear</span>
+            <span class="text-base font-heading font-bold text-brand leading-tight">OEM / ODM / OBM</span>
           </div>
         </NuxtLink>
 
         <div class="hidden md:flex items-center gap-6">
+          <img src="/sales-avatar.jpg" alt="Sales Representative" class="w-10 h-10 rounded-full object-cover border-2 border-gray-200 flex-shrink-0" />
           <a href="https://wa.me/8618271971983" target="_blank" class="flex items-center gap-2.5 hover:text-brand transition-colors">
             <span class="w-9 h-9 rounded-full border-2 border-green-500 flex items-center justify-center flex-shrink-0">
               <svg class="w-4.5 h-4.5 text-green-500" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471.145-.575.297-.101.15-.39.54-.72 1.09-.134.212-.249.227-.46.082-.16-.074-.729-.27-1.393-.866-.515-.462-.862-1.029-.968-1.248-.099-.21.01-.325.083-.46.075-.134.15-.247.299-.492.099-.168.049-.312-.024-.439-.075-.126-.67-1.611-.916-2.206-.242-.59-.487-.511-.67-.52-.16-.008-.341-.01-.52-.01-.18 0-.47.07-.719.347-.248.277-.944.92-1.433 1.798-.49.878-.49 1.933.028 3.774.52 1.84 1.56 3.582 2.994 4.828 1.433 1.247 3.174 1.943 4.919 2.429.64.14 1.225.227 1.655.273.695.086 1.331.074 1.843-.04 1.05-.23 3.393-1.324 3.896-2.61.503-1.287.503-2.399.354-2.61-.149-.21-.54-.339-1.13-.59z"/></svg>
