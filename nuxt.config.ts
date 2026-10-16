@@ -158,9 +158,16 @@ export default defineNuxtConfig({
       try {
         console.log('🔍 Fetching dynamic routes for prerendering...')
         
-        const [productsResponse, blogsResponse] = await Promise.all([
-          $fetch(`${STRAPI_URL}/api/products?fields[0]=slug`),
-          $fetch(`${STRAPI_URL}/api/blogs?fields[0]=slug`)
+        const jsonFetch = async (url: string) => {
+          const res = await fetch(url)
+          if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`)
+          return res.json()
+        }
+        
+        const [productsResponse, blogsResponse, faqsResponse] = await Promise.all([
+          jsonFetch(`${STRAPI_URL}/api/products?fields[0]=slug`),
+          jsonFetch(`${STRAPI_URL}/api/blogs?fields[0]=slug`),
+          jsonFetch(`${STRAPI_URL}/api/faqs?fields[0]=slug`)
         ])
         
         const dynamicRoutes: string[] = []
@@ -175,6 +182,12 @@ export default defineNuxtConfig({
         blogs.forEach((item: any) => {
           const slug = item.slug || item.attributes?.slug
           if (slug) dynamicRoutes.push(`/blog/${slug}`)
+        })
+        
+        const faqs = (faqsResponse as any)?.data || []
+        faqs.forEach((item: any) => {
+          const slug = item.slug || item.attributes?.slug
+          if (slug) dynamicRoutes.push(`/faq/${slug}`)
         })
         
         console.log(`✅ Found ${dynamicRoutes.length} dynamic routes to prerender`)

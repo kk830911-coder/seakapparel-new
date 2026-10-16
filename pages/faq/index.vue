@@ -1,12 +1,15 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { computed } from 'vue'
 
 useCanonicalUrl()
 
 const { strapiUrl } = useStrapi()
-const responseData = ref(null)
-const loading = ref(true)
-const fetchError = ref(false)
+
+const { data: responseData, pending: loading, error: fetchError } = await useFetch(`${strapiUrl}/api/faqs`, {
+  query: { populate: '*' },
+  key: 'faq-list'
+})
+
 const faqList = computed(() => responseData.value?.data || [])
 
 const renderFaqContent = (content) => {
@@ -20,18 +23,6 @@ const renderFaqContent = (content) => {
   }
   return ''
 }
-
-onMounted(async () => {
-  try {
-    const res = await $fetch(`${strapiUrl}/api/faqs?populate=*`)
-    responseData.value = res
-  } catch (err) {
-    console.error('FAQ fetch error:', err)
-    fetchError.value = true
-  } finally {
-    loading.value = false
-  }
-})
 
 useHead({
   title: 'FAQ | Custom Sportswear Manufacturing Questions',
@@ -64,7 +55,7 @@ useHead({
 </script>
 
 <template>
-  <div class="max-w-4xl mx-auto px-4 py-16">
+  <div class="max-w-7xl mx-auto px-4 py-12">
     <div class="mb-8">
       <nav class="text-sm text-gray-400 mb-3">
         <NuxtLink to="/" class="hover:text-brand transition-colors">Home</NuxtLink>

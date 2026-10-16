@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 useCanonicalUrl()
@@ -8,9 +8,10 @@ const route = useRoute()
 const faqSlug = route.params.slug
 const { strapiUrl } = useStrapi()
 
-const responseData = ref(null)
-const loading = ref(true)
-const fetchError = ref(false)
+const { data: responseData, pending: loading, error: fetchError } = await useFetch(`${strapiUrl}/api/faqs`, {
+  query: { 'filters[slug][$eq]': faqSlug, populate: '*' },
+  key: `faq-${faqSlug}`
+})
 
 const faqItem = computed(() => {
   const res = responseData.value
@@ -26,18 +27,6 @@ const renderFaqContent = (content) => {
   }
   return ''
 }
-
-onMounted(async () => {
-  try {
-    const res = await $fetch(`${strapiUrl}/api/faqs?filters[slug][$eq]=${faqSlug}&populate=*`)
-    responseData.value = res
-  } catch (err) {
-    console.error('FAQ detail fetch error:', err)
-    fetchError.value = true
-  } finally {
-    loading.value = false
-  }
-})
 
 useHead({
   title: computed(() => `${faqItem.value?.title || faqItem.value?.attributes?.title || 'FAQ Detail'} | TontonSports`),
