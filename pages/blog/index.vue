@@ -2,6 +2,8 @@
 import { computed, ref, watch } from 'vue'
 import { useFetch, useHead } from '#imports'
 
+useCanonicalUrl()
+
 const { strapiUrl } = useStrapi()
 const currentPage = ref(1)
 

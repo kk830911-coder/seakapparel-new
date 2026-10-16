@@ -3,6 +3,8 @@ import { computed } from 'vue'
 import { useRoute, useHead, useFetch } from '#imports'
 import MarkdownIt from 'markdown-it'
 
+useCanonicalUrl()
+
 const route = useRoute()
 const postSlug = route.params.slug
 const { strapiUrl } = useStrapi()
@@ -25,6 +27,7 @@ const formatDate = (item) => {
 
 const renderMarkdownContent = (content) => {
   if (!content) return '<p>No content available.</p>'
+  const postTitle = post.value?.title || post.value?.attributes?.title || 'TontonSports Blog'
   if (Array.isArray(content)) {
     let html = ''
     content.forEach(block => {
@@ -43,7 +46,7 @@ const renderMarkdownContent = (content) => {
         block.children?.forEach(child => { p += child.bold ? `<strong>${child.text}</strong>` : child.text })
         html += p + '</p>'
       } else if (block.type === 'image' && block.image?.url) {
-        html += `<div class="blog-image-wrapper"><img src="${block.image.url}" alt="${block.image.alternativeText || post.value?.title || 'TontonSports Blog Image'}" /></div>`
+        html += `<div class="blog-image-wrapper"><img src="${block.image.url}" alt="${postTitle}" /></div>`
       }
     })
     return html
@@ -82,6 +85,28 @@ useHead({
       },
       "datePublished": post.value?.publishedAt || post.value?.attributes?.publishedAt || '',
       "url": `https://www.seakapparel.com/blog/${post.value?.slug || post.value?.attributes?.slug || ''}`
+    })
+  }, {
+    type: 'application/ld+json',
+    innerHTML: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://www.seakapparel.com"
+      }, {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Blog",
+        "item": "https://www.seakapparel.com/blog"
+      }, {
+        "@type": "ListItem",
+        "position": 3,
+        "name": post.value?.title || post.value?.attributes?.title || 'Blog Detail',
+        "item": `https://www.seakapparel.com/blog/${post.value?.slug || post.value?.attributes?.slug || ''}`
+      }]
     })
   }])
 })

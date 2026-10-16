@@ -2,6 +2,8 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
+useCanonicalUrl()
+
 const route = useRoute()
 const faqSlug = route.params.slug
 const { strapiUrl } = useStrapi()

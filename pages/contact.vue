@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from 'vue'
 
+useCanonicalUrl()
+
 const form = ref({
   name: '',
   email: '',

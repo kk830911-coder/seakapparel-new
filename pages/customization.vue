@@ -1,4 +1,6 @@
 <script setup>
+useCanonicalUrl()
+
 useHead({
   title: 'Custom Sportswear Manufacturing | OEM ODM Process',
   meta: [

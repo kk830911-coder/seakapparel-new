@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 
+useCanonicalUrl()
+
 const { strapiUrl } = useStrapi()
 const responseData = ref(null)
 const loading = ref(true)

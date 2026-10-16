@@ -2,6 +2,8 @@
 import { ref, computed, nextTick } from 'vue'
 import { useRoute } from '#imports'
 
+useCanonicalUrl()
+
 const route = useRoute()
 const { strapiUrl } = useStrapi()
 
@@ -72,6 +74,28 @@ useHead({
         "availability": "https://schema.org/InStock",
         "seller": { "@type": "Organization", "name": "TontonSports" }
       }
+    })
+  }, {
+    type: 'application/ld+json',
+    innerHTML: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://www.seakapparel.com"
+      }, {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Products",
+        "item": "https://www.seakapparel.com/products"
+      }, {
+        "@type": "ListItem",
+        "position": 3,
+        "name": getTitle(product.value) || 'Product Detail',
+        "item": `https://www.seakapparel.com/products/${route.params.slug}`
+      }]
     })
   }])
 })

@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 
+useCanonicalUrl()
+
 useHead({
   title: 'Custom Sportswear Manufacturer | OEM Activewear & Gym Wear',
   meta: [
@@ -191,7 +193,7 @@ const testimonials = [
           <p class="text-gray-500 max-w-2xl mx-auto">Custom designs for every sport. Click a category to explore our capabilities.</p>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-          <a v-for="cat in categories" :key="cat.slug" :href="`/products?category=${cat.slug}`" target="_blank" rel="noopener noreferrer" class="group relative overflow-hidden rounded-xl aspect-[4/3] shadow-sm hover:shadow-lg transition-all duration-300">
+          <NuxtLink v-for="cat in categories" :key="cat.slug" :to="`/products?category=${cat.slug}`" class="group relative overflow-hidden rounded-xl aspect-[4/3] shadow-sm hover:shadow-lg transition-all duration-300">
             <img :src="cat.img" :alt="`${cat.name} Custom Sportswear`" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
             <div class="absolute inset-0 bg-gradient-to-t from-navy/80 via-navy/20 to-transparent"></div>
             <div class="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
@@ -267,18 +269,18 @@ const testimonials = [
         <div v-if="hotLoading" class="text-center py-16 text-gray-500">Loading products...</div>
         <div v-else class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div v-for="item in hotProducts" :key="item.documentId || item.id" class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 group border border-gray-100">
-            <a :href="`/products/${getSlug(item)}`" target="_blank" rel="noopener noreferrer" class="aspect-square overflow-hidden block bg-gray-50 relative">
+            <NuxtLink :to="`/products/${getSlug(item)}`" class="aspect-square overflow-hidden block bg-gray-50 relative">
               <img :src="getProductImageUrl(item, strapiUrl)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" :alt="`${getTitle(item) || 'Custom Sportswear'} - TontonSports`" loading="lazy" />
-            </a>
+            </NuxtLink>
             <div class="p-2 sm:p-4">
-              <a :href="`/products/${getSlug(item)}`" target="_blank" rel="noopener noreferrer" class="block">
+              <NuxtLink :to="`/products/${getSlug(item)}`" class="block">
                 <h3 class="text-xs sm:text-sm font-medium text-gray-800 line-clamp-2 mb-2 group-hover:text-brand transition-colors">{{ getTitle(item) }}</h3>
-              </a>
+              </NuxtLink>
               <div class="flex justify-between items-center mb-2">
                 <span class="text-brand font-bold text-sm sm:text-lg">${{ getPrice(item) }}</span>
                 <span class="text-gray-400 text-xs">MOQ: {{ getMoq(item) }} pc</span>
               </div>
-              <a :href="`/products/${getSlug(item)}`" target="_blank" rel="noopener noreferrer" class="block w-full text-center text-xs sm:text-sm font-medium text-brand border border-brand/20 hover:bg-brand hover:text-white py-1.5 sm:py-2 rounded-lg transition-colors">Send Inquiry</a>
+              <NuxtLink :to="`/products/${getSlug(item)}`" class="block w-full text-center text-xs sm:text-sm font-medium text-brand border border-brand/20 hover:bg-brand hover:text-white py-1.5 sm:py-2 rounded-lg transition-colors">Send Inquiry</NuxtLink>
             </div>
           </div>
         </div>

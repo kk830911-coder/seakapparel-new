@@ -1,4 +1,6 @@
 <script setup>
+useCanonicalUrl()
+
 useHead({
   title: 'About Us | 20+ Years Sportswear Manufacturer',
   meta: [

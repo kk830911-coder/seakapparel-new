@@ -40,9 +40,6 @@ export default defineNuxtConfig({
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-        { rel: 'canonical', href: 'https://www.seakapparel.com' },
-        { rel: 'alternate', hreflang: 'en', href: 'https://www.seakapparel.com/' },
-        { rel: 'alternate', hreflang: 'x-default', href: 'https://www.seakapparel.com/' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         { rel: 'preconnect', href: 'https://seak-backend.onrender.com' },
@@ -152,15 +149,55 @@ export default defineNuxtConfig({
     }
   },
 
+  hooks: {
+    async 'nitro:config'(nitroConfig) {
+      if (nitroConfig.dev) return
+      
+      const STRAPI_URL = process.env.NUXT_PUBLIC_STRAPI_URL || 'https://seak-backend.onrender.com'
+      
+      try {
+        console.log('🔍 Fetching dynamic routes for prerendering...')
+        
+        const [productsResponse, blogsResponse] = await Promise.all([
+          $fetch(`${STRAPI_URL}/api/products?fields[0]=slug`),
+          $fetch(`${STRAPI_URL}/api/blogs?fields[0]=slug`)
+        ])
+        
+        const dynamicRoutes: string[] = []
+        
+        const products = (productsResponse as any)?.data || []
+        products.forEach((item: any) => {
+          const slug = item.slug || item.attributes?.slug
+          if (slug) dynamicRoutes.push(`/products/${slug}`)
+        })
+        
+        const blogs = (blogsResponse as any)?.data || []
+        blogs.forEach((item: any) => {
+          const slug = item.slug || item.attributes?.slug
+          if (slug) dynamicRoutes.push(`/blog/${slug}`)
+        })
+        
+        console.log(`✅ Found ${dynamicRoutes.length} dynamic routes to prerender`)
+        
+        nitroConfig.prerender = nitroConfig.prerender || {}
+        nitroConfig.prerender.routes = nitroConfig.prerender.routes || []
+        nitroConfig.prerender.routes.push(...dynamicRoutes)
+        
+      } catch (error) {
+        console.error('⚠️ Failed to fetch dynamic routes:', error)
+      }
+    }
+  },
+
   nitro: {
     prerender: {
       routes: ['/', '/products', '/blog', '/faq', '/about', '/contact', '/privacy-policy', '/customization'],
       failOnError: false
     },
     routeRules: {
-      '/products/**': { swr: 300 },
-      '/blog/**': { swr: 300 },
-      '/faq/**': { swr: 300 }
+      '/products/**': { swr: 1200 },
+      '/blog/**': { swr: 1200 },
+      '/faq/**': { swr: 1200 }
     }
   }
 })
