@@ -67,13 +67,13 @@ const trustItems = [
 
 const categories = [
   { name: 'Basketball Uniform', slug: 'basketball-uniform', img: '/category/basketball.png' },
-  { name: 'Football Uniform', slug: 'football-uniform', img: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=300&fit=crop&q=80' },
+  { name: 'Football Uniform', slug: 'football-uniform', img: '/category/football.png' },
   { name: 'Badminton Jersey', slug: 'badminton-jersey', img: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=400&h=300&fit=crop&q=80' },
   { name: 'Baseball Jersey', slug: 'baseball-jersey', img: 'https://images.unsplash.com/photo-1529737857439-769e35827323?w=400&h=300&fit=crop&q=80' },
   { name: 'Wrestling Singlet', slug: 'wrestling-singlet', img: 'https://images.unsplash.com/photo-1555597673-b21d5c934865?w=400&h=300&fit=crop&q=80' },
   { name: 'Ice Hockey Jersey', slug: 'ice-hockey-jersey', img: 'https://images.unsplash.com/photo-1515703407324-5f753afd8be8?w=400&h=300&fit=crop&q=80' },
   { name: 'Rugby Jersey', slug: 'rugby-jersey', img: 'https://images.unsplash.com/photo-1574610758891-5b809b6e6e5d?w=400&h=300&fit=crop&q=80' },
-  { name: 'American Football Jersey', slug: 'american-football-jersey', img: 'https://images.unsplash.com/photo-1560272564-c83b66b18daa?w=400&h=300&fit=crop&q=80' },
+  { name: 'American Football Jersey', slug: 'american-football-jersey', img: '/category/AmericanFootball.png' },
   { name: 'Boxing Outfit', slug: 'boxing-outfit', img: 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=400&h=300&fit=crop&q=80' },
   { name: 'Sports Hoodie', slug: 'sports-hoodie', img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=300&fit=crop&q=80' },
   { name: 'Yoga Wear', slug: 'yoga-wear', img: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=300&fit=crop&q=80' }
