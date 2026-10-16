@@ -48,22 +48,13 @@ const prevSlide = () => { stopPlay(); currentIndex.value = currentIndex.value - 
 const nextSlide = () => { stopPlay(); currentIndex.value = (currentIndex.value + 1) % bannerList.value.length; autoPlay() }
 const switchSlide = (idx) => { stopPlay(); currentIndex.value = idx; autoPlay() }
 
-const hotProducts = ref([])
-const hotLoading = ref(false)
+const { data: hotProductsData, pending: hotLoading } = await useFetch(`${strapiUrl}/api/products`, {
+  query: { populate: 'image', 'pagination[limit]': 8 },
+  key: 'home-hot-products'
+})
+const hotProducts = computed(() => hotProductsData.value?.data || [])
 
-const getHotProducts = async () => {
-  hotLoading.value = true
-  try {
-    const res = await $fetch(`${strapiUrl}/api/products?populate=image&pagination[limit]=8`)
-    hotProducts.value = res.data || []
-  } catch (err) {
-    console.error('Hot products fetch error:', err)
-  } finally {
-    hotLoading.value = false
-  }
-}
-
-onMounted(() => { autoPlay(); getHotProducts() })
+onMounted(() => { autoPlay() })
 onUnmounted(() => stopPlay())
 
 const trustItems = [
