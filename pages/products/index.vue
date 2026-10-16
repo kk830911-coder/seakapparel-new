@@ -31,8 +31,14 @@ const activeCategoryName = computed(() => {
   return found?.name || null
 })
 
-const { data: responseData, pending: loading, error: fetchError } = await useFetch(`${strapiUrl}/api/products?populate=*&pagination[limit]=1000`)
-const { data: catRes } = await useFetch(`${strapiUrl}/api/categories`)
+const { data: responseData, pending: loading, error: fetchError } = await useFetch(`${strapiUrl}/api/products?populate=*&pagination[limit]=1000`, {
+  cache: 'max-age=300, stale-while-revalidate=600',
+  dedupe: 'cancel'
+})
+const { data: catRes } = await useFetch(`${strapiUrl}/api/categories`, {
+  cache: 'max-age=300, stale-while-revalidate=600',
+  dedupe: 'cancel'
+})
 
 const strapiCategories = computed(() => catRes.value?.data || [])
 const allProducts = computed(() => responseData.value?.data || [])

@@ -12,7 +12,9 @@ const { data: responseData } = await useFetch(() => `${strapiUrl}/api/products`,
     'filters[slug][$eq]': route.params.slug,
     'pagination[limit]': 1
   },
-  key: `product-${route.params.slug}`
+  key: `product-${route.params.slug}`,
+  cache: 'max-age=300, stale-while-revalidate=600',
+  dedupe: 'cancel'
 })
 
 const product = computed(() => {

@@ -11,7 +11,9 @@ const md = new MarkdownIt({ html: true, linkify: true, typographer: true })
 
 const { data: responseData, pending: loading, error: fetchError } = await useFetch(`${strapiUrl}/api/blogs`, {
   query: { 'filters[slug][$eq]': postSlug, populate: '*' },
-  key: `blog-${postSlug}`
+  key: `blog-${postSlug}`,
+  cache: 'max-age=300, stale-while-revalidate=600',
+  dedupe: 'cancel'
 })
 
 const post = computed(() => responseData.value?.data?.[0] || null)
