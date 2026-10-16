@@ -156,6 +156,11 @@ export default defineNuxtConfig({
     prerender: {
       routes: ['/', '/products', '/blog', '/faq', '/about', '/contact', '/privacy-policy', '/customization'],
       failOnError: false
+    },
+    routeRules: {
+      '/products/**': { swr: 300 },
+      '/blog/**': { swr: 300 },
+      '/faq/**': { swr: 300 }
     }
   }
 })

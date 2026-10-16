@@ -7,9 +7,7 @@ const currentPage = ref(1)
 
 const { data: responseData, pending, error } = await useFetch(`${strapiUrl}/api/blogs`, {
   query: computed(() => ({ populate: '*', sort: 'publishedAt:desc', 'pagination[page]': currentPage.value, 'pagination[pageSize]': 20 })),
-  key: computed(() => `blogs-list-page-${currentPage.value}`),
-  cache: 'max-age=300, stale-while-revalidate=600',
-  dedupe: 'cancel'
+  key: computed(() => `blogs-list-page-${currentPage.value}`)
 })
 
 watch(currentPage, () => { if (process.client) window.scrollTo({ top: 0, behavior: 'smooth' }) })
