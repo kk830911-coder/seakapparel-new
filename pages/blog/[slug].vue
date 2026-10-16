@@ -113,7 +113,7 @@ useHead({
 </script>
 
 <template>
-  <div class="max-w-4xl mx-auto px-4 py-12">
+  <div class="max-w-4xl mx-auto px-4 py-6 md:py-12">
     <NuxtLink to="/blog" class="inline-flex items-center text-sm text-gray-500 hover:text-brand gap-1 mb-8 transition-colors">
       <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
       Back to Blog

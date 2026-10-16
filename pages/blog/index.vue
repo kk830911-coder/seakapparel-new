@@ -54,7 +54,7 @@ useHead({
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto px-4 py-12">
+  <div class="max-w-7xl mx-auto px-4 py-6 md:py-12">
     <div class="mb-8">
       <nav class="text-sm text-gray-400 mb-3">
         <NuxtLink to="/" class="hover:text-brand transition-colors">Home</NuxtLink>

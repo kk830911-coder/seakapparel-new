@@ -54,7 +54,7 @@ useHead({
 </script>
 
 <template>
-  <div class="max-w-4xl mx-auto px-4 py-16">
+  <div class="max-w-4xl mx-auto px-4 py-6 md:py-16">
     <NuxtLink to="/faq" class="inline-flex items-center text-sm text-gray-500 hover:text-brand gap-1 mb-8">← Back to all FAQs</NuxtLink>
     <div v-if="loading" class="text-center py-20 text-gray-500">
       <div class="animate-spin inline-block w-8 h-8 border-4 border-brand border-t-transparent rounded-full mb-4"></div>
