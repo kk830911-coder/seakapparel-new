@@ -188,6 +188,7 @@ const acceptCookies = () => {
           <NuxtLink to="/customization" active-class="!text-white bg-brand" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">CUSTOMIZATION</NuxtLink>
           <NuxtLink to="/about" active-class="!text-white bg-brand" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">ABOUT US</NuxtLink>
           <NuxtLink to="/blog" active-class="!text-white bg-brand" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">BLOG</NuxtLink>
+          <NuxtLink to="/faq" active-class="!text-white bg-brand" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">FAQ</NuxtLink>
           <NuxtLink to="/contact" active-class="!text-white bg-brand" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">CONTACT US</NuxtLink>
         </nav>
 
@@ -230,6 +231,7 @@ const acceptCookies = () => {
           <NuxtLink to="/customization" active-class="!text-brand font-semibold" @click="isMenuOpen = false" class="py-1">Customization</NuxtLink>
           <NuxtLink to="/about" active-class="!text-brand font-semibold" @click="isMenuOpen = false" class="py-1">About Us</NuxtLink>
           <NuxtLink to="/blog" active-class="!text-brand font-semibold" @click="isMenuOpen = false" class="py-1">Blog</NuxtLink>
+          <NuxtLink to="/faq" active-class="!text-brand font-semibold" @click="isMenuOpen = false" class="py-1">FAQ</NuxtLink>
           <NuxtLink to="/contact" active-class="!text-brand font-semibold" @click="isMenuOpen = false" class="py-1">Contact</NuxtLink>
           <NuxtLink to="/contact" @click="isMenuOpen = false" class="inline-flex items-center justify-center gap-2 bg-accent text-white font-semibold px-5 py-2.5 rounded-lg mt-2">Get Free Quote</NuxtLink>
         </nav>
