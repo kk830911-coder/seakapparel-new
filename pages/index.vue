@@ -66,7 +66,7 @@ const trustItems = [
 ]
 
 const categories = [
-  { name: 'Basketball Uniform', slug: 'basketball-uniform', img: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400&h=300&fit=crop&q=80' },
+  { name: 'Basketball Uniform', slug: 'basketball-uniform', img: '/category/basketball.png' },
   { name: 'Football Uniform', slug: 'football-uniform', img: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=300&fit=crop&q=80' },
   { name: 'Badminton Jersey', slug: 'badminton-jersey', img: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=400&h=300&fit=crop&q=80' },
   { name: 'Baseball Jersey', slug: 'baseball-jersey', img: 'https://images.unsplash.com/photo-1529737857439-769e35827323?w=400&h=300&fit=crop&q=80' },
