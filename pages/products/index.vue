@@ -1,5 +1,5 @@
 <script setup>
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, onMounted } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -82,6 +82,15 @@ useHead({
     { property: 'og:type', content: 'website' },
     { property: 'og:url', content: activeCategorySlug.value ? `https://www.seakapparel.com/products?category=${activeCategorySlug.value}` : 'https://www.seakapparel.com/products' }
   ])
+})
+
+onMounted(() => {
+  const slugs = allProducts.value
+    .map(p => p.slug || p.attributes?.slug)
+    .filter(Boolean)
+  slugs.forEach(slug => {
+    fetch(`/products/${slug}`, { priority: 'low' }).catch(() => {})
+  })
 })
 </script>
 
