@@ -203,7 +203,7 @@ const testimonials = [
                 <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
               </span>
             </div>
-          </a>
+          </NuxtLink>
         </div>
       </div>
     </section>
