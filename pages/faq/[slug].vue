@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 definePageMeta({
-  revalidate: 1200
+  revalidate: 300
 })
 
 useCanonicalUrl()

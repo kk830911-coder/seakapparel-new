@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { useFetch, useHead } from '#imports'
 
 definePageMeta({
-  revalidate: 1200
+  revalidate: 300
 })
 
 useCanonicalUrl()

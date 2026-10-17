@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 
 definePageMeta({
-  revalidate: 1200
+  revalidate: 300
 })
 
 useCanonicalUrl()

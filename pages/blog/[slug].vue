@@ -4,7 +4,7 @@ import { useRoute, useHead, useFetch } from '#imports'
 import MarkdownIt from 'markdown-it'
 
 definePageMeta({
-  revalidate: 1200
+  revalidate: 300
 })
 
 useCanonicalUrl()

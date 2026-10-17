@@ -208,13 +208,13 @@ export default defineNuxtConfig({
       failOnError: false
     },
     routeRules: {
-      '/':            { isr: 1200 },
-      '/products':    { isr: 1200 },
-      '/products/**': { isr: 1200 },
-      '/blog':        { isr: 1200 },
-      '/blog/**':     { isr: 1200 },
-      '/faq':         { isr: 1200 },
-      '/faq/**':      { isr: 1200 }
+      '/':            { isr: 300 },
+      '/products':    { isr: 300 },
+      '/products/**': { isr: 300 },
+      '/blog':        { isr: 300 },
+      '/blog/**':     { isr: 300 },
+      '/faq':         { isr: 300 },
+      '/faq/**':      { isr: 300 }
     }
   }
 })
