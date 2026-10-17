@@ -1,6 +1,10 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 
+definePageMeta({
+  revalidate: 1200
+})
+
 useCanonicalUrl()
 
 useHead({

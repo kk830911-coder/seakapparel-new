@@ -2,6 +2,10 @@
 import { computed, ref, watch } from 'vue'
 import { useFetch, useHead } from '#imports'
 
+definePageMeta({
+  revalidate: 1200
+})
+
 useCanonicalUrl()
 
 const { strapiUrl } = useStrapi()

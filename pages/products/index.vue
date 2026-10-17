@@ -2,6 +2,10 @@
 import { useRoute, useRouter } from 'vue-router'
 import { onMounted } from 'vue'
 
+definePageMeta({
+  revalidate: 1200
+})
+
 useCanonicalUrl()
 
 const route = useRoute()

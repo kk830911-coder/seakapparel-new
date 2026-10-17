@@ -2,6 +2,10 @@
 import { ref, computed, nextTick } from 'vue'
 import { useRoute } from '#imports'
 
+definePageMeta({
+  revalidate: 1200
+})
+
 useCanonicalUrl()
 
 const route = useRoute()

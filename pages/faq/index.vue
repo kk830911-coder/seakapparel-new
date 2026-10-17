@@ -1,6 +1,10 @@
 <script setup>
 import { computed } from 'vue'
 
+definePageMeta({
+  revalidate: 1200
+})
+
 useCanonicalUrl()
 
 const { strapiUrl } = useStrapi()

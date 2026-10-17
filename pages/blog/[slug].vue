@@ -3,6 +3,10 @@ import { computed } from 'vue'
 import { useRoute, useHead, useFetch } from '#imports'
 import MarkdownIt from 'markdown-it'
 
+definePageMeta({
+  revalidate: 1200
+})
+
 useCanonicalUrl()
 
 const route = useRoute()
