@@ -149,62 +149,11 @@ export default defineNuxtConfig({
     }
   },
 
-  hooks: {
-    async 'nitro:config'(nitroConfig) {
-      if (nitroConfig.dev) return
-      
-      const STRAPI_URL = process.env.NUXT_PUBLIC_STRAPI_URL || 'https://seak-backend.onrender.com'
-      
-      try {
-        console.log('🔍 Fetching dynamic routes for prerendering...')
-        
-        const jsonFetch = async (url: string) => {
-          const res = await fetch(url)
-          if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`)
-          return res.json()
-        }
-        
-        const [productsResponse, blogsResponse, faqsResponse] = await Promise.all([
-          jsonFetch(`${STRAPI_URL}/api/products?fields[0]=slug`),
-          jsonFetch(`${STRAPI_URL}/api/blogs?fields[0]=slug`),
-          jsonFetch(`${STRAPI_URL}/api/faqs?fields[0]=slug`)
-        ])
-        
-        const dynamicRoutes: string[] = []
-        
-        const products = (productsResponse as any)?.data || []
-        products.forEach((item: any) => {
-          const slug = item.slug || item.attributes?.slug
-          if (slug) dynamicRoutes.push(`/products/${slug}`)
-        })
-        
-        const blogs = (blogsResponse as any)?.data || []
-        blogs.forEach((item: any) => {
-          const slug = item.slug || item.attributes?.slug
-          if (slug) dynamicRoutes.push(`/blog/${slug}`)
-        })
-        
-        const faqs = (faqsResponse as any)?.data || []
-        faqs.forEach((item: any) => {
-          const slug = item.slug || item.attributes?.slug
-          if (slug) dynamicRoutes.push(`/faq/${slug}`)
-        })
-        
-        console.log(`✅ Found ${dynamicRoutes.length} dynamic routes to prerender`)
-        
-        nitroConfig.prerender = nitroConfig.prerender || {}
-        nitroConfig.prerender.routes = nitroConfig.prerender.routes || []
-        nitroConfig.prerender.routes.push(...dynamicRoutes)
-        
-      } catch (error) {
-        console.error('⚠️ Failed to fetch dynamic routes:', error)
-      }
-    }
-  },
-
   nitro: {
     prerender: {
-      routes: ['/', '/products', '/blog', '/faq', '/about', '/contact', '/privacy-policy', '/customization'],
+      // 只预渲染真正的静态页。动态内容页(首页/产品/博客/FAQ)交给 isr 按需渲染+定时再验证,
+      // 否则它们会变成 Vercel 静态文件,永远不会再验证,后台新增内容无法自动出现在前端。
+      routes: ['/about', '/contact', '/privacy-policy', '/customization'],
       failOnError: false
     },
     routeRules: {
