@@ -37,18 +37,9 @@ const activeCategoryName = computed(() => {
   return found?.name || null
 })
 
-const { data: responseData, pending: loading, error: fetchError } = await useAsyncData(
-  'products-list',
-  () => {
-    const page = currentPage.value
-    const cat = activeCategorySlug.value
-    let url = `${strapiUrl}/api/products?populate=*&pagination[page]=${page}&pagination[pageSize]=${pageSize}&sort=createdAt:desc`
-    if (cat) {
-      url += `&filters[category][slug]=${encodeURIComponent(cat)}`
-    }
-    return $fetch(url)
-  }
-)
+const { data: responseData, pending: loading, error: fetchError } = await useFetch(`${strapiUrl}/api/products?populate=*&pagination[limit]=1000&sort=createdAt:desc`, {
+  key: 'products-list'
+})
 
 const { data: catRes } = await useFetch(`${strapiUrl}/api/categories`, {
   key: 'products-categories'
@@ -56,9 +47,24 @@ const { data: catRes } = await useFetch(`${strapiUrl}/api/categories`, {
 
 const strapiCategories = computed(() => catRes.value?.data || [])
 const allProducts = computed(() => responseData.value?.data || [])
-const totalItems = computed(() => responseData.value?.meta?.pagination?.total || 0)
-const totalPage = computed(() => Math.ceil(totalItems.value / pageSize))
-const pageProducts = computed(() => allProducts.value)
+
+const toSlug = (name) => name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+
+const filteredProducts = computed(() => {
+  if (!activeCategorySlug.value) return allProducts.value
+  return allProducts.value.filter(item => {
+    const cat = item.category || item.attributes?.category
+    if (!cat) return false
+    const catSlug = cat.slug || toSlug(cat.name || '')
+    return catSlug === activeCategorySlug.value
+  })
+})
+
+const totalPage = computed(() => Math.ceil(filteredProducts.value.length / pageSize))
+const pageProducts = computed(() => {
+  const start = (currentPage.value - 1) * pageSize
+  return filteredProducts.value.slice(start, start + pageSize)
+})
 
 const selectCategory = (slug) => {
   currentPage.value = 1
@@ -124,7 +130,7 @@ useHead({
     </div>
 
     <!-- Empty -->
-    <div v-else-if="allProducts.length === 0" class="text-center py-20 text-gray-500 bg-gray-50 rounded-xl">
+    <div v-else-if="filteredProducts.length === 0" class="text-center py-20 text-gray-500 bg-gray-50 rounded-xl">
       <p class="text-lg font-medium mb-2">No products found in this category</p>
       <p class="text-sm">Try selecting a different category or <NuxtLink to="/contact" class="text-brand hover:underline">contact us</NuxtLink> for custom orders.</p>
     </div>
