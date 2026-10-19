@@ -53,7 +53,7 @@ const nextSlide = () => { stopPlay(); currentIndex.value = (currentIndex.value +
 const switchSlide = (idx) => { stopPlay(); currentIndex.value = idx; autoPlay() }
 
 const { data: hotProductsData, pending: hotLoading } = await useFetch(`${strapiUrl}/api/products`, {
-  query: { populate: 'image', 'pagination[limit]': 8 },
+  query: { populate: 'image', 'pagination[limit]': 20, 'sort': 'createdAt:desc' },
   key: 'home-hot-products'
 })
 const hotProducts = computed(() => hotProductsData.value?.data || [])

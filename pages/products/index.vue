@@ -1,6 +1,5 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
-import { onMounted } from 'vue'
 
 definePageMeta({
   revalidate: 300
@@ -11,7 +10,7 @@ useCanonicalUrl()
 const route = useRoute()
 const router = useRouter()
 const { strapiUrl } = useStrapi()
-const pageSize = 12
+const pageSize = 20
 const currentPage = ref(1)
 
 const productCategories = [
@@ -38,33 +37,28 @@ const activeCategoryName = computed(() => {
   return found?.name || null
 })
 
-const { data: responseData, pending: loading, error: fetchError } = await useFetch(`${strapiUrl}/api/products?populate=*&pagination[limit]=1000`, {
-  key: 'products-list'
-})
+const { data: responseData, pending: loading, error: fetchError } = await useFetch(
+  () => {
+    const page = currentPage.value
+    const cat = activeCategorySlug.value
+    let url = `${strapiUrl}/api/products?populate=*&pagination[page]=${page}&pagination[pageSize]=${pageSize}&pagination[withCount]=true&sort=createdAt:desc`
+    if (cat) {
+      url += `&filters[category][slug]=${encodeURIComponent(cat)}`
+    }
+    return url
+  },
+  { key: 'products-list' }
+)
+
 const { data: catRes } = await useFetch(`${strapiUrl}/api/categories`, {
   key: 'products-categories'
 })
 
 const strapiCategories = computed(() => catRes.value?.data || [])
 const allProducts = computed(() => responseData.value?.data || [])
-
-const toSlug = (name) => name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-
-const filteredProducts = computed(() => {
-  if (!activeCategorySlug.value) return allProducts.value
-  return allProducts.value.filter(item => {
-    const cat = item.category || item.attributes?.category
-    if (!cat) return false
-    const catSlug = cat.slug || toSlug(cat.name || '')
-    return catSlug === activeCategorySlug.value
-  })
-})
-
-const totalPage = computed(() => Math.ceil(filteredProducts.value.length / pageSize))
-const pageProducts = computed(() => {
-  const start = (currentPage.value - 1) * pageSize
-  return filteredProducts.value.slice(start, start + pageSize)
-})
+const totalItems = computed(() => responseData.value?.meta?.pagination?.total || 0)
+const totalPage = computed(() => Math.ceil(totalItems.value / pageSize))
+const pageProducts = computed(() => allProducts.value)
 
 const selectCategory = (slug) => {
   currentPage.value = 1
@@ -93,15 +87,6 @@ useHead({
     { property: 'og:type', content: 'website' },
     { property: 'og:url', content: activeCategorySlug.value ? `https://www.seakapparel.com/products?category=${activeCategorySlug.value}` : 'https://www.seakapparel.com/products' }
   ])
-})
-
-onMounted(() => {
-  const slugs = allProducts.value
-    .map(p => p.slug || p.attributes?.slug)
-    .filter(Boolean)
-  slugs.forEach(slug => {
-    fetch(`/products/${slug}`, { priority: 'low' }).catch(() => {})
-  })
 })
 </script>
 
@@ -139,7 +124,7 @@ onMounted(() => {
     </div>
 
     <!-- Empty -->
-    <div v-else-if="filteredProducts.length === 0" class="text-center py-20 text-gray-500 bg-gray-50 rounded-xl">
+    <div v-else-if="allProducts.length === 0" class="text-center py-20 text-gray-500 bg-gray-50 rounded-xl">
       <p class="text-lg font-medium mb-2">No products found in this category</p>
       <p class="text-sm">Try selecting a different category or <NuxtLink to="/contact" class="text-brand hover:underline">contact us</NuxtLink> for custom orders.</p>
     </div>
