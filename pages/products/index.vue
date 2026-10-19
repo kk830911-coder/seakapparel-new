@@ -37,17 +37,17 @@ const activeCategoryName = computed(() => {
   return found?.name || null
 })
 
-const { data: responseData, pending: loading, error: fetchError } = await useFetch(
+const { data: responseData, pending: loading, error: fetchError } = await useAsyncData(
+  'products-list',
   () => {
     const page = currentPage.value
     const cat = activeCategorySlug.value
-    let url = `${strapiUrl}/api/products?populate=*&pagination[page]=${page}&pagination[pageSize]=${pageSize}&pagination[withCount]=true&sort=createdAt:desc`
+    let url = `${strapiUrl}/api/products?populate=*&pagination[page]=${page}&pagination[pageSize]=${pageSize}&sort=createdAt:desc`
     if (cat) {
       url += `&filters[category][slug]=${encodeURIComponent(cat)}`
     }
-    return url
-  },
-  { key: 'products-list' }
+    return $fetch(url)
+  }
 )
 
 const { data: catRes } = await useFetch(`${strapiUrl}/api/categories`, {
