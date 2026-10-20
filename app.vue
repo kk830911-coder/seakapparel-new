@@ -342,6 +342,7 @@ const acceptCookies = () => {
             <p>&copy; 2004-2026 Tonton Sportswear (Shenzhen) Co., Ltd. All Rights Reserved.</p>
             <div class="flex gap-4">
               <NuxtLink to="/privacy-policy" class="hover:text-gray-300 transition-colors">Privacy Policy</NuxtLink>
+              <NuxtLink to="/terms-conditions" class="hover:text-gray-300 transition-colors">Terms & Conditions</NuxtLink>
               <NuxtLink to="/faq" class="hover:text-gray-300 transition-colors">FAQ</NuxtLink>
               <a href="/sitemap.xml" class="hover:text-gray-300 transition-colors">Sitemap</a>
             </div>
