@@ -4,7 +4,7 @@ const FALLBACK_IMG = 'https://images.unsplash.com/photo-1556906781-9a412961c28c?
 
 export function useStrapi() {
   const config = useRuntimeConfig()
-  const strapiUrl = config.public.strapiUrl || 'https://seak-backend.onrender.com'
+  const strapiUrl = config.public.strapiUrl || 'https://tutesportswear-strapi-us.onrender.com'
   return { strapiUrl }
 }
 

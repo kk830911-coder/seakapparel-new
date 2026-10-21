@@ -3,7 +3,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      strapiUrl: 'https://seak-backend.onrender.com'
+      strapiUrl: 'https://tutesportswear-strapi-us.onrender.com'
     }
   },
 
@@ -42,7 +42,7 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        { rel: 'preconnect', href: 'https://seak-backend.onrender.com' },
+        { rel: 'preconnect', href: 'https://tutesportswear-strapi-us.onrender.com' },
         { rel: 'preconnect', href: 'https://res.cloudinary.com' },
         { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@600;700;800;900&display=swap' }
       ],
@@ -153,7 +153,7 @@ export default defineNuxtConfig({
     async 'nitro:config'(nitroConfig) {
       if (nitroConfig.dev) return
       
-      const STRAPI_URL = process.env.NUXT_PUBLIC_STRAPI_URL || 'https://seak-backend.onrender.com'
+      const STRAPI_URL = process.env.NUXT_PUBLIC_STRAPI_URL || 'https://tutesportswear-strapi-us.onrender.com'
       
       try {
         console.log('🔍 Fetching dynamic routes for prerendering...')

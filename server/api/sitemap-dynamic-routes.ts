@@ -1,6 +1,6 @@
 // server/api/sitemap-dynamic-routes.ts
 export default defineEventHandler(async () => {
-  const STRAPI_BASE_URL = process.env.NUXT_PUBLIC_STRAPI_URL || 'https://seak-backend.onrender.com'
+  const STRAPI_BASE_URL = process.env.NUXT_PUBLIC_STRAPI_URL || 'https://tutesportswear-strapi-us.onrender.com'
 
   try {
     const [productsResponse, blogsResponse] = await Promise.all([
