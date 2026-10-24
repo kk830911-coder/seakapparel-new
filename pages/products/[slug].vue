@@ -239,6 +239,34 @@ const handleTouchEnd = (e, next, prev) => {
       <!-- Product Description -->
       <div class="bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
         <h3 class="text-base sm:text-lg font-heading font-bold text-navy mb-4 sm:mb-6 pb-2 sm:pb-3 border-b border-gray-100">Product Description</h3>
+        
+        <!-- Company Profile GIFs -->
+        <div class="mb-6 sm:mb-8 space-y-4">
+          <!-- 01 Company Banner -->
+          <div class="relative">
+            <span class="absolute top-2 left-2 bg-brand text-white text-xs font-bold px-2 py-1 rounded">01</span>
+            <img src="/xq_01.gif" alt="Tonton Sports - 22 Years of Experience" class="w-full rounded-lg" loading="lazy" />
+          </div>
+          
+          <!-- 02 Production Process -->
+          <div class="relative">
+            <span class="absolute top-2 left-2 bg-brand text-white text-xs font-bold px-2 py-1 rounded">02</span>
+            <img src="/xq_02.gif" alt="Digital Printing, UPS Sewing, Laser Cutting" class="w-full rounded-lg" loading="lazy" />
+          </div>
+          
+          <!-- 03 Team -->
+          <div class="relative">
+            <span class="absolute top-2 left-2 bg-brand text-white text-xs font-bold px-2 py-1 rounded">03</span>
+            <img src="/xq_03.gif" alt="Design Team, Sample Room, Sales Team" class="w-full rounded-lg" loading="lazy" />
+          </div>
+          
+          <!-- 04 Contact -->
+          <div class="relative">
+            <span class="absolute top-2 left-2 bg-brand text-white text-xs font-bold px-2 py-1 rounded">04</span>
+            <img src="/xq_04.gif" alt="Your Service Specialist - Contact Info" class="w-full rounded-lg" loading="lazy" />
+          </div>
+        </div>
+        
         <div class="prose max-w-none text-gray-600 text-sm sm:text-base">
           <template v-for="(node, idx) in descriptionNodes" :key="idx">
             <div v-if="node.type === 'image'" class="my-4 sm:my-6"><img :src="node.url" class="max-w-full rounded-lg" :alt="node.alt" /></div>
