@@ -104,7 +104,7 @@ const testimonials = [
         <NuxtImg :src="bannerImage" format="avif" fallbackFormat="webp" class="w-full h-full object-cover" alt="Custom Sportswear Manufacturing" preload fetchpriority="high" />
 
         <!-- Hero Content Overlay -->
-        <div class="absolute inset-0 flex items-start justify-center pt-[15%] md:pt-[18%] lg:pt-[20%]">
+        <div class="absolute inset-0 flex items-start justify-center pt-2.5 md:pt-12 lg:pt-16">
           <div class="px-6 w-full text-center">
             <h1 class="text-3xl md:text-5xl lg:text-6xl font-heading font-black text-brand leading-tight mb-3 drop-shadow-lg">
               Your Trusted Custom Sportswear Manufacturer
