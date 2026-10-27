@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://www.seakapparel.com/sitemap.xml
+
+# Disallow admin and API paths
+Disallow: /admin/
+Disallow: /api/
