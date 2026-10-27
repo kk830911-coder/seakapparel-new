@@ -105,30 +105,28 @@ const testimonials = [
       </div>
 
       <!-- Hero Content Overlay -->
-      <div class="absolute inset-0 flex items-center">
-        <div class="max-w-7xl mx-auto px-6 w-full">
-          <div class="max-w-2xl">
-            <div class="inline-flex items-center gap-2 bg-black/30 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-6">
-              <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-              <span class="text-white text-sm font-medium drop-shadow-md">Trusted by 500+ Brands Worldwide</span>
-            </div>
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-heading font-black text-white leading-tight mb-4 drop-shadow-lg">
-              Your Trusted<br>
-              <span class="text-brand-light">Custom Sportswear</span><br>
-              Manufacturer
-            </h1>
-            <p class="text-white text-lg md:text-xl mb-8 leading-relaxed max-w-lg drop-shadow-md">
-              OEM/ODM activewear, team uniforms & athletic clothing. From design to delivery — we bring your vision to life.
-            </p>
-            <div class="flex flex-col sm:flex-row gap-3">
-              <NuxtLink to="/contact" class="inline-flex items-center justify-center gap-2 bg-accent hover:bg-accent-dark text-white font-semibold px-7 py-3.5 rounded-lg transition-colors text-base">
-                Get Free Mockup
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-              </NuxtLink>
-              <NuxtLink to="/products" class="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm border border-white/30 hover:bg-white/20 text-white font-semibold px-7 py-3.5 rounded-lg transition-colors text-base">
-                Explore Products
-              </NuxtLink>
-            </div>
+      <div class="absolute inset-0 flex items-center justify-center">
+        <div class="px-6 w-full text-center">
+          <div class="inline-flex items-center gap-2 bg-black/30 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-6">
+            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+            <span class="text-white text-sm font-medium drop-shadow-md">Trusted by 500+ Brands Worldwide</span>
+          </div>
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-heading font-black text-white leading-tight mb-4 drop-shadow-lg">
+            Your Trusted<br>
+            <span class="text-brand-light">Custom Sportswear</span><br>
+            Manufacturer
+          </h1>
+          <p class="text-white text-lg md:text-xl mb-8 leading-relaxed mx-auto max-w-2xl drop-shadow-md">
+            OEM/ODM activewear, team uniforms & athletic clothing. From design to delivery — we bring your vision to life.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <NuxtLink to="/contact" class="inline-flex items-center justify-center gap-2 bg-accent hover:bg-accent-dark text-white font-semibold px-7 py-3.5 rounded-lg transition-colors text-base">
+              Get Free Mockup
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </NuxtLink>
+            <NuxtLink to="/products" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 text-navy font-semibold px-7 py-3.5 rounded-lg transition-colors text-base">
+              Explore Products
+            </NuxtLink>
           </div>
         </div>
       </div>
