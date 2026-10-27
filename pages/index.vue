@@ -107,16 +107,10 @@ const testimonials = [
       <!-- Hero Content Overlay -->
       <div class="absolute inset-0 flex items-center justify-center">
         <div class="px-6 w-full text-center">
-          <div class="inline-flex items-center gap-2 bg-black/30 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-6">
-            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-            <span class="text-white text-sm font-medium drop-shadow-md">Trusted by 500+ Brands Worldwide</span>
-          </div>
-          <h1 class="text-4xl md:text-5xl lg:text-6xl font-heading font-black text-white leading-tight mb-4 drop-shadow-lg">
-            Your Trusted<br>
-            <span class="text-brand-light">Custom Sportswear</span><br>
-            Manufacturer
+          <h1 class="text-3xl md:text-5xl lg:text-6xl font-heading font-black text-brand leading-tight mb-3 drop-shadow-lg">
+            Your Trusted Custom Sportswear Manufacturer
           </h1>
-          <p class="text-white text-lg md:text-xl mb-8 leading-relaxed mx-auto max-w-2xl drop-shadow-md">
+          <p class="text-accent text-base md:text-lg lg:text-xl font-semibold mb-6 drop-shadow-md">
             OEM/ODM activewear, team uniforms & athletic clothing. From design to delivery — we bring your vision to life.
           </p>
           <div class="flex flex-col sm:flex-row gap-3 justify-center">
