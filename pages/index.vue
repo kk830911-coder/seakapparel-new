@@ -105,7 +105,7 @@ const testimonials = [
       </div>
 
       <!-- Hero Content Overlay -->
-      <div class="absolute inset-0 flex items-center justify-center">
+      <div class="absolute inset-0 flex items-start justify-center pt-[15%] md:pt-[18%] lg:pt-[20%]">
         <div class="px-6 w-full text-center">
           <h1 class="text-3xl md:text-5xl lg:text-6xl font-heading font-black text-brand leading-tight mb-3 drop-shadow-lg">
             Your Trusted Custom Sportswear Manufacturer
