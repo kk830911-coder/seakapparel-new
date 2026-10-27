@@ -27,7 +27,7 @@ useHead({
           "telephone": "+86-18271971983",
           "contactType": "sales",
           "email": "Marc@tutesports.com",
-          "availableLanguage": ["English", "Chinese"]
+          "availableLanguage": ["English"]
         },
         "areaServed": ["North America", "Europe", "Australia", "South America"],
         "knowsAbout": ["Custom Sportswear", "Activewear Manufacturing", "OEM", "ODM", "Team Uniforms"],

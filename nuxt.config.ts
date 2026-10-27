@@ -99,7 +99,7 @@ export default defineNuxtConfig({
         telephone: '+86-18271971983',
         contactType: 'sales',
         email: 'Marc@tutesports.com',
-        availableLanguage: ['English', 'Chinese']
+        availableLanguage: ['English']
       },
       sameAs: [
         'https://www.facebook.com/TontonSports'
