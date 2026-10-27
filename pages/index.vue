@@ -102,29 +102,28 @@ const testimonials = [
     <section class="relative w-full overflow-hidden">
       <div class="relative h-[40vh] min-h-[300px] md:h-[50vh] lg:h-[calc(100vw*600/1920)] lg:max-h-[600px]">
         <NuxtImg :src="bannerImage" format="avif" fallbackFormat="webp" class="w-full h-full object-cover" alt="Custom Sportswear Manufacturing" preload fetchpriority="high" />
-      </div>
 
-      <!-- Hero Content Overlay -->
-      <div class="absolute inset-0 flex items-start justify-center pt-[15%] md:pt-[18%] lg:pt-[20%]">
-        <div class="px-6 w-full text-center">
-          <h1 class="text-3xl md:text-5xl lg:text-6xl font-heading font-black text-brand leading-tight mb-3 drop-shadow-lg">
-            Your Trusted Custom Sportswear Manufacturer
-          </h1>
-          <p class="text-accent text-base md:text-lg lg:text-xl font-semibold mb-6 drop-shadow-md">
-            OEM/ODM activewear, team uniforms & athletic clothing. From design to delivery — we bring your vision to life.
-          </p>
-          <div class="flex flex-col sm:flex-row gap-3 justify-center">
-            <NuxtLink to="/contact" class="inline-flex items-center justify-center gap-2 bg-accent hover:bg-accent-dark text-white font-semibold px-7 py-3.5 rounded-lg transition-colors text-base">
-              Get Free Mockup
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-            </NuxtLink>
-            <NuxtLink to="/products" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 text-navy font-semibold px-7 py-3.5 rounded-lg transition-colors text-base">
-              Explore Products
-            </NuxtLink>
+        <!-- Hero Content Overlay -->
+        <div class="absolute inset-0 flex items-start justify-center pt-[15%] md:pt-[18%] lg:pt-[20%]">
+          <div class="px-6 w-full text-center">
+            <h1 class="text-3xl md:text-5xl lg:text-6xl font-heading font-black text-brand leading-tight mb-3 drop-shadow-lg">
+              Your Trusted Custom Sportswear Manufacturer
+            </h1>
+            <p class="text-accent text-base md:text-lg lg:text-xl font-semibold mb-6 drop-shadow-md">
+              OEM/ODM activewear, team uniforms & athletic clothing. From design to delivery — we bring your vision to life.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+              <NuxtLink to="/contact" class="inline-flex items-center justify-center gap-2 bg-accent hover:bg-accent-dark text-white font-semibold px-7 py-3.5 rounded-lg transition-colors text-base">
+                Get Free Mockup
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+              </NuxtLink>
+              <NuxtLink to="/products" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 text-navy font-semibold px-7 py-3.5 rounded-lg transition-colors text-base">
+                Explore Products
+              </NuxtLink>
+            </div>
           </div>
         </div>
       </div>
-
     </section>
 
     <!-- Section 2: Trust Bar -->
