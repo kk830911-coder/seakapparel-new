@@ -30,13 +30,13 @@ export default defineNuxtConfig({
         { property: 'og:site_name', content: 'TontonSports' },
         { property: 'og:title', content: 'Custom Sportswear Manufacturer | OEM Activewear | TontonSports' },
         { property: 'og:description', content: '20+ years professional custom sportswear manufacturer. OEM/ODM, low MOQ 1pc, ISO certified. Global shipping.' },
-        { property: 'og:image', content: 'https://www.seakapparel.com/og-image.jpg' },
-        { property: 'og:url', content: 'https://www.seakapparel.com' },
+        { property: 'og:image', content: 'https://www.tutesports.com/og-image.jpg' },
+        { property: 'og:url', content: 'https://www.tutesports.com' },
         { property: 'og:locale', content: 'en_US' },
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:title', content: 'Custom Sportswear Manufacturer | OEM Activewear | TontonSports' },
         { name: 'twitter:description', content: '20+ years professional custom sportswear manufacturer. OEM/ODM, low MOQ 1pc, ISO certified.' },
-        { name: 'twitter:image', content: 'https://www.seakapparel.com/og-image.jpg' }
+        { name: 'twitter:image', content: 'https://www.tutesports.com/og-image.jpg' }
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
@@ -45,24 +45,12 @@ export default defineNuxtConfig({
         { rel: 'preconnect', href: 'https://tutesportswear-strapi-us.onrender.com' },
         { rel: 'preconnect', href: 'https://res.cloudinary.com' },
         { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@600;700;800;900&display=swap' }
-      ],
-      script: [
-        { src: 'https://www.googletagmanager.com/gtag/js?id=G-H794JGCTR0', async: true },
-        {
-          innerHTML: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-H794JGCTR0');
-          `,
-          type: 'text/javascript'
-        }
       ]
     }
   },
 
   site: {
-    url: 'https://www.seakapparel.com',
+    url: 'https://www.tutesports.com',
     name: 'TontonSports',
     description: 'Custom Sportswear Manufacturer - OEM/ODM Activewear, Low MOQ, ISO Certified',
     defaultLocale: 'en'
@@ -82,8 +70,8 @@ export default defineNuxtConfig({
       type: 'Organization',
       name: 'TontonSports',
       alternateName: 'Tonton Sportswear (Shenzhen) Co., Ltd.',
-      url: 'https://www.seakapparel.com',
-      logo: 'https://www.seakapparel.com/logo.png',
+      url: 'https://www.tutesports.com',
+      logo: 'https://www.tutesports.com/logo.png',
       description: 'Professional custom sportswear manufacturer since 2004. OEM/ODM activewear, gym wear, team uniforms.',
       foundingDate: '2004',
       address: {

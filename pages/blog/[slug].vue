@@ -84,11 +84,11 @@ useHead({
         "name": "TontonSports",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://www.seakapparel.com/logo.png"
+          "url": "https://www.tutesports.com/logo.png"
         }
       },
       "datePublished": post.value?.publishedAt || post.value?.attributes?.publishedAt || '',
-      "url": `https://www.seakapparel.com/blog/${post.value?.slug || post.value?.attributes?.slug || ''}`
+      "url": `https://www.tutesports.com/blog/${post.value?.slug || post.value?.attributes?.slug || ''}`
     })
   }, {
     type: 'application/ld+json',
@@ -99,17 +99,17 @@ useHead({
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://www.seakapparel.com"
+        "item": "https://www.tutesports.com"
       }, {
         "@type": "ListItem",
         "position": 2,
         "name": "Blog",
-        "item": "https://www.seakapparel.com/blog"
+        "item": "https://www.tutesports.com/blog"
       }, {
         "@type": "ListItem",
         "position": 3,
         "name": post.value?.title || post.value?.attributes?.title || 'Blog Detail',
-        "item": `https://www.seakapparel.com/blog/${post.value?.slug || post.value?.attributes?.slug || ''}`
+        "item": `https://www.tutesports.com/blog/${post.value?.slug || post.value?.attributes?.slug || ''}`
       }]
     })
   }])

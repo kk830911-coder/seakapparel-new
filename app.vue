@@ -11,8 +11,8 @@ useHead({
         "@type": "Organization",
         "name": "TontonSports",
         "alternateName": "Tonton Sportswear (Shenzhen) Co., Ltd.",
-        "url": "https://www.seakapparel.com",
-        "logo": "https://www.seakapparel.com/logo.png",
+        "url": "https://www.tutesports.com",
+        "logo": "https://www.tutesports.com/logo.png",
         "description": "Professional custom sportswear manufacturer since 2004. OEM/ODM activewear, gym wear, team uniforms. ISO9001 & BSCI certified.",
         "foundingDate": "2004",
         "address": {
@@ -69,15 +69,43 @@ const closeDropdown = () => {
 const isMobileProductsOpen = ref(false)
 
 const showCookieBanner = ref(false)
+const GA_MEASUREMENT_ID = 'G-H794JGCTR0'
+
+// GDPR: GA4 仅在用户明确接受 Cookie 后才动态加载；拒绝则永不加载
+const loadGA = () => {
+  if (document.getElementById('ga-main-script')) return
+  const s = document.createElement('script')
+  s.id = 'ga-main-script'
+  s.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`
+  s.async = true
+  document.head.appendChild(s)
+  window.dataLayer = window.dataLayer || []
+  window.gtag = function () { window.dataLayer.push(arguments) }
+  window.gtag('js', new Date())
+  window.gtag('config', GA_MEASUREMENT_ID)
+}
+
 onMounted(() => {
-  const isCookieAccepted = localStorage.getItem('seak_cookie_accepted')
-  if (!isCookieAccepted) {
+  const consent = localStorage.getItem('seak_cookie_accepted')
+  if (consent === 'true') {
+    loadGA()
+  } else if (consent === 'false') {
+    // 用户已拒绝：不加载任何追踪脚本，也不再弹窗
+  } else {
     setTimeout(() => { showCookieBanner.value = true }, 1500)
   }
 })
+
 const acceptCookies = () => {
   localStorage.setItem('seak_cookie_accepted', 'true')
   showCookieBanner.value = false
+  loadGA()
+}
+
+const declineCookies = () => {
+  localStorage.setItem('seak_cookie_accepted', 'false')
+  showCookieBanner.value = false
+  // 不加载 GA
 }
 </script>
 
@@ -392,7 +420,7 @@ const acceptCookies = () => {
             We use cookies to improve your experience and support our marketing efforts. By clicking "Accept", you agree to our use of cookies. Learn more in our <NuxtLink to="/privacy-policy" class="text-brand hover:underline font-medium">Privacy Policy</NuxtLink>.
           </div>
           <div class="flex items-center gap-4 flex-shrink-0">
-            <button @click="showCookieBanner = false" class="text-xs text-gray-400 hover:text-gray-600 font-medium transition">Decline</button>
+            <button @click="declineCookies" class="text-xs text-gray-400 hover:text-gray-600 font-medium transition">Decline</button>
             <button @click="acceptCookies" class="bg-navy text-white text-xs md:text-sm font-semibold px-5 py-2 rounded-lg hover:bg-navy-light transition duration-300 shadow-sm">Accept Cookies</button>
           </div>
         </div>

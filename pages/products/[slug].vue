@@ -56,7 +56,7 @@ useSeoMeta({
     return `Custom ${title} from TontonSports. Factory price: $${price}, MOQ: ${moq} piece. OEM/ODM, free design, global shipping.`
   },
   ogDescription: () => `Custom ${getTitle(product.value) || 'sportswear'} at factory direct price. OEM/ODM, low MOQ, ISO certified manufacturer.`,
-  ogImage: () => currentMainImageUrl.value ? getCleanImageUrl(currentMainImageUrl.value, strapiUrl) : 'https://www.seakapparel.com/og-image.jpg',
+  ogImage: () => currentMainImageUrl.value ? getCleanImageUrl(currentMainImageUrl.value, strapiUrl) : 'https://www.tutesports.com/og-image.jpg',
   ogType: 'product',
   twitterCard: 'summary_large_image',
 })
@@ -88,17 +88,17 @@ useHead({
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://www.seakapparel.com"
+        "item": "https://www.tutesports.com"
       }, {
         "@type": "ListItem",
         "position": 2,
         "name": "Products",
-        "item": "https://www.seakapparel.com/products"
+        "item": "https://www.tutesports.com/products"
       }, {
         "@type": "ListItem",
         "position": 3,
         "name": getTitle(product.value) || 'Product Detail',
-        "item": `https://www.seakapparel.com/products/${route.params.slug}`
+        "item": `https://www.tutesports.com/products/${route.params.slug}`
       }]
     })
   }])

@@ -14,7 +14,7 @@ useHead({
     { property: 'og:title', content: 'Custom Sportswear Manufacturer | OEM Activewear | TontonSports' },
     { property: 'og:description', content: '20+ years professional custom sportswear manufacturer. OEM/ODM, low MOQ 1pc, ISO certified. Global shipping.' },
     { property: 'og:type', content: 'website' },
-    { property: 'og:url', content: 'https://www.seakapparel.com' }
+    { property: 'og:url', content: 'https://www.tutesports.com' }
   ],
   script: [
     {
@@ -23,11 +23,11 @@ useHead({
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "TontonSports",
-        "url": "https://www.seakapparel.com",
+        "url": "https://www.tutesports.com",
         "description": "Professional Custom Sportswear Manufacturer Since 2004",
         "potentialAction": {
           "@type": "SearchAction",
-          "target": "https://www.seakapparel.com/products?q={search_term_string}",
+          "target": "https://www.tutesports.com/products?q={search_term_string}",
           "query-input": "required name=search_term_string"
         }
       })

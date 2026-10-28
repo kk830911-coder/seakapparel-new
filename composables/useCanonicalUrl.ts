@@ -1,6 +1,6 @@
 export const useCanonicalUrl = () => {
   const route = useRoute()
-  const baseUrl = 'https://www.seakapparel.com'
+  const baseUrl = 'https://www.tutesports.com'
   
   const canonicalUrl = computed(() => {
     const path = route.path

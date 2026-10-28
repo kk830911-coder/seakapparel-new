@@ -37,7 +37,7 @@ useHead({
     { property: 'og:title', content: 'Contact TontonSports | Get a Free Quote' },
     { property: 'og:description', content: 'Get a free custom sportswear quote within 24 hours.' },
     { property: 'og:type', content: 'website' },
-    { property: 'og:url', content: 'https://www.seakapparel.com/contact' }
+    { property: 'og:url', content: 'https://www.tutesports.com/contact' }
   ],
   script: [
     {
@@ -47,7 +47,7 @@ useHead({
         "@type": "ContactPage",
         "name": "Contact TontonSports",
         "description": "Contact TontonSports for custom sportswear manufacturing inquiries",
-        "url": "https://www.seakapparel.com/contact"
+        "url": "https://www.tutesports.com/contact"
       })
     }
   ]

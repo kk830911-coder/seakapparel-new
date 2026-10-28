@@ -52,7 +52,7 @@ useHead({
     { property: 'og:title', content: 'Sportswear Industry Blog | TontonSports' },
     { property: 'og:description', content: 'Expert insights on custom sportswear manufacturing and industry trends.' },
     { property: 'og:type', content: 'website' },
-    { property: 'og:url', content: 'https://www.seakapparel.com/blog' }
+    { property: 'og:url', content: 'https://www.tutesports.com/blog' }
   ]
 })
 </script>

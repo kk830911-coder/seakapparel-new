@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://www.seakapparel.com/sitemap.xml
+Sitemap: https://www.tutesports.com/sitemap.xml
 
 # Disallow admin and API paths
 Disallow: /admin/

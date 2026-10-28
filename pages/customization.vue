@@ -9,7 +9,7 @@ useHead({
     { property: 'og:title', content: 'Custom Sportswear Manufacturing Process | TontonSports' },
     { property: 'og:description', content: 'From design to delivery — full OEM/ODM sportswear manufacturing. Free mockup, low MOQ.' },
     { property: 'og:type', content: 'website' },
-    { property: 'og:url', content: 'https://www.seakapparel.com/customization' }
+    { property: 'og:url', content: 'https://www.tutesports.com/customization' }
   ],
   script: [
     {

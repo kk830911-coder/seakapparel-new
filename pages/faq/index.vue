@@ -36,7 +36,7 @@ useHead({
     { property: 'og:title', content: 'FAQ | Custom Sportswear Manufacturing' },
     { property: 'og:description', content: 'Answers to common questions about custom sportswear manufacturing.' },
     { property: 'og:type', content: 'website' },
-    { property: 'og:url', content: 'https://www.seakapparel.com/faq' }
+    { property: 'og:url', content: 'https://www.tutesports.com/faq' }
   ],
   script: [
     {

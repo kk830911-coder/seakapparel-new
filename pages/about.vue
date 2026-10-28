@@ -9,7 +9,7 @@ useHead({
     { property: 'og:title', content: 'About TontonSports | 20+ Years Sportswear Manufacturer' },
     { property: 'og:description', content: 'Established 2004. ISO certified factory serving 500+ brands in 60+ countries.' },
     { property: 'og:type', content: 'website' },
-    { property: 'og:url', content: 'https://www.seakapparel.com/about' }
+    { property: 'og:url', content: 'https://www.tutesports.com/about' }
   ]
 })
 

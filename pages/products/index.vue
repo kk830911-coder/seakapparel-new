@@ -91,7 +91,7 @@ useHead({
     { property: 'og:title', content: `${pageTitle.value} | TontonSports` },
     { property: 'og:description', content: pageDescription.value },
     { property: 'og:type', content: 'website' },
-    { property: 'og:url', content: activeCategorySlug.value ? `https://www.seakapparel.com/products?category=${activeCategorySlug.value}` : 'https://www.seakapparel.com/products' }
+    { property: 'og:url', content: activeCategorySlug.value ? `https://www.tutesports.com/products?category=${activeCategorySlug.value}` : 'https://www.tutesports.com/products' }
   ])
 })
 </script>
