@@ -3,9 +3,10 @@ export default defineEventHandler(async () => {
   const STRAPI_BASE_URL = process.env.NUXT_PUBLIC_STRAPI_URL || 'https://tutesportswear-strapi-us.onrender.com'
 
   try {
-    const [productsResponse, blogsResponse] = await Promise.all([
+    const [productsResponse, blogsResponse, faqsResponse] = await Promise.all([
       $fetch(`${STRAPI_BASE_URL}/api/products?fields[0]=slug`),
-      $fetch(`${STRAPI_BASE_URL}/api/blogs?fields[0]=slug`)
+      $fetch(`${STRAPI_BASE_URL}/api/blogs?fields[0]=slug`),
+      $fetch(`${STRAPI_BASE_URL}/api/faqs?fields[0]=slug`)
     ])
 
     const routes = []
@@ -34,6 +35,20 @@ export default defineEventHandler(async () => {
           lastmod: item.publishedAt || item.attributes?.publishedAt || new Date().toISOString(),
           changefreq: 'monthly',
           priority: 0.7
+        })
+      }
+    })
+
+    // FAQs - medium priority
+    const faqs = (faqsResponse as any)?.data || []
+    faqs.forEach((item: any) => {
+      const faqSlug = item.slug || item.attributes?.slug
+      if (faqSlug) {
+        routes.push({
+          loc: `/faq/${faqSlug}`,
+          lastmod: item.updatedAt || item.attributes?.updatedAt || new Date().toISOString(),
+          changefreq: 'monthly',
+          priority: 0.6
         })
       }
     })

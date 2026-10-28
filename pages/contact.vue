@@ -19,11 +19,31 @@ const submitForm = async () => {
   if (!form.value.name || !form.value.email || !form.value.message) return
   formSubmitting.value = true
   try {
-    const mailtoLink = `mailto:Marc@tutesports.com?subject=Inquiry from ${form.value.name} - ${form.value.company || 'Individual'}&body=Name: ${form.value.name}%0AEmail: ${form.value.email}%0ACompany: ${form.value.company || 'N/A'}%0APhone: ${form.value.phone || 'N/A'}%0AProduct Interest: ${form.value.product || 'N/A'}%0AQuantity: ${form.value.quantity || 'N/A'}%0A%0AMessage:%0A${form.value.message}`
-    window.location.href = mailtoLink
-    formSubmitted.value = true
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        access_key: 'f74fd901-0b24-4634-8a2f-95c549480b83',
+        subject: `Inquiry from ${form.value.name} - ${form.value.company || 'Individual'}`,
+        from_name: 'TontonSports Website',
+        name: form.value.name,
+        email: form.value.email,
+        company: form.value.company || 'N/A',
+        phone: form.value.phone || 'N/A',
+        product: form.value.product || 'N/A',
+        quantity: form.value.quantity || 'N/A',
+        message: form.value.message
+      })
+    })
+    const data = await res.json()
+    if (data.success) {
+      formSubmitted.value = true
+    } else {
+      alert('Sorry, there was an error sending your message. Please try WhatsApp or email us directly.')
+    }
   } catch (err) {
     console.error('Form submission error:', err)
+    alert('Sorry, there was an error sending your message. Please try WhatsApp or email us directly.')
   } finally {
     formSubmitting.value = false
   }
