@@ -4,9 +4,9 @@ export default defineEventHandler(async () => {
 
   try {
     const [productsResponse, blogsResponse, faqsResponse] = await Promise.all([
-      $fetch(`${STRAPI_BASE_URL}/api/products?fields[0]=slug`),
-      $fetch(`${STRAPI_BASE_URL}/api/blogs?fields[0]=slug`),
-      $fetch(`${STRAPI_BASE_URL}/api/faqs?fields[0]=slug`)
+      $fetch(`${STRAPI_BASE_URL}/api/products?fields[0]=slug&fields[1]=updatedAt&fields[2]=publishedAt`),
+      $fetch(`${STRAPI_BASE_URL}/api/blogs?fields[0]=slug&fields[1]=updatedAt&fields[2]=publishedAt`),
+      $fetch(`${STRAPI_BASE_URL}/api/faqs?fields[0]=slug&fields[1]=updatedAt&fields[2]=publishedAt`)
     ])
 
     const routes = []
