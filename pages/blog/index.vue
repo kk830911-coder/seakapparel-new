@@ -29,7 +29,7 @@ const formatDate = (item) => {
 }
 
 const getBlogImageUrl = (item) => {
-  if (!item) return '/cover/1.jpg'
+  if (!item) return '/og-image.jpg'
   const coverData = item.cover || item.attributes?.cover
   let mediaUrl = null
   if (typeof coverData === 'string') mediaUrl = coverData
@@ -39,7 +39,7 @@ const getBlogImageUrl = (item) => {
   const fallbackUrl = mediaUrl || item.cover_url || item.attributes?.cover_url
   if (fallbackUrl) return fallbackUrl.startsWith('/') ? `${strapiUrl}${fallbackUrl}` : fallbackUrl.split('?')[0]
 
-  const defaultCovers = ['/cover/1.jpg', '/cover/2.jpg', '/cover/3.jpg', '/cover/4.jpg']
+  const defaultCovers = ['/og-image.jpg', '/og-image.jpg', '/og-image.jpg', '/og-image.jpg']
   const seed = item.id || (item.title?.length || 0) || (item.attributes?.title?.length || 0)
   return defaultCovers[Math.abs(seed) % defaultCovers.length]
 }
