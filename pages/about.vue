@@ -30,12 +30,12 @@ const certifications = [
 ]
 
 const factoryAreas = [
-  { src: '/gongchang_01.jpg', alt: 'Factory Exterior', label: 'Factory View' },
-  { src: '/gongchang_02.jpg', alt: 'Design & Sampling Room', label: 'Design Center' },
-  { src: '/gongchang_03.jpg', alt: 'Ironing & Finishing', label: 'Finishing Area' },
-  { src: '/gongchang_04.jpg', alt: 'Cutting Workshop', label: 'Cutting Room' },
-  { src: '/gongchang_05.jpg', alt: 'Sewing Workshop', label: 'Sewing Line' },
-  { src: '/gongchang_06.jpg', alt: 'Packaging Area', label: 'Packaging' }
+  { src: '/category/BoxingOutfit.png', alt: 'Factory Exterior', label: 'Factory View' },
+  { src: '/category/WrestlingSinglet.png', alt: 'Design & Sampling Room', label: 'Design Center' },
+  { src: '/category/IceHockeyJersey.png', alt: 'Ironing & Finishing', label: 'Finishing Area' },
+  { src: '/category/RugbyJersey.png', alt: 'Cutting Workshop', label: 'Cutting Room' },
+  { src: '/category/BaseballJersey.png', alt: 'Sewing Workshop', label: 'Sewing Line' },
+  { src: '/category/BadmintonJersey.png', alt: 'Packaging Area', label: 'Packaging' }
 ]
 
 const milestones = [
@@ -86,7 +86,7 @@ const milestones = [
             </div>
           </div>
           <div class="relative">
-            <img src="/gongchang.jpg" alt="TontonSports Factory Building" class="w-full rounded-xl shadow-lg" loading="lazy" />
+            <img src="/category/basketball.png" alt="TontonSports Factory Building" class="w-full rounded-xl shadow-lg" loading="lazy" />
             <div class="absolute -bottom-4 -left-4 bg-brand text-white p-4 rounded-xl shadow-lg">
               <div class="text-2xl font-heading font-black">2004</div>
               <div class="text-sm">Established</div>
@@ -137,7 +137,7 @@ const milestones = [
           </div>
         </div>
         <div class="mt-4 relative overflow-hidden rounded-xl">
-          <NuxtImg src="/gongchang_07.jpg" format="avif" fallbackFormat="webp" alt="Production Workshop" class="w-full h-64 md:h-80 object-cover" loading="lazy" />
+          <NuxtImg src="/category/football.png" format="avif" fallbackFormat="webp" alt="Production Workshop" class="w-full h-64 md:h-80 object-cover" loading="lazy" />
           <div class="absolute inset-0 bg-gradient-to-r from-navy/70 to-transparent flex items-center">
             <div class="p-8 text-white">
               <div class="text-3xl font-heading font-black">5,000m+</div>

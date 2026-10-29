@@ -1,6 +1,6 @@
 import { useRuntimeConfig } from '#imports'
 
-const FALLBACK_IMG = 'https://images.unsplash.com/photo-1556906781-9a412961c28c?w=600&h=600&c_fill&q=75&f_auto'
+const FALLBACK_IMG = '/category/basketball.png'
 
 export function useStrapi() {
   const config = useRuntimeConfig()
