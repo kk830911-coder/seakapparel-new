@@ -69,7 +69,7 @@ const closeDropdown = () => {
 const isMobileProductsOpen = ref(false)
 
 const showCookieBanner = ref(false)
-const GA_MEASUREMENT_ID = 'G-066KSKY54P'
+const GA_MEASUREMENT_ID = 'G-XDS9H51BLV'
 
 // GDPR: GA4 仅在用户明确接受 Cookie 后才动态加载；拒绝则永不加载
 const loadGA = () => {
