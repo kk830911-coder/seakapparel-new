@@ -90,7 +90,10 @@ export default defineNuxtConfig({
         availableLanguage: ['English']
       },
       sameAs: [
-        'https://www.facebook.com/TontonSports'
+        'https://www.facebook.com/profile.php?id=61596052913953',
+        'https://www.instagram.com/tonton_sports',
+        'https://www.linkedin.com/in/shuizhong-zheng-b4ba01447',
+        'https://www.youtube.com/@tonton_marczheng'
       ]
     }
   },
