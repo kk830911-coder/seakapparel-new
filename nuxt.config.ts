@@ -164,33 +164,17 @@ export default defineNuxtConfig({
           jsonFetch(`${STRAPI_URL}/api/blogs?fields[0]=slug`),
           jsonFetch(`${STRAPI_URL}/api/faqs?fields[0]=slug`)
         ])
-        
-        const dynamicRoutes: string[] = []
-        
-        const products = (productsResponse as any)?.data || []
-        products.forEach((item: any) => {
-          const slug = item.slug || item.attributes?.slug
-          if (slug) dynamicRoutes.push(`/products/${slug}`)
-        })
-        
-        const blogs = (blogsResponse as any)?.data || []
-        blogs.forEach((item: any) => {
-          const slug = item.slug || item.attributes?.slug
-          if (slug) dynamicRoutes.push(`/blog/${slug}`)
-        })
-        
-        const faqs = (faqsResponse as any)?.data || []
-        faqs.forEach((item: any) => {
-          const slug = item.slug || item.attributes?.slug
-          if (slug) dynamicRoutes.push(`/faq/${slug}`)
-        })
-        
-        console.log(`✅ Found ${dynamicRoutes.length} dynamic routes to prerender`)
-        
-        nitroConfig.prerender = nitroConfig.prerender || {}
-        nitroConfig.prerender.routes = nitroConfig.prerender.routes || []
-        nitroConfig.prerender.routes.push(...dynamicRoutes)
-        
+
+        // ⚠️ 详情页（/products/xxx 等）不再构建时预渲染。
+        // prerender 的页面会变成静态文件，Vercel 直接返回文件系统版本，
+        // ISR / Webhook 按需重渲染对它永远无效（内容冻结到下次部署）。
+        // 详情页统一走 ISR 动态渲染：Webhook 秒级刷新 + 过期自动兜底。
+        const counts: string[] = []
+        for (const [name, res] of [['products', productsResponse], ['blogs', blogsResponse], ['faqs', faqsResponse]] as const) {
+          counts.push(`${name}: ${(res as any)?.data?.length || 0}`)
+        }
+        console.log(`ℹ️ Dynamic detail routes are ISR-rendered (not prerendered): ${counts.join(', ')}`)
+
       } catch (error) {
         console.error('⚠️ Failed to fetch dynamic routes:', error)
       }
@@ -199,7 +183,12 @@ export default defineNuxtConfig({
 
   nitro: {
     prerender: {
-      routes: ['/', '/products', '/blog', '/faq', '/about', '/contact', '/privacy-policy', '/customization'],
+      // 只预渲染纯静态页（改动走代码部署）。
+      // 首页和内容列表页（/ /products /blog /faq）也走 ISR：
+      // prerender 会把它们变成静态文件，后台发布新内容后永远不会更新
+      routes: ['/about', '/contact', '/privacy-policy', '/customization'],
+      // 防止 crawlLinks 从列表页的链接里发现详情页又把它们预渲染成静态文件
+      ignore: [/^\/products\/.+/, /^\/blog\/.+/, /^\/faq\/.+/],
       failOnError: false
     },
     // 方案 B：把 bypass token 写进 Vercel 的 prerender 配置，
@@ -209,13 +198,13 @@ export default defineNuxtConfig({
       : undefined,
     routeRules: {
       // 有 Webhook 主动通知后，ISR 只作为兜底，周期放长减少无效唤醒
-      '/':            { isr: 3600 },
-      '/products':    { isr: 3600 },
-      '/products/**': { isr: 3600 },
-      '/blog':        { isr: 3600 },
-      '/blog/**':     { isr: 3600 },
-      '/faq':         { isr: 3600 },
-      '/faq/**':      { isr: 3600 }
+      '/':            { isr: 120 },
+      '/products':    { isr: 120 },
+      '/products/**': { isr: 120 },
+      '/blog':        { isr: 120 },
+      '/blog/**':     { isr: 120 },
+      '/faq':         { isr: 120 },
+      '/faq/**':      { isr: 120 }
     }
   } as any
 })
