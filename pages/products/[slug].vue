@@ -224,10 +224,10 @@ const handleTouchEnd = (e, next, prev) => {
           <div class="bg-gray-50 rounded-xl p-4 sm:p-5 my-4 sm:my-6">
             <template v-if="priceTiers.length">
               <div class="text-xs font-medium uppercase tracking-wide text-gray-400 mb-3">Quantity pricing</div>
-              <div class="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3 lg:grid-cols-4">
-                <div v-for="tier in priceTiers" :key="tier.minQty" class="rounded-lg bg-white border border-gray-100 px-3 py-2.5">
-                  <div class="font-heading font-bold text-brand text-xl sm:text-2xl leading-none whitespace-nowrap">${{ formatPrice(tier.unitPrice) }}</div>
-                  <div class="text-xs text-gray-500 mt-1.5">{{ tierRange(tier) }}</div>
+              <div class="divide-y divide-gray-200">
+                <div v-for="tier in priceTiers" :key="tier.minQty" class="flex justify-between items-center py-2">
+                  <span class="text-sm sm:text-base text-gray-600">{{ tierRange(tier) }}</span>
+                  <span class="font-heading font-bold text-brand text-lg sm:text-xl whitespace-nowrap">${{ formatPrice(tier.unitPrice) }}</span>
                 </div>
               </div>
             </template>
