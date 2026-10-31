@@ -48,17 +48,14 @@ const previewImageUrl = computed(() => imagesList.value[previewIndex.value] || '
 
 const priceTiers = computed(() => getPriceTiers(product.value))
 const priceFrom = computed(() => getPriceFrom(product.value))
-const priceNote = computed(() => getPriceNote(product.value))
+const priceNote = computed(() =>
+  priceFrom.value === null
+    ? 'Final price depends on fabric, print method and quantity. Send us your requirements for a detailed quote within 24 hours.'
+    : getPriceNote(product.value)
+)
 const offerRange = computed(() => getOfferRange(product.value))
 
-// 阶梯卡展示：拆分整数/小数部分（$5.90 -> $5 + 上标 90），整档数量区间文案
-function tierPriceParts(value) {
-  const s = formatPrice(value)
-  if (!s) return { dollars: '', cents: '' }
-  const idx = s.indexOf('.')
-  if (idx === -1) return { dollars: s, cents: '' }
-  return { dollars: s.slice(0, idx), cents: s.slice(idx + 1) }
-}
+// 阶梯卡数量区间文案
 function tierRange(tier) {
   return tier.maxQty ? `${tier.minQty}–${tier.maxQty} pieces` : `≥${tier.minQty} pieces`
 }
@@ -223,34 +220,23 @@ const handleTouchEnd = (e, next, prev) => {
         <div class="flex flex-col">
           <h1 class="text-xl sm:text-2xl md:text-3xl font-heading font-bold text-navy mt-1 sm:mt-2">{{ getTitle(product) }}</h1>
 
-          <!-- Price & MOQ -->
+          <!-- Quantity Pricing -->
           <div class="bg-gray-50 rounded-xl p-4 sm:p-5 my-4 sm:my-6">
-            <div class="flex items-baseline justify-between gap-3">
-              <span class="text-gray-500 text-sm">Unit price</span>
-              <span v-if="priceFrom !== null" class="text-xl sm:text-2xl font-heading font-bold text-brand whitespace-nowrap">
-                <span class="text-xs sm:text-sm font-medium text-gray-500 mr-1">From</span>${{ formatPrice(priceFrom) }}<span class="text-xs sm:text-sm font-medium text-gray-500"> /pc</span>
-              </span>
-              <span v-else class="text-sm font-semibold text-navy">Price on request</span>
-            </div>
-
-            <div class="flex justify-between items-center mt-2">
-              <span class="text-gray-500 text-sm">Minimum order</span>
-              <span class="font-semibold text-navy text-sm">{{ getMoq(product) }} pcs</span>
-            </div>
-
-            <div v-if="priceTiers.length" class="mt-4 pt-4 border-t border-gray-200">
+            <template v-if="priceTiers.length">
               <div class="text-xs font-medium uppercase tracking-wide text-gray-400 mb-3">Quantity pricing</div>
               <div class="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3 lg:grid-cols-4">
                 <div v-for="tier in priceTiers" :key="tier.minQty" class="rounded-lg bg-white border border-gray-100 px-3 py-2.5">
-                  <div class="font-heading font-bold text-navy leading-none whitespace-nowrap">
-                    <span class="text-sm align-top">$</span><span class="text-xl sm:text-2xl">{{ tierPriceParts(tier.unitPrice).dollars }}</span><span v-if="tierPriceParts(tier.unitPrice).cents" class="text-xs sm:text-sm align-top">{{ tierPriceParts(tier.unitPrice).cents }}</span>
-                  </div>
+                  <div class="font-heading font-bold text-brand text-xl sm:text-2xl leading-none whitespace-nowrap">${{ formatPrice(tier.unitPrice) }}</div>
                   <div class="text-xs text-gray-500 mt-1.5">{{ tierRange(tier) }}</div>
                 </div>
               </div>
+            </template>
+            <div v-else class="flex justify-between items-center">
+              <span class="text-gray-500 text-sm">Unit price</span>
+              <span class="text-sm font-semibold text-navy">Price on request</span>
             </div>
 
-            <p v-if="priceFrom !== null" class="text-xs leading-relaxed text-gray-400 mt-3">{{ priceNote }}</p>
+            <p class="text-xs leading-relaxed text-gray-400 mt-3">{{ priceNote }}</p>
           </div>
 
           <!-- Key Features -->

@@ -30,8 +30,19 @@ export function getTitle(item: any): string {
   return item?.title || item?.attributes?.title || ''
 }
 
+// 无价格产品使用该默认起订量
+export const DEFAULT_MOQ = 10
+
+/**
+ * 起订量：优先取阶梯价第一档的 minQty（与价格区间保持一致），
+ * 其次取产品自填 moq 字段，都没有则用 DEFAULT_MOQ。
+ */
 export function getMoq(item: any): number {
-  return item?.moq ?? item?.attributes?.moq ?? 1
+  const tiers = getPriceTiers(item)
+  if (tiers.length) return tiers[0].minQty
+
+  const legacy = toNumber(item?.moq ?? item?.attributes?.moq)
+  return legacy !== null && legacy > 0 ? legacy : DEFAULT_MOQ
 }
 
 // ---------- Pricing ----------
