@@ -70,7 +70,7 @@ useSeoMeta({
 const productJsonLd = computed(() => {
   if (!product.value) return null
   const range = offerRange.value
-  const node: Record<string, any> = {
+  const node = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: getTitle(product.value) || '',
@@ -106,7 +106,7 @@ const productJsonLd = computed(() => {
 
 useHead({
   script: computed(() => {
-    const scripts: any[] = []
+    const scripts = []
     if (productJsonLd.value) {
       scripts.push({
         type: 'application/ld+json',
