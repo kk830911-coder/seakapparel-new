@@ -2,6 +2,10 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
 
   runtimeConfig: {
+    // 按需重渲染（方案 B/Strapi Webhook），由环境变量注入
+    revalidateSecret: process.env.REVALIDATE_SECRET || '',
+    revalidateBypassToken: process.env.REVALIDATE_BYPASS_TOKEN || '',
+    deployHookUrl: process.env.DEPLOY_HOOK_URL || '',
     public: {
       strapiUrl: 'https://tutesportswear-strapi-us.onrender.com'
     }
@@ -198,14 +202,20 @@ export default defineNuxtConfig({
       routes: ['/', '/products', '/blog', '/faq', '/about', '/contact', '/privacy-policy', '/customization'],
       failOnError: false
     },
+    // 方案 B：把 bypass token 写进 Vercel 的 prerender 配置，
+    // 之后 /api/revalidate 带着这个 token 请求页面即可只刷新该页面
+    vercel: process.env.REVALIDATE_BYPASS_TOKEN
+      ? { config: { bypassToken: process.env.REVALIDATE_BYPASS_TOKEN } }
+      : undefined,
     routeRules: {
-      '/':            { isr: 300 },
-      '/products':    { isr: 300 },
-      '/products/**': { isr: 300 },
-      '/blog':        { isr: 300 },
-      '/blog/**':     { isr: 300 },
-      '/faq':         { isr: 300 },
-      '/faq/**':      { isr: 300 }
+      // 有 Webhook 主动通知后，ISR 只作为兜底，周期放长减少无效唤醒
+      '/':            { isr: 3600 },
+      '/products':    { isr: 3600 },
+      '/products/**': { isr: 3600 },
+      '/blog':        { isr: 3600 },
+      '/blog/**':     { isr: 3600 },
+      '/faq':         { isr: 3600 },
+      '/faq/**':      { isr: 3600 }
     }
-  }
+  } as any
 })
