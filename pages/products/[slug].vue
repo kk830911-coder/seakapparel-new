@@ -51,6 +51,18 @@ const priceFrom = computed(() => getPriceFrom(product.value))
 const priceNote = computed(() => getPriceNote(product.value))
 const offerRange = computed(() => getOfferRange(product.value))
 
+// 阶梯卡展示：拆分整数/小数部分（$5.90 -> $5 + 上标 90），整档数量区间文案
+function tierPriceParts(value) {
+  const s = formatPrice(value)
+  if (!s) return { dollars: '', cents: '' }
+  const idx = s.indexOf('.')
+  if (idx === -1) return { dollars: s, cents: '' }
+  return { dollars: s.slice(0, idx), cents: s.slice(idx + 1) }
+}
+function tierRange(tier) {
+  return tier.maxQty ? `${tier.minQty}–${tier.maxQty} pieces` : `≥${tier.minQty} pieces`
+}
+
 useSeoMeta({
   title: () => `${getTitle(product.value) || 'Custom Sportswear'} | TontonSports`,
   ogTitle: () => `${getTitle(product.value) || 'Custom Sportswear'} - TontonSports`,
@@ -227,11 +239,13 @@ const handleTouchEnd = (e, next, prev) => {
             </div>
 
             <div v-if="priceTiers.length" class="mt-4 pt-4 border-t border-gray-200">
-              <div class="text-xs font-medium uppercase tracking-wide text-gray-400 mb-2">Quantity pricing</div>
-              <div class="space-y-1.5">
-                <div v-for="tier in priceTiers" :key="tier.minQty" class="flex justify-between items-baseline text-sm">
-                  <span class="text-gray-600">{{ tier.label }}</span>
-                  <span class="font-semibold text-navy">${{ formatPrice(tier.unitPrice) }}</span>
+              <div class="text-xs font-medium uppercase tracking-wide text-gray-400 mb-3">Quantity pricing</div>
+              <div class="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3 lg:grid-cols-4">
+                <div v-for="tier in priceTiers" :key="tier.minQty" class="rounded-lg bg-white border border-gray-100 px-3 py-2.5">
+                  <div class="font-heading font-bold text-navy leading-none whitespace-nowrap">
+                    <span class="text-sm align-top">$</span><span class="text-xl sm:text-2xl">{{ tierPriceParts(tier.unitPrice).dollars }}</span><span v-if="tierPriceParts(tier.unitPrice).cents" class="text-xs sm:text-sm align-top">{{ tierPriceParts(tier.unitPrice).cents }}</span>
+                  </div>
+                  <div class="text-xs text-gray-500 mt-1.5">{{ tierRange(tier) }}</div>
                 </div>
               </div>
             </div>
