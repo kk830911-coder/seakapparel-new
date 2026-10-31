@@ -148,9 +148,12 @@ useHead({
           <NuxtLink :to="`/products/${getSlug(item) || item.id}`" class="block">
             <h3 class="text-xs sm:text-sm font-medium text-gray-800 line-clamp-2 mb-2 group-hover:text-brand transition-colors">{{ getTitle(item) }}</h3>
           </NuxtLink>
-          <div class="flex justify-between items-center mb-2 sm:mb-3">
-            <span class="text-brand font-bold text-xs sm:text-sm">${{ getPrice(item) }}</span>
-            <span class="text-gray-400 text-xs">MOQ: {{ getMoq(item) }} pc</span>
+          <div class="flex justify-between items-baseline mb-2 sm:mb-3 gap-1">
+            <span v-if="hasPrice(item)" class="text-brand font-bold text-xs sm:text-sm whitespace-nowrap">
+              <span class="font-medium text-gray-400">From</span> ${{ formatPrice(getPriceFrom(item)) }}
+            </span>
+            <span v-else class="text-navy font-semibold text-xs sm:text-sm">Price on request</span>
+            <span class="text-gray-400 text-xs whitespace-nowrap">MOQ {{ getMoq(item) }}</span>
           </div>
           <NuxtLink :to="`/products/${getSlug(item) || item.id}`" class="block w-full text-center text-xs font-medium text-brand border border-brand/20 hover:bg-brand hover:text-white py-1.5 sm:py-2 rounded-lg transition-colors">Send Inquiry</NuxtLink>
         </div>

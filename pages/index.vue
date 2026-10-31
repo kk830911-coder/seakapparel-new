@@ -40,7 +40,7 @@ const { strapiUrl } = useStrapi()
 const bannerImage = '/banner/banner1.jpg'
 
 const { data: hotProductsData, pending: hotLoading } = await useFetch(`${strapiUrl}/api/products`, {
-  query: { populate: 'image', 'pagination[limit]': 20, 'sort': 'createdAt:desc' },
+  query: { 'populate[image]': 'true', 'populate[priceTiers]': 'true', 'pagination[limit]': 20, 'sort': 'createdAt:desc' },
   key: 'home-hot-products'
 })
 const hotProducts = computed(() => hotProductsData.value?.data || [])
@@ -235,9 +235,12 @@ const testimonials = [
               <NuxtLink :to="`/products/${getSlug(item)}`" class="block">
                 <h3 class="text-xs sm:text-sm font-medium text-gray-800 line-clamp-2 mb-2 group-hover:text-brand transition-colors">{{ getTitle(item) }}</h3>
               </NuxtLink>
-              <div class="flex justify-between items-center mb-2">
-                <span class="text-brand font-bold text-sm sm:text-lg">${{ getPrice(item) }}</span>
-                <span class="text-gray-400 text-xs">MOQ: {{ getMoq(item) }} pc</span>
+              <div class="flex justify-between items-baseline mb-2 gap-1">
+                <span v-if="hasPrice(item)" class="text-brand font-bold text-sm sm:text-lg whitespace-nowrap">
+                  <span class="text-xs font-medium text-gray-400">From</span> ${{ formatPrice(getPriceFrom(item)) }}
+                </span>
+                <span v-else class="text-navy font-semibold text-xs sm:text-sm">Price on request</span>
+                <span class="text-gray-400 text-xs whitespace-nowrap">MOQ {{ getMoq(item) }}</span>
               </div>
               <NuxtLink :to="`/products/${getSlug(item)}`" class="block w-full text-center text-xs sm:text-sm font-medium text-brand border border-brand/20 hover:bg-brand hover:text-white py-1.5 sm:py-2 rounded-lg transition-colors">Send Inquiry</NuxtLink>
             </div>

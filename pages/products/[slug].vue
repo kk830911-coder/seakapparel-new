@@ -46,14 +46,20 @@ const imagesList = computed(() => {
 const currentMainImageUrl = computed(() => imagesList.value[activeImageIndex.value] || '')
 const previewImageUrl = computed(() => imagesList.value[previewIndex.value] || '')
 
+const priceTiers = computed(() => getPriceTiers(product.value))
+const priceFrom = computed(() => getPriceFrom(product.value))
+const priceNote = computed(() => getPriceNote(product.value))
+const offerRange = computed(() => getOfferRange(product.value))
+
 useSeoMeta({
   title: () => `${getTitle(product.value) || 'Custom Sportswear'} | TontonSports`,
   ogTitle: () => `${getTitle(product.value) || 'Custom Sportswear'} - TontonSports`,
   description: () => {
     const title = getTitle(product.value) || 'Custom sportswear'
-    const price = getPrice(product.value) || ''
     const moq = getMoq(product.value)
-    return `Custom ${title} from TontonSports. Factory price: $${price}, MOQ: ${moq} piece. OEM/ODM, free design, global shipping.`
+    return priceFrom.value === null
+      ? `Custom ${title} from TontonSports. OEM/ODM manufacturer, MOQ ${moq} pcs, free design and a detailed quote within 24 hours.`
+      : `Custom ${title} from TontonSports. Reference price from $${formatPrice(priceFrom.value)}/pc, MOQ ${moq} pcs. OEM/ODM, free design, global shipping.`
   },
   ogDescription: () => `Custom ${getTitle(product.value) || 'sportswear'} at factory direct price. OEM/ODM, low MOQ, ISO certified manufacturer.`,
   ogImage: () => currentMainImageUrl.value ? getCleanImageUrl(currentMainImageUrl.value, strapiUrl) : 'https://www.tutesports.com/og-image.jpg',
@@ -61,47 +67,77 @@ useSeoMeta({
   twitterCard: 'summary_large_image',
 })
 
+const productJsonLd = computed(() => {
+  if (!product.value) return null
+  const range = offerRange.value
+  const node: Record<string, any> = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: getTitle(product.value) || '',
+    description: `Custom ${getTitle(product.value)} from TontonSports. Professional OEM/ODM sportswear manufacturer.`,
+    image: currentMainImageUrl.value ? getCleanImageUrl(currentMainImageUrl.value, strapiUrl) : '',
+    brand: { '@type': 'Brand', name: 'TontonSports' },
+    manufacturer: { '@type': 'Organization', name: 'TontonSports' }
+  }
+
+  // 无价产品不输出 offers，避免出现 price: 0
+  if (range) {
+    const seller = { '@type': 'Organization', name: 'TontonSports' }
+    node.offers = range.count > 1
+      ? {
+          '@type': 'AggregateOffer',
+          priceCurrency: 'USD',
+          lowPrice: formatPrice(range.low),
+          highPrice: formatPrice(range.high),
+          offerCount: range.count,
+          availability: 'https://schema.org/InStock',
+          seller
+        }
+      : {
+          '@type': 'Offer',
+          priceCurrency: 'USD',
+          price: formatPrice(range.low),
+          availability: 'https://schema.org/InStock',
+          seller
+        }
+  }
+  return node
+})
+
 useHead({
-  script: computed(() => [{
-    type: 'application/ld+json',
-    innerHTML: JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "Product",
-      "name": getTitle(product.value) || '',
-      "description": `Custom ${getTitle(product.value)} from TontonSports. Professional OEM/ODM sportswear manufacturer.`,
-      "image": currentMainImageUrl.value ? getCleanImageUrl(currentMainImageUrl.value, strapiUrl) : '',
-      "brand": { "@type": "Brand", "name": "TontonSports" },
-      "offers": {
-        "@type": "Offer",
-        "priceCurrency": "USD",
-        "price": getPrice(product.value) || 0,
-        "availability": "https://schema.org/InStock",
-        "seller": { "@type": "Organization", "name": "TontonSports" }
-      }
+  script: computed(() => {
+    const scripts: any[] = []
+    if (productJsonLd.value) {
+      scripts.push({
+        type: 'application/ld+json',
+        innerHTML: JSON.stringify(productJsonLd.value)
+      })
+    }
+    scripts.push({
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [{
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.tutesports.com"
+        }, {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Products",
+          "item": "https://www.tutesports.com/products"
+        }, {
+          "@type": "ListItem",
+          "position": 3,
+          "name": getTitle(product.value) || 'Product Detail',
+          "item": `https://www.tutesports.com/products/${route.params.slug}`
+        }]
+      })
     })
-  }, {
-    type: 'application/ld+json',
-    innerHTML: JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [{
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": "https://www.tutesports.com"
-      }, {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Products",
-        "item": "https://www.tutesports.com/products"
-      }, {
-        "@type": "ListItem",
-        "position": 3,
-        "name": getTitle(product.value) || 'Product Detail',
-        "item": `https://www.tutesports.com/products/${route.params.slug}`
-      }]
-    })
-  }])
+    return scripts
+  })
 })
 
 const nextImage = () => { if (imagesList.value.length > 1) activeImageIndex.value = (activeImageIndex.value + 1) % imagesList.value.length }
@@ -176,15 +212,31 @@ const handleTouchEnd = (e, next, prev) => {
           <h1 class="text-xl sm:text-2xl md:text-3xl font-heading font-bold text-navy mt-1 sm:mt-2">{{ getTitle(product) }}</h1>
 
           <!-- Price & MOQ -->
-          <div class="bg-gray-50 rounded-xl p-4 sm:p-5 my-4 sm:my-6 space-y-2 sm:space-y-3">
-            <div class="flex justify-between items-center">
-              <span class="text-gray-500 text-sm">Unit Price</span>
-              <span class="text-xl sm:text-2xl font-heading font-bold text-brand">${{ getPrice(product) }}</span>
+          <div class="bg-gray-50 rounded-xl p-4 sm:p-5 my-4 sm:my-6">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="text-gray-500 text-sm">Unit price</span>
+              <span v-if="priceFrom !== null" class="text-xl sm:text-2xl font-heading font-bold text-brand whitespace-nowrap">
+                <span class="text-xs sm:text-sm font-medium text-gray-500 mr-1">From</span>${{ formatPrice(priceFrom) }}<span class="text-xs sm:text-sm font-medium text-gray-500"> /pc</span>
+              </span>
+              <span v-else class="text-sm font-semibold text-navy">Price on request</span>
             </div>
-            <div class="flex justify-between items-center">
-              <span class="text-gray-500 text-sm">Minimum Order</span>
-              <span class="font-semibold text-navy">{{ getMoq(product) }} piece</span>
+
+            <div class="flex justify-between items-center mt-2">
+              <span class="text-gray-500 text-sm">Minimum order</span>
+              <span class="font-semibold text-navy text-sm">{{ getMoq(product) }} pcs</span>
             </div>
+
+            <div v-if="priceTiers.length" class="mt-4 pt-4 border-t border-gray-200">
+              <div class="text-xs font-medium uppercase tracking-wide text-gray-400 mb-2">Quantity pricing</div>
+              <div class="space-y-1.5">
+                <div v-for="tier in priceTiers" :key="tier.minQty" class="flex justify-between items-baseline text-sm">
+                  <span class="text-gray-600">{{ tier.label }}</span>
+                  <span class="font-semibold text-navy">${{ formatPrice(tier.unitPrice) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <p v-if="priceFrom !== null" class="text-xs leading-relaxed text-gray-400 mt-3">{{ priceNote }}</p>
           </div>
 
           <!-- Key Features -->
