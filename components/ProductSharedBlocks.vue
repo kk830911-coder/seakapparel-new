@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import DetailAccordion from './DetailAccordion.vue'
 
 /**
@@ -26,6 +26,18 @@ const accordionItems = computed(() =>
     .map(b => ({ title: b.title, body: b.body || '' }))
 )
 const hasInfoBlocks = computed(() => accordionItems.value.length > 0)
+
+// 工厂实拍点击查看大图（Esc / 点击遮罩关闭）
+const lightbox = ref<{ url: string; alt: string } | null>(null)
+const openLightbox = (shot: { url: string; alt?: string }) =>
+  (lightbox.value = { url: shot.url, alt: shot.alt || 'Factory photo' })
+const closeLightbox = () => (lightbox.value = null)
+
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape') closeLightbox()
+}
+onMounted(() => window.addEventListener('keydown', onKeydown))
+onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 </script>
 
 <template>
@@ -109,14 +121,28 @@ const hasInfoBlocks = computed(() => accordionItems.value.length > 0)
       <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-1">Inside Our Factory</h2>
       <p class="text-sm text-gray-500 mb-5">Real shots from our Hubei manufacturing base.</p>
       <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-        <figure v-for="shot in factoryShots" :key="shot.url" class="rounded-xl overflow-hidden bg-white border border-gray-100">
-          <img
-            :src="shot.url"
-            :alt="shot.alt || 'Factory production shot'"
-            class="w-full h-40 sm:h-48 object-cover"
-            loading="lazy"
-            decoding="async"
-          />
+        <figure
+          v-for="shot in factoryShots"
+          :key="shot.url"
+          class="rounded-xl overflow-hidden bg-white border border-gray-100 cursor-zoom-in group"
+          @click="openLightbox(shot)"
+        >
+          <div class="relative">
+            <img
+              :src="shot.url"
+              :alt="shot.alt || 'Factory production shot'"
+              class="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="absolute inset-0 bg-navy/0 group-hover:bg-navy/20 transition-colors flex items-center justify-center">
+              <span class="w-9 h-9 rounded-full bg-white/90 text-navy flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14zM11 8v6M8 11h6" />
+                </svg>
+              </span>
+            </div>
+          </div>
           <figcaption v-if="shot.alt" class="text-xs text-gray-500 px-3 py-2">{{ shot.alt }}</figcaption>
         </figure>
       </div>
@@ -127,5 +153,28 @@ const hasInfoBlocks = computed(() => accordionItems.value.length > 0)
       <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4">Payment, Shipping & Packaging</h2>
       <DetailAccordion :items="accordionItems" />
     </section>
+
+    <!-- 工厂实拍大图 -->
+    <Teleport to="body">
+      <div
+        v-if="lightbox"
+        class="fixed inset-0 z-[9999] bg-black/90 flex items-center justify-center p-4"
+        @click="closeLightbox"
+      >
+        <button
+          class="absolute top-3 right-3 sm:top-5 sm:right-5 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+          aria-label="Close"
+          @click.stop="closeLightbox"
+        >
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <figure class="max-w-[95vw] max-h-[90vh] flex flex-col items-center gap-3" @click.stop>
+          <img :src="lightbox.url" :alt="lightbox.alt" class="max-h-[80vh] w-auto max-w-full object-contain rounded-lg" />
+          <figcaption v-if="lightbox.alt" class="text-xs sm:text-sm text-white/70 text-center">{{ lightbox.alt }}</figcaption>
+        </figure>
+      </div>
+    </Teleport>
   </div>
 </template>

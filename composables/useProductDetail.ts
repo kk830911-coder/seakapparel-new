@@ -1,4 +1,4 @@
-import { useStrapi, getMediaList, getMoq, getPriceFrom, formatPrice } from './useStrapi'
+import { useStrapi, getMediaList } from './useStrapi'
 
 export interface SpecRow {
   label: string
@@ -32,18 +32,14 @@ export function resolveSpecRows(product: any, globalBlocks: any): SpecRow[] {
   push(product?.category?.specRows)
   push(globalBlocks?.specDefaults)
 
-  // 兜底：从产品字段自动推导，保证任何产品都有一张像样的参数表
+  // 兜底：从产品字段自动推导，保证任何产品都有一张像样的参数表。
+  // 不再推导 MOQ / Reference Price / Category：这三项在页面顶部（阶梯价、面包屑）已经显示，
+  // 重复出现只会让参数表显得啰嗦。
   const derived: SpecRow[] = []
-  const moq = getMoq(product)
-  if (moq > 0) derived.push({ label: 'MOQ', value: `${moq} pieces` })
-  const priceFrom = getPriceFrom(product)
-  if (priceFrom !== null) derived.push({ label: 'Reference Price', value: `From $${formatPrice(priceFrom)} / pc` })
   const material = product?.material || product?.attributes?.material
   if (material) derived.push({ label: 'Material', value: String(material) })
   const sport = product?.sport_type || product?.attributes?.sport_type
   if (sport) derived.push({ label: 'Sport Type', value: String(sport).replace(/_/g, ' ') })
-  const categoryName = product?.category?.name
-  if (categoryName) derived.push({ label: 'Category', value: String(categoryName) })
   derived.forEach((r: SpecRow) => {
     if (!rows.some((x: SpecRow) => x.label.toLowerCase() === r.label.toLowerCase())) rows.push(r)
   })
