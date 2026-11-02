@@ -463,7 +463,7 @@ const handleTouchEnd = (e, next, prev) => {
             :info-blocks="infoBlocks"
           />
 
-          <!-- 5. 交易条款 + FAQ + 收口 CTA -->
+          <!-- 5. 交易条款 + FAQ（CTA 统一用页脚那条，不在页内重复） -->
           <section v-if="tradeTerms || detailFaqs.length" id="terms" class="scroll-mt-[170px] space-y-6">
             <div v-if="tradeTerms">
               <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-3">Trade Terms</h2>
@@ -473,19 +473,6 @@ const handleTouchEnd = (e, next, prev) => {
             <div v-if="detailFaqs.length">
               <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4">FAQ</h2>
               <DetailFaq :items="detailFaqs" />
-            </div>
-
-            <div class="bg-brand/5 border border-brand/10 rounded-xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p class="text-sm sm:text-base text-navy font-medium text-center sm:text-left">
-                Need this style in your own design? Free mockup and quote within 24 hours.
-              </p>
-              <NuxtLink
-                :to="`/contact?product=${getSlug(product)}&title=${encodeURIComponent(getTitle(product) || '')}`"
-                class="inline-flex items-center gap-2 bg-accent hover:bg-accent-dark text-white font-semibold px-6 py-3 rounded-lg transition-colors whitespace-nowrap"
-              >
-                Send Inquiry
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-              </NuxtLink>
             </div>
           </section>
         </div>
