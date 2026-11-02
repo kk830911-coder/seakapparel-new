@@ -1,7 +1,9 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
 useCanonicalUrl()
+
+const route = useRoute()
 
 const form = ref({
   name: '',
@@ -10,13 +12,28 @@ const form = ref({
   phone: '',
   product: '',
   quantity: '',
-  message: ''
+  message: '',
+  // honeypot：对真人不可见，机器人填了就丢弃这次提交
+  botfield: ''
 })
 const formSubmitted = ref(false)
 const formSubmitting = ref(false)
 
+// 从产品页点"Send Email Inquiry"过来时自动带出产品，客户不用重新描述需求
+onMounted(() => {
+  const slug = typeof route.query.product === 'string' ? route.query.product : ''
+  const title = typeof route.query.title === 'string' ? route.query.title : ''
+  const categoryName = getCategoryName(slug)
+  if (categoryName) form.value.product = categoryName
+  if (title) {
+    form.value.message = `I'm interested in: ${title}${categoryName ? ` (${categoryName})` : ''}\n\n`
+  }
+})
+
 const submitForm = async () => {
   if (!form.value.name || !form.value.email || !form.value.message) return
+  // 机器人命中 honeypot：静默丢弃，不消耗 Web3Forms 的月度额度
+  if (form.value.botfield) return
   formSubmitting.value = true
   try {
     const res = await fetch('https://api.web3forms.com/submit', {
@@ -38,6 +55,13 @@ const submitForm = async () => {
     const data = await res.json()
     if (data.success) {
       formSubmitted.value = true
+      // GA4 转化事件：没有它，广告和 SEO 的询盘无法归因
+      if (process.client && window.gtag) {
+        window.gtag('event', 'generate_lead', {
+          event_category: 'inquiry',
+          event_label: form.value.product || 'general'
+        })
+      }
     } else {
       alert('Sorry, there was an error sending your message. Please try WhatsApp or email us directly.')
     }
@@ -161,12 +185,7 @@ useHead({
                     <label class="block text-sm font-medium text-gray-700 mb-1">Product Interest</label>
                     <select v-model="form.product" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm bg-white">
                       <option value="">Select a category</option>
-                      <option value="Basketball Jerseys">Basketball Jerseys</option>
-                      <option value="Football Uniforms">Football Uniforms</option>
-                      <option value="Hockey Jerseys">Hockey Jerseys</option>
-                      <option value="Yoga & Fitness Wear">Yoga & Fitness Wear</option>
-                      <option value="Running Apparel">Running Apparel</option>
-                      <option value="Team Uniforms">Team Uniforms</option>
+                      <option v-for="cat in productCategories" :key="cat.slug" :value="cat.name">{{ cat.name }}</option>
                       <option value="Other">Other</option>
                     </select>
                   </div>
@@ -186,6 +205,16 @@ useHead({
                   <label class="block text-sm font-medium text-gray-700 mb-1">Message *</label>
                   <textarea v-model="form.message" required rows="4" placeholder="Tell us about your project: design ideas, fabric preferences, timeline, etc." class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm resize-none"></textarea>
                 </div>
+                <!-- honeypot：真人看不到，填了就判定为机器人 -->
+                <input
+                  v-model="form.botfield"
+                  type="text"
+                  name="bot-field"
+                  tabindex="-1"
+                  autocomplete="off"
+                  aria-hidden="true"
+                  class="hidden"
+                />
                 <button type="submit" :disabled="formSubmitting" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-accent hover:bg-accent-dark disabled:opacity-50 text-white font-semibold px-8 py-3 rounded-lg transition-colors">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                   {{ formSubmitting ? 'Sending...' : 'Send Inquiry' }}
@@ -203,8 +232,15 @@ useHead({
                 <li class="flex items-start gap-3">
                   <svg class="w-5 h-5 text-brand mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                   <div>
-                    <div class="font-medium text-navy">Factory Address</div>
-                    <div class="text-gray-500 mt-0.5">Room 207, Building A, Jiewei Industrial Park,<br>Longgang District, Shenzhen,<br>Guangdong Province, China</div>
+                    <div class="font-medium text-navy">Business Office (Shenzhen)</div>
+                    <div class="text-gray-500 mt-0.5">Room 208, Building A, Phase 3, Jiewei Industrial City,<br>Shangmugu Community, Pinghu, Longgang District,<br>Shenzhen 518111, Guangdong, China</div>
+                  </div>
+                </li>
+                <li class="flex items-start gap-3">
+                  <svg class="w-5 h-5 text-brand mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                  <div>
+                    <div class="font-medium text-navy">Factory (Hubei)</div>
+                    <div class="text-gray-500 mt-0.5">No.121 Xianyuan Avenue North, Longhuashan,<br>Xiantao, Hubei 433099, China</div>
                   </div>
                 </li>
                 <li class="flex items-start gap-3">
@@ -237,7 +273,7 @@ useHead({
                 <div class="text-center text-gray-400">
                   <svg class="w-10 h-10 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                   <p class="text-sm">Google Maps</p>
-                  <p class="text-xs">Longgang District, Shenzhen</p>
+                  <p class="text-xs">Shenzhen office · Xiantao factory</p>
                 </div>
               </div>
             </div>

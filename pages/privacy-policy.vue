@@ -30,7 +30,7 @@
         <ul class="list-disc pl-6 space-y-3 mb-8">
           <li><strong>Account</strong> means a unique account created for You to access our Service or parts of our Service.</li>
           <li><strong>Affiliate</strong> means an entity that controls, is controlled by, or is under common control with a party, where "control" means ownership of 50% or more of the shares, equity interest or other securities entitled to vote for election of directors or other managing authority.</li>
-          <li><strong>Company</strong> (referred to as either "the Company", "We", "Us" or "Our" in this Privacy Policy) refers to TontonSports.</li>
+          <li><strong>Company</strong> (referred to as either "the Company", "We", "Us" or "Our" in this Privacy Policy) refers to <strong>Tonton Sports (Shenzhen) Co., Ltd.</strong> (图腾体育用品（深圳）有限公司), trading as TontonSports, the contracting entity for this website. Registered address: Room 208, Building A, Phase 3, Jiewei Industrial City, Shangmugu Community, Pinghu, Longgang District, Shenzhen 518111, Guangdong, China. Unified Social Credit Code: 91440300678591414G. Manufacturing is carried out by our group company Tonton Sportswear (Hubei) Co., Ltd. (图腾体育用品（湖北）有限公司), Xiantao, Hubei.</li>
           <li><strong>Cookies</strong> are small files that are placed on Your computer, mobile device or any other device by a website, containing the details of Your browsing history on that website among its many uses.</li>
           <li><strong>Country</strong> refers to: China.</li>
           <li><strong>Device</strong> means any device that can access the Service such as a computer, a cell phone or a digital tablet.</li>

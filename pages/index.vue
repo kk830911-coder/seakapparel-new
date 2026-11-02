@@ -9,10 +9,10 @@ useCanonicalUrl()
 useHead({
   title: 'Custom Sportswear Manufacturer | OEM Activewear & Gym Wear',
   meta: [
-    { name: 'description', content: 'TontonSports by Tonton Sportswear — 20+ years professional custom sportswear manufacturer. OEM/ODM activewear, gym wear, team uniforms. Low MOQ from 1 piece. ISO9001 & BSCI certified.' },
+    { name: 'description', content: 'TontonSports — 20+ years professional custom sportswear manufacturer. OEM/ODM activewear, gym wear, team uniforms. Low MOQ from 1 piece. SEDEX SMETA 4-Pillar audited factory.' },
     { name: 'keywords', content: 'custom sportswear manufacturer, activewear OEM, gym wear supplier, custom athletic clothing, team uniform manufacturer' },
     { property: 'og:title', content: 'Custom Sportswear Manufacturer | OEM Activewear | TontonSports' },
-    { property: 'og:description', content: '20+ years professional custom sportswear manufacturer. OEM/ODM, low MOQ 1pc, ISO certified. Global shipping.' },
+    { property: 'og:description', content: '20+ years professional custom sportswear manufacturer. OEM/ODM, low MOQ 1pc, SEDEX SMETA audited. Global shipping.' },
     { property: 'og:type', content: 'website' },
     { property: 'og:url', content: 'https://www.tutesports.com' }
   ],
@@ -24,7 +24,7 @@ useHead({
         "@type": "WebSite",
         "name": "TontonSports",
         "url": "https://www.tutesports.com",
-        "description": "Professional Custom Sportswear Manufacturer Since 2004",
+        "description": "Professional Custom Sportswear Manufacturer Since 2002",
         "potentialAction": {
           "@type": "SearchAction",
           "target": "https://www.tutesports.com/products?q={search_term_string}",
@@ -81,12 +81,12 @@ const processSteps = [
 ]
 
 const advantages = [
-  { title: '20+ Years Experience', desc: 'Established in 2004, two decades of sportswear manufacturing expertise serving global brands.', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
-  { title: 'AI Smart Factory', desc: '5,000m+ intelligent production facility with 200+ skilled workers and 20,000+ monthly output.', icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z' },
+  { title: '20+ Years Experience', desc: 'Teamwear manufacturing since 2002, more than two decades of expertise serving global brands.', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
+  { title: 'AI Smart Factory', desc: '5,000m+ production base with 150+ staff group-wide and a SEDEX SMETA audited line.', icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z' },
   { title: 'Low MOQ (1 Piece)', desc: 'Start your brand with as few as 1 piece. Perfect for startups, teams, and small businesses.', icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' },
   { title: 'Free Design Service', desc: 'Our professional design team creates mockups at no cost. Bring your vision to life before committing.', icon: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' },
   { title: 'Global Shipping', desc: 'Fast, reliable delivery to 60+ countries. DHL, FedEx, sea freight — we handle logistics.', icon: 'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
-  { title: 'Quality Assured', desc: 'ISO9001, BSCI, WRAP certified. Every garment undergoes strict quality inspection.', icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z' }
+  { title: 'Quality Assured', desc: 'SEDEX SMETA 4-Pillar audited production. Every garment undergoes strict quality inspection.', icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z' }
 ]
 
 const testimonials = [

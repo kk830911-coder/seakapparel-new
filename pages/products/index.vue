@@ -13,20 +13,6 @@ const { strapiUrl } = useStrapi()
 const pageSize = 20
 const currentPage = ref(1)
 
-const productCategories = [
-  { name: 'Basketball Uniform', slug: 'basketball-uniform' },
-  { name: 'Football Uniform', slug: 'football-uniform' },
-  { name: 'Badminton Jersey', slug: 'badminton-jersey' },
-  { name: 'Baseball Jersey', slug: 'baseball-jersey' },
-  { name: 'Wrestling Singlet', slug: 'wrestling-singlet' },
-  { name: 'Ice Hockey Jersey', slug: 'ice-hockey-jersey' },
-  { name: 'Rugby Jersey', slug: 'rugby-jersey' },
-  { name: 'American Football Jersey', slug: 'american-football-jersey' },
-  { name: 'Boxing Outfit', slug: 'boxing-outfit' },
-  { name: 'Sports Hoodie', slug: 'sports-hoodie' },
-  { name: 'Yoga Wear', slug: 'yoga-wear' }
-]
-
 const activeCategorySlug = computed(() => {
   const cat = route.query.category
   return typeof cat === 'string' ? cat : null

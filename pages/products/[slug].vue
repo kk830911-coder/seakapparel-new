@@ -11,21 +11,50 @@ useCanonicalUrl()
 const route = useRoute()
 const { strapiUrl } = useStrapi()
 
-// Optimize: Use pagination limit to reduce response size
-const { data: responseData } = await useFetch(() => `${strapiUrl}/api/products`, {
+const baseQuery = {
+  'filters[slug][$eq]': route.params.slug,
+  'pagination[limit]': 1
+}
+
+const { data: responseData, error: productError } = await useFetch(`${strapiUrl}/api/products`, {
   query: {
-    populate: '*',
-    'filters[slug][$eq]': route.params.slug,
-    'pagination[limit]': 1
+    ...baseQuery,
+    'populate[image]': true,
+    'populate[priceTiers]': true,
+    'populate[specRows]': true,
+    'populate[sizeChart]': true,
+    'populate[detailImages]': true,
+    'populate[category][populate][specRows]': true
   },
   key: `product-${route.params.slug}`
 })
+
+// 后端还没部署新字段（specRows / sizeChart / detailImages）时 Strapi 会返回 400，
+// 这里回退到旧的基础字段，避免整个产品页在后端升级前变成 404
+const hasProductData = () => !!(responseData.value && responseData.value.data && responseData.value.data.length)
+
+if (productError.value || !hasProductData()) {
+  const { data: legacyData } = await useFetch(`${strapiUrl}/api/products`, {
+    query: { ...baseQuery, populate: '*' },
+    key: `product-legacy-${route.params.slug}`
+  })
+  if (legacyData.value && legacyData.value.data && legacyData.value.data.length) {
+    responseData.value = legacyData.value
+  }
+}
+
+// 全站共用区块（工艺 / 认证 / 客户 / 工厂 / 物流 / 条款 / FAQ）
+const { blocks: globalBlocks } = await useGlobalProductBlocks()
 
 const product = computed(() => {
   const res = responseData.value
   if (res && Array.isArray(res.data) && res.data.length > 0) return res.data[0]
   return null
 })
+
+// 产品不存在时返回真正的 404，避免软 404 被 Google 判为低质页
+const event = useRequestEvent()
+if (!product.value && event) setResponseStatus(event, 404)
 
 const activeImageIndex = ref(0)
 const previewOpen = ref(false)
@@ -55,13 +84,76 @@ const priceNote = computed(() =>
 )
 const offerRange = computed(() => getOfferRange(product.value))
 
+// ---------- 详情区数据（参数表继承：产品 → 分类 → 全站默认） ----------
+const specRows = computed(() => resolveSpecRows(product.value, globalBlocks.value))
+const craft = computed(() => resolveCraft(product.value, globalBlocks.value, strapiUrl))
+const sizeChartUrl = computed(() => getMediaUrl(product.value?.sizeChart, strapiUrl))
+const detailShots = computed(() => getMediaList(product.value?.detailImages, strapiUrl))
+const tradeTerms = computed(() => globalBlocks.value?.tradeTerms || '')
+
+const certifications = computed(() =>
+  (globalBlocks.value?.certifications || [])
+    .map(c => ({
+      name: c?.name,
+      desc: c?.desc,
+      issuer: c?.issuer,
+      validUntil: c?.validUntil,
+      image: getMediaUrl(c?.image, strapiUrl)
+    }))
+    .filter(c => !!c.name)
+)
+
+const clients = computed(() =>
+  (globalBlocks.value?.clients || [])
+    .map(c => ({ name: c?.name, image: getMediaUrl(c?.image, strapiUrl) }))
+    .filter(c => !!c.name)
+)
+
+const factoryShots = computed(() =>
+  (globalBlocks.value?.factoryShots || [])
+    .map(s => ({ url: getMediaUrl(s?.image, strapiUrl), alt: s?.caption || '' }))
+    .filter(s => !!s.url)
+)
+
+const infoBlocks = computed(() =>
+  (globalBlocks.value?.infoBlocks || [])
+    .map(b => ({ title: b?.title, body: b?.body, images: getMediaList(b?.images, strapiUrl) }))
+    .filter(b => !!b.title && (b.body || b.images.length))
+)
+
+const detailFaqs = computed(() =>
+  (globalBlocks.value?.detailFaqs || [])
+    .map(q => ({ question: q?.question, answer: q?.answer }))
+    .filter(q => !!q.question && !!q.answer)
+)
+
+const hasSharedBlocks = computed(
+  () => !!craft.value.body || craft.value.images.length > 0 || certifications.value.length > 0 ||
+    clients.value.length > 0 || factoryShots.value.length > 0 || infoBlocks.value.length > 0
+)
+
+const anchorSections = computed(() => {
+  const list = []
+  if (specRows.value.length || sizeChartUrl.value) list.push({ id: 'specs', label: 'Specifications' })
+  if (descriptionNodes.value.length) list.push({ id: 'description', label: 'Description' })
+  if (detailShots.value.length) list.push({ id: 'gallery', label: 'Close-ups' })
+  if (craft.value.body || craft.value.images.length) list.push({ id: 'craft', label: 'Craft & Fabric' })
+  if (certifications.value.length) list.push({ id: 'certifications', label: 'Certifications' })
+  if (clients.value.length) list.push({ id: 'clients', label: 'Our Clients' })
+  if (factoryShots.value.length) list.push({ id: 'factory', label: 'Factory' })
+  if (infoBlocks.value.length) list.push({ id: 'logistics', label: 'Shipping' })
+  if (tradeTerms.value || detailFaqs.value.length) list.push({ id: 'terms', label: 'Terms & FAQ' })
+  return list
+})
+
 // 阶梯卡数量区间文案
 function tierRange(tier) {
   return tier.maxQty ? `${tier.minQty}–${tier.maxQty} pieces` : `≥${tier.minQty} pieces`
 }
 
 useSeoMeta({
-  title: () => `${getTitle(product.value) || 'Custom Sportswear'} | TontonSports`,
+  // 不要手写 "| TontonSports"：nuxt.config 的 titleTemplate 会自动追加，否则线上会出现两个品牌名
+  title: () => getTitle(product.value) || 'Custom Sportswear',
   ogTitle: () => `${getTitle(product.value) || 'Custom Sportswear'} - TontonSports`,
   description: () => {
     const title = getTitle(product.value) || 'Custom sportswear'
@@ -87,6 +179,15 @@ const productJsonLd = computed(() => {
     image: currentMainImageUrl.value ? getCleanImageUrl(currentMainImageUrl.value, strapiUrl) : '',
     brand: { '@type': 'Brand', name: 'TontonSports' },
     manufacturer: { '@type': 'Organization', name: 'TontonSports' }
+  }
+
+  // 参数表同步进结构化数据，让 Google 能读到具体规格
+  if (specRows.value.length) {
+    node.additionalProperty = specRows.value.map(row => ({
+      '@type': 'PropertyValue',
+      name: row.label,
+      value: row.value
+    }))
   }
 
   // 无价产品不输出 offers，避免出现 price: 0
@@ -145,6 +246,21 @@ useHead({
         }]
       })
     })
+    // 详情区 FAQ（有内容才输出，避免出现空 mainEntity）
+    if (detailFaqs.value.length) {
+      scripts.push({
+        type: 'application/ld+json',
+        innerHTML: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": detailFaqs.value.map(q => ({
+            "@type": "Question",
+            "name": q.question,
+            "acceptedAnswer": { "@type": "Answer", "text": q.answer }
+          }))
+        })
+      })
+    }
     return scripts
   })
 })
@@ -185,8 +301,14 @@ const handleTouchEnd = (e, next, prev) => {
       <NuxtLink to="/" class="hover:text-brand transition-colors">Home</NuxtLink>
       <span class="mx-2">/</span>
       <NuxtLink to="/products" class="hover:text-brand transition-colors">Products</NuxtLink>
-      <span class="mx-2">/</span>
-      <span class="text-gray-600">Product Detail</span>
+      <template v-if="product">
+        <template v-if="product.category?.name">
+          <span class="mx-2">/</span>
+          <NuxtLink :to="`/products?category=${product.category.slug}`" class="hover:text-brand transition-colors">{{ product.category.name }}</NuxtLink>
+        </template>
+        <span class="mx-2">/</span>
+        <span class="text-gray-600">{{ getTitle(product) }}</span>
+      </template>
     </nav>
 
     <div v-if="!product" class="text-center py-20 text-red-500 bg-red-50 rounded-xl">
@@ -280,7 +402,7 @@ const handleTouchEnd = (e, next, prev) => {
               <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471.145-.575.297-.101.15-.39.54-.72 1.09-.134.212-.249.227-.46.082-.16-.074-.729-.27-1.393-.866-.515-.462-.862-1.029-.968-1.248-.099-.21.01-.325.083-.46.075-.134.15-.247.299-.492.099-.168.049-.312-.024-.439-.075-.126-.67-1.611-.916-2.206-.242-.59-.487-.511-.67-.52-.16-.008-.341-.01-.52-.01-.18 0-.47.07-.719.347-.248.277-.944.92-1.433 1.798-.49.878-.49 1.933.028 3.774.52 1.84 1.56 3.582 2.994 4.828 1.433 1.247 3.174 1.943 4.919 2.429.64.14 1.225.227 1.655.273.695.086 1.331.074 1.843-.04 1.05-.23 3.393-1.324 3.896-2.61.503-1.287.503-2.399.354-2.61-.149-.21-.54-.339-1.13-.59z"/></svg>
               WhatsApp Inquiry
             </a>
-            <NuxtLink to="/contact" class="flex-1 inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white font-semibold py-3 sm:py-3.5 rounded-lg transition-colors text-sm sm:text-base">
+            <NuxtLink :to="`/contact?product=${getSlug(product)}&title=${encodeURIComponent(getTitle(product) || '')}`" class="flex-1 inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white font-semibold py-3 sm:py-3.5 rounded-lg transition-colors text-sm sm:text-base">
               <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
               Send Email Inquiry
             </NuxtLink>
@@ -288,28 +410,84 @@ const handleTouchEnd = (e, next, prev) => {
         </div>
       </div>
 
-      <!-- Product Description -->
-      <div class="bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
-        <h3 class="text-base sm:text-lg font-heading font-bold text-navy mb-4 sm:mb-6 pb-2 sm:pb-3 border-b border-gray-100">Product Description</h3>
-        
-        <!-- Company Profile GIFs -->
-        <div class="mb-6 sm:mb-8">
-          <img src="/xq_01.gif" alt="Tonton Sports - 22 Years of Experience Global Custom Sportswear Supplier" class="w-full" loading="lazy" />
-          <img src="/xq_02.gif" alt="Digital Printing, UPS Sewing, Laser Cutting Production Process" class="w-full" loading="lazy" />
-          <img src="/xq_03.gif" alt="Design Team, Sample Room, Sales Team" class="w-full" loading="lazy" />
-          <img src="/xq_04.gif" alt="Your Service Specialist Contact Information" class="w-full" loading="lazy" />
-        </div>
-        
-        <div class="prose max-w-none text-gray-600 text-sm sm:text-base">
-          <template v-for="(node, idx) in descriptionNodes" :key="idx">
-            <div v-if="node.type === 'image'" class="my-4 sm:my-6"><img :src="node.url" class="max-w-full rounded-lg" :alt="node.alt" /></div>
-            <component v-else-if="node.type === 'block'" :is="node.tag === 'paragraph' ? 'p' : node.tag">
-              <template v-for="(child, cIdx) in node.children" :key="cIdx">
-                <img v-if="child.type === 'image'" :src="child.url" class="my-4 sm:my-6 rounded-lg" :alt="child.alt" />
-                <span v-else>{{ child.content }}</span>
+      <!-- ===== 详情区（内容宽度 1182px，共用块来自 Strapi，后台一次维护全站生效） ===== -->
+      <div class="max-w-[1182px] mx-auto">
+        <DetailAnchorNav :sections="anchorSections" />
+
+        <div class="space-y-10 sm:space-y-14 pt-6">
+          <!-- 1. 核心参数表 -->
+          <section v-if="specRows.length || sizeChartUrl" id="specs" class="scroll-mt-[170px]">
+            <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4">Technical Specifications</h2>
+            <DetailSpecTable :rows="specRows" :size-chart="sizeChartUrl" />
+          </section>
+
+          <!-- 2. 产品描述（单品独有，后台 product.description） -->
+          <section v-if="descriptionNodes.length" id="description" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
+            <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4 sm:mb-6 pb-2 sm:pb-3 border-b border-gray-100">Product Description</h2>
+            <div class="prose max-w-none text-gray-600 text-sm sm:text-base">
+              <template v-for="(node, idx) in descriptionNodes" :key="idx">
+                <div v-if="node.type === 'image'" class="my-4 sm:my-6"><img :src="node.url" class="max-w-full rounded-lg" :alt="node.alt" loading="lazy" /></div>
+                <component v-else-if="node.type === 'block'" :is="node.tag === 'paragraph' ? 'p' : node.tag">
+                  <template v-for="(child, cIdx) in node.children" :key="cIdx">
+                    <img v-if="child.type === 'image'" :src="child.url" class="my-4 sm:my-6 rounded-lg" :alt="child.alt" loading="lazy" />
+                    <span v-else>{{ child.content }}</span>
+                  </template>
+                </component>
               </template>
-            </component>
-          </template>
+            </div>
+          </section>
+
+          <!-- 3. 细节实拍（单品独有，后台 product.detailImages） -->
+          <section v-if="detailShots.length" id="gallery" class="scroll-mt-[170px]">
+            <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4">Product Details & Close-ups</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <img
+                v-for="shot in detailShots"
+                :key="shot.url"
+                :src="shot.url"
+                :alt="shot.alt || `${getTitle(product)} detail`"
+                class="w-full h-48 sm:h-56 object-cover rounded-xl"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          </section>
+
+          <!-- 4. 全站共用区块：工艺面料 / 认证 / 客户 / 工厂 / 物流 -->
+          <ProductSharedBlocks
+            v-if="hasSharedBlocks"
+            :craft="craft"
+            :certifications="certifications"
+            :clients="clients"
+            :factory-shots="factoryShots"
+            :info-blocks="infoBlocks"
+          />
+
+          <!-- 5. 交易条款 + FAQ + 收口 CTA -->
+          <section v-if="tradeTerms || detailFaqs.length" id="terms" class="scroll-mt-[170px] space-y-6">
+            <div v-if="tradeTerms">
+              <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-3">Trade Terms</h2>
+              <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{{ tradeTerms }}</p>
+            </div>
+
+            <div v-if="detailFaqs.length">
+              <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4">FAQ</h2>
+              <DetailFaq :items="detailFaqs" />
+            </div>
+
+            <div class="bg-brand/5 border border-brand/10 rounded-xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <p class="text-sm sm:text-base text-navy font-medium text-center sm:text-left">
+                Need this style in your own design? Free mockup and quote within 24 hours.
+              </p>
+              <NuxtLink
+                :to="`/contact?product=${getSlug(product)}&title=${encodeURIComponent(getTitle(product) || '')}`"
+                class="inline-flex items-center gap-2 bg-accent hover:bg-accent-dark text-white font-semibold px-6 py-3 rounded-lg transition-colors whitespace-nowrap"
+              >
+                Send Inquiry
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+              </NuxtLink>
+            </div>
+          </section>
         </div>
       </div>
     </div>

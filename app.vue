@@ -10,16 +10,17 @@ useHead({
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "TontonSports",
-        "alternateName": "Tonton Sportswear (Shenzhen) Co., Ltd.",
+        "alternateName": "Tonton Sports (Shenzhen) Co., Ltd.",
         "url": "https://www.tutesports.com",
         "logo": "https://www.tutesports.com/logo.png",
-        "description": "Professional custom sportswear manufacturer since 2004. OEM/ODM activewear, gym wear, team uniforms. ISO9001 & BSCI certified.",
-        "foundingDate": "2004",
+        "description": "Professional custom sportswear manufacturer since 2002. OEM/ODM activewear, gym wear, team uniforms. SEDEX SMETA 4-Pillar audited factory.",
+        "foundingDate": "2008-07-23",
         "address": {
           "@type": "PostalAddress",
-          "streetAddress": "Room 207, Building A, Jiewei Industrial Park, Longgang District",
+          "streetAddress": "Room 208, Building A, Phase 3, Jiewei Industrial City, Shangmugu Community, Pinghu",
           "addressLocality": "Shenzhen",
           "addressRegion": "Guangdong Province",
+          "postalCode": "518111",
           "addressCountry": "CN"
         },
         "contactPoint": {
@@ -43,20 +44,6 @@ const scrollToTop = () => { window.scrollTo({ top: 0, behavior: 'smooth' }) }
 
 const isProductsDropdownOpen = ref(false)
 const dropdownTimeout = ref(null)
-
-const productCategories = [
-  { name: 'Basketball Uniform', slug: 'basketball-uniform' },
-  { name: 'Football Uniform', slug: 'football-uniform' },
-  { name: 'Badminton Jersey', slug: 'badminton-jersey' },
-  { name: 'Baseball Jersey', slug: 'baseball-jersey' },
-  { name: 'Wrestling Singlet', slug: 'wrestling-singlet' },
-  { name: 'Ice Hockey Jersey', slug: 'ice-hockey-jersey' },
-  { name: 'Rugby Jersey', slug: 'rugby-jersey' },
-  { name: 'American Football Jersey', slug: 'american-football-jersey' },
-  { name: 'Boxing Outfit', slug: 'boxing-outfit' },
-  { name: 'Sports Hoodie', slug: 'sports-hoodie' },
-  { name: 'Yoga Wear', slug: 'yoga-wear' }
-]
 
 const openDropdown = () => {
   if (dropdownTimeout.value) clearTimeout(dropdownTimeout.value)
@@ -121,7 +108,7 @@ const declineCookies = () => {
           </span>
           <span class="flex items-center gap-1.5">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            ISO9001 | BSCI | WRAP Certified
+            SEDEX SMETA 4-Pillar Audited
           </span>
         </div>
         <div class="flex items-center gap-5">
@@ -296,7 +283,7 @@ const declineCookies = () => {
             <div class="flex items-center gap-2 mb-4">
               <NuxtImg src="/logo.png" alt="TontonSports" class="h-8 w-auto brightness-200" />
             </div>
-            <p class="text-gray-400 leading-relaxed mb-4">Professional custom sportswear manufacturer since 2004. OEM/ODM services for teams, brands, and businesses worldwide.</p>
+            <p class="text-gray-400 leading-relaxed mb-4">Professional custom sportswear manufacturer since 2002. OEM/ODM services for teams, brands, and businesses worldwide.</p>
             <div class="flex gap-3">
               <a href="https://www.facebook.com/profile.php?id=61596052913953" target="_blank" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition-colors" aria-label="Facebook">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
@@ -367,7 +354,7 @@ const declineCookies = () => {
         <!-- Bottom bar -->
         <div class="border-t border-white/10 pt-6 text-xs text-gray-500">
           <div class="flex flex-col md:flex-row justify-between items-center gap-3">
-            <p>&copy; 2004-2026 Tonton Sportswear (Shenzhen) Co., Ltd. All Rights Reserved.</p>
+            <p>&copy; 2008–2026 Tonton Sports (Shenzhen) Co., Ltd. All Rights Reserved.</p>
             <div class="flex gap-4">
               <NuxtLink to="/privacy-policy" class="hover:text-gray-300 transition-colors">Privacy Policy</NuxtLink>
               <NuxtLink to="/terms-conditions" class="hover:text-gray-300 transition-colors">Terms & Conditions</NuxtLink>

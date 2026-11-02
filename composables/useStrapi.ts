@@ -22,6 +22,39 @@ export function getProductImageUrl(item: any, strapiUrl: string): string {
   return getCleanImageUrl(url, strapiUrl)
 }
 
+/** Cloudinary 原图 → 自动格式 + 压缩（后台走 Cloudinary 上传，URL 形如 .../upload/v123/xxx.png） */
+export function optimizeCloudinary(url: string): string {
+  if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url
+  if (url.includes('/f_auto')) return url
+  const [base, rest] = url.split('/upload/')
+  return `${base}/upload/f_auto,q_auto,w_1200/${rest}`
+}
+
+/** 单个媒体字段（可传数组，取第一张）→ 完整可访问 URL */
+export function getMediaUrl(value: any, strapiUrl: string): string {
+  if (!value) return ''
+  const media = Array.isArray(value) ? value[0] : value
+  const raw = typeof media === 'string' ? media : (media?.url || media?.attributes?.url || '')
+  if (!raw) return ''
+  return optimizeCloudinary(getCleanImageUrl(raw, strapiUrl))
+}
+
+/** 多个媒体字段 → [{ url, alt }]，兼容 Strapi 5 扁平数组与 Strapi 4 的 data[].attributes */
+export function getMediaList(value: any, strapiUrl: string): { url: string; alt: string }[] {
+  const raw = Array.isArray(value)
+    ? value
+    : (value?.data ? value.data : (value ? [value] : []))
+  return raw
+    .map((m: any) => {
+      const url = typeof m === 'string' ? m : (m?.url || m?.attributes?.url || '')
+      return {
+        url: url ? optimizeCloudinary(getCleanImageUrl(url, strapiUrl)) : '',
+        alt: (typeof m === 'string' ? '' : (m?.alternativeText || m?.attributes?.alternativeText || '')) as string
+      }
+    })
+    .filter((i: { url: string }) => !!i.url)
+}
+
 export function getSlug(item: any): string {
   return item?.slug || item?.attributes?.slug || ''
 }
