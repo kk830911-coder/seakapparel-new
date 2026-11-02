@@ -25,3 +25,6 @@ logs
 
 # Vercel build output (local)
 .vercel/
+
+# 本地保留的旧构建产物（调试用，绝不入库）
+.output_old_*/

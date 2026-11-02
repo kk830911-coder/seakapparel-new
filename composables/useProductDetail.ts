@@ -32,14 +32,12 @@ export function resolveSpecRows(product: any, globalBlocks: any): SpecRow[] {
   push(product?.category?.specRows)
   push(globalBlocks?.specDefaults)
 
-  // 兜底：从产品字段自动推导，保证任何产品都有一张像样的参数表。
-  // 不再推导 MOQ / Reference Price / Category：这三项在页面顶部（阶梯价、面包屑）已经显示，
-  // 重复出现只会让参数表显得啰嗦。
+  // 兜底：只推导 Material（产品字段里有值时才出现）。
+  // MOQ / Reference Price / Category / Sport Type 都不再推导：
+  // 这四项要么在页面顶部（阶梯价、面包屑、标题）已经显示，要么与分类重复，放进参数表只会显得啰嗦。
   const derived: SpecRow[] = []
   const material = product?.material || product?.attributes?.material
   if (material) derived.push({ label: 'Material', value: String(material) })
-  const sport = product?.sport_type || product?.attributes?.sport_type
-  if (sport) derived.push({ label: 'Sport Type', value: String(sport).replace(/_/g, ' ') })
   derived.forEach((r: SpecRow) => {
     if (!rows.some((x: SpecRow) => x.label.toLowerCase() === r.label.toLowerCase())) rows.push(r)
   })
