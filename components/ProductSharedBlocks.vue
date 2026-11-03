@@ -41,7 +41,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 </script>
 
 <template>
-  <div class="space-y-10 sm:space-y-14">
+  <div class="space-y-5 sm:space-y-7">
     <!-- 工艺与面料 -->
     <section v-if="hasCraft" id="craft" class="scroll-mt-[170px]">
       <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4">{{ craft.title }}</h2>

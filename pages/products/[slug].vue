@@ -528,7 +528,7 @@ const handleTouchEnd = (e, next, prev) => {
           </video>
         </div>
 
-        <div class="space-y-10 sm:space-y-14 pt-6">
+        <div class="space-y-5 sm:space-y-7 pt-6">
           <!-- 1. 核心参数表 -->
           <section v-if="specRows.length" id="specs" class="scroll-mt-[170px]">
             <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4">Technical Specifications</h2>
