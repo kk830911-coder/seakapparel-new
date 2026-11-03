@@ -345,12 +345,7 @@ const renderStrapiRichTextNodes = (nodes) => {
   })
 }
 const descriptionNodes = computed(() => renderStrapiRichTextNodes(product.value?.description || product.value?.attributes?.description))
-
-// 后台 descriptionHtml 字段（可直接粘贴 HTML 源码），渲染前用 DOMPurify 清洗防 XSS
-const sanitizeHtml = useSanitizeHtml()
-const rawDescriptionHtml = computed(() => product.value?.descriptionHtml || product.value?.attributes?.descriptionHtml || '')
-const descriptionHtml = computed(() => sanitizeHtml(rawDescriptionHtml.value))
-const hasDescription = computed(() => descriptionNodes.value.length > 0 || !!descriptionHtml.value)
+const hasDescription = computed(() => descriptionNodes.value.length > 0)
 
 let touchStartX = 0
 const handleTouchStart = (e) => { touchStartX = e.changedTouches[0].screenX }
@@ -507,12 +502,10 @@ const handleTouchEnd = (e, next, prev) => {
             <DetailSpecTable :rows="specRows" />
           </section>
 
-          <!-- 2. 产品描述（单品独有，后台 product.description / descriptionHtml） -->
+          <!-- 2. 产品描述（单品独有，后台 product.description） -->
           <section v-if="hasDescription" id="description" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
             <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4 sm:mb-6 pb-2 sm:pb-3 border-b border-gray-100">Product Description</h2>
             <div class="prose max-w-none text-gray-600 text-sm sm:text-base">
-              <!-- 后台直接粘贴的 HTML 源码（尺码表等），经 DOMPurify 清洗后渲染，显示在 blocks 内容上方 -->
-              <div v-if="descriptionHtml" class="description-html" v-html="descriptionHtml"></div>
               <RichTextNode v-for="(node, idx) in descriptionNodes" :key="idx" :node="node" />
               <!-- 尺码表图片：直接展示，点击放大查看原图 -->
               <div v-if="sizeChartUrl" class="mt-5">
@@ -602,14 +595,4 @@ const handleTouchEnd = (e, next, prev) => {
 .prose :deep(strong) { font-weight: 700; color: #111827; }
 .prose :deep(pre) { background: #f3f4f6; border-radius: 0.5rem; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
 .prose :deep(code) { font-family: ui-monospace, monospace; font-size: 0.9em; }
-/* 后台粘贴的 HTML（如尺码表）同样套用以上排版规则 */
-/* 粘贴的 HTML 里常带固定宽度，这里限制在容器内：表格超宽时区域横向滑动，不撑破页面 */
-.prose :deep(.description-html) { overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; }
-.prose :deep(.description-html) table { width: auto; min-width: 100%; border-collapse: collapse; margin: 1rem 0; }
-.prose :deep(.description-html) th, .prose :deep(.description-html) td { white-space: nowrap; }
-.prose :deep(.description-html) th, .prose :deep(.description-html) td { border: 1px solid #e5e7eb; padding: 0.5rem 0.75rem; text-align: left; }
-.prose :deep(.description-html) th { background: #f9fafb; font-weight: 600; }
-.prose :deep(.description-html) img { max-width: 100%; border-radius: 0.5rem; margin: 0.5rem 0; }
-.prose :deep(.description-html) ul { list-style-type: disc; padding-left: 1.5rem; margin: 0.5rem 0 1rem; }
-.prose :deep(.description-html) ol { list-style-type: decimal; padding-left: 1.5rem; margin: 0.5rem 0 1rem; }
 </style>
