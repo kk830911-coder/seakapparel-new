@@ -603,7 +603,10 @@ const handleTouchEnd = (e, next, prev) => {
 .prose :deep(pre) { background: #f3f4f6; border-radius: 0.5rem; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
 .prose :deep(code) { font-family: ui-monospace, monospace; font-size: 0.9em; }
 /* 后台粘贴的 HTML（如尺码表）同样套用以上排版规则 */
-.prose :deep(.description-html) table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+/* 粘贴的 HTML 里常带固定宽度，这里限制在容器内：表格超宽时区域横向滑动，不撑破页面 */
+.prose :deep(.description-html) { overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; }
+.prose :deep(.description-html) table { width: auto; min-width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.prose :deep(.description-html) th, .prose :deep(.description-html) td { white-space: nowrap; }
 .prose :deep(.description-html) th, .prose :deep(.description-html) td { border: 1px solid #e5e7eb; padding: 0.5rem 0.75rem; text-align: left; }
 .prose :deep(.description-html) th { background: #f9fafb; font-weight: 600; }
 .prose :deep(.description-html) img { max-width: 100%; border-radius: 0.5rem; margin: 0.5rem 0; }
