@@ -110,8 +110,8 @@ useHead({
 <template>
   <div class="max-w-7xl mx-auto px-4 py-6 md:py-12">
     <!-- Breadcrumb & Title -->
-    <div class="mb-8">
-      <nav class="text-sm text-gray-400 mb-3">
+    <div class="mb-4">
+      <nav class="text-sm text-gray-400 mb-2">
         <NuxtLink to="/" class="hover:text-brand transition-colors">Home</NuxtLink>
         <span class="mx-2">/</span>
         <NuxtLink to="/products" class="hover:text-brand transition-colors">Products</NuxtLink>
@@ -123,15 +123,15 @@ useHead({
       <h1 class="text-xl md:text-2xl font-heading font-bold text-navy mb-2 text-center">
         {{ activeCategoryName ? `Custom ${activeCategoryName} Manufacturer` : 'Custom Sportswear Products' }}
       </h1>
-      <p class="text-sm text-gray-500 leading-relaxed max-w-3xl mx-auto text-center">
+      <p class="text-sm text-gray-500 text-center">
         {{ activeCategoryName
-          ? `Browse our custom ${activeCategoryName} range — sublimation printing, OEM/ODM production, low MOQ from 1 piece and factory direct pricing. Free design mockup within 24 hours.`
-          : 'OEM/ODM custom sportswear direct from our factory — basketball jerseys, football uniforms, hockey jerseys, yoga wear and more. Low MOQ, free design, global shipping.' }}
+          ? `Sublimation printing, OEM/ODM production, low MOQ from 1 piece, free design.`
+          : 'OEM/ODM custom sportswear — low MOQ from 1 piece, free design, global shipping.' }}
       </p>
     </div>
 
     <!-- Category Filter -->
-    <div class="flex flex-wrap gap-2 mb-8 pb-6 border-b border-gray-100">
+    <div class="flex flex-wrap gap-2 mb-4 pb-3 border-b border-gray-100">
       <button @click="selectCategory(null)" :class="['px-4 py-2 rounded-lg text-sm font-medium transition-all', !activeCategorySlug ? 'bg-brand text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200']">All Products</button>
       <button v-for="cat in productCategories" :key="cat.slug" @click="selectCategory(cat.slug)" :class="['px-4 py-2 rounded-lg text-sm font-medium transition-all', activeCategorySlug === cat.slug ? 'bg-brand text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200']">{{ cat.name }}</button>
     </div>
