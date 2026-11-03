@@ -24,6 +24,8 @@ const { data: responseData, error: productError } = await useFetch(`${strapiUrl}
     'populate[specRows]': true,
     'populate[sizeChart]': true,
     'populate[detailImages]': true,
+    'populate[skuImages]': true,
+    'populate[video]': true,
     'populate[category][populate][specRows]': true
   },
   key: `product-${route.params.slug}`
@@ -60,6 +62,8 @@ const activeImageIndex = ref(0)
 const previewOpen = ref(false)
 const previewIndex = ref(0)
 const imgPreviewKey = ref(0)
+const activeSkuIndex = ref(-1)
+const sizeChartZoomOpen = ref(false)
 
 const imagesList = computed(() => {
   const data = product.value
@@ -72,7 +76,32 @@ const imagesList = computed(() => {
   return list.map(img => (typeof img === 'string' ? img : (img.url || img.attributes?.url))).filter(Boolean)
 })
 
-const currentMainImageUrl = computed(() => imagesList.value[activeImageIndex.value] || '')
+// 产品视频（单视频字段，放在图片列表末尾作为一个可选项）
+const videoUrl = computed(() => {
+  const v = product.value?.video || product.value?.attributes?.video
+  const raw = v?.url || v?.attributes?.url || (typeof v === 'string' ? v : '')
+  return raw ? getCleanImageUrl(raw, strapiUrl) : ''
+})
+
+// 画廊条目：图片 + 视频
+const galleryItems = computed(() => {
+  const items = imagesList.value.map(u => ({ type: 'image', url: u, poster: '' }))
+  if (videoUrl.value) items.push({ type: 'video', url: videoUrl.value, poster: items[0]?.url || '' })
+  return items
+})
+const currentItem = computed(() => galleryItems.value[activeImageIndex.value] || { type: 'image', url: '', poster: '' })
+
+// SKU 颜色图（后台 skuImages，点击切换主图预览）
+const skuImages = computed(() => getMediaList(product.value?.skuImages, strapiUrl))
+
+// 当前主图：选中 SKU 时显示 SKU 图，否则显示画廊当前项
+const mainImageUrl = computed(() => {
+  if (activeSkuIndex.value >= 0 && skuImages.value[activeSkuIndex.value]) return skuImages.value[activeSkuIndex.value].url
+  return currentItem.value.url
+})
+const selectSku = (i) => { activeSkuIndex.value = activeSkuIndex.value === i ? -1 : i }
+const selectGalleryItem = (i) => { activeImageIndex.value = i; activeSkuIndex.value = -1 }
+
 const previewImageUrl = computed(() => imagesList.value[previewIndex.value] || '')
 
 const priceTiers = computed(() => getPriceTiers(product.value))
@@ -134,7 +163,7 @@ const hasSharedBlocks = computed(
 
 const anchorSections = computed(() => {
   const list = []
-  if (specRows.value.length || sizeChartUrl.value) list.push({ id: 'specs', label: 'Specifications' })
+  if (specRows.value.length) list.push({ id: 'specs', label: 'Specifications' })
   if (hasDescription.value) list.push({ id: 'description', label: 'Description' })
   if (detailShots.value.length) list.push({ id: 'gallery', label: 'Close-ups' })
   if (craft.value.body || craft.value.images.length) list.push({ id: 'craft', label: 'Craft & Fabric' })
@@ -163,7 +192,7 @@ useSeoMeta({
       : `Custom ${title} from TontonSports. Reference price from $${formatPrice(priceFrom.value)}/pc, MOQ ${moq} pcs. OEM/ODM, free design, global shipping.`
   },
   ogDescription: () => `Custom ${getTitle(product.value) || 'sportswear'} at factory direct price. OEM/ODM, low MOQ, ISO certified manufacturer.`,
-  ogImage: () => currentMainImageUrl.value ? getCleanImageUrl(currentMainImageUrl.value, strapiUrl) : 'https://www.tutesports.com/og-image.jpg',
+  ogImage: () => imagesList.value[0] ? getCleanImageUrl(imagesList.value[0], strapiUrl) : 'https://www.tutesports.com/og-image.jpg',
   ogType: 'product',
   twitterCard: 'summary_large_image',
 })
@@ -176,7 +205,7 @@ const productJsonLd = computed(() => {
     '@type': 'Product',
     name: getTitle(product.value) || '',
     description: `Custom ${getTitle(product.value)} from TontonSports. Professional OEM/ODM sportswear manufacturer.`,
-    image: currentMainImageUrl.value ? getCleanImageUrl(currentMainImageUrl.value, strapiUrl) : '',
+    image: imagesList.value[0] ? getCleanImageUrl(imagesList.value[0], strapiUrl) : '',
     brand: { '@type': 'Brand', name: 'TontonSports' },
     manufacturer: { '@type': 'Organization', name: 'TontonSports' }
   }
@@ -265,8 +294,8 @@ useHead({
   })
 })
 
-const nextImage = () => { if (imagesList.value.length > 1) activeImageIndex.value = (activeImageIndex.value + 1) % imagesList.value.length }
-const prevImage = () => { if (imagesList.value.length > 1) activeImageIndex.value = (activeImageIndex.value - 1 + imagesList.value.length) % imagesList.value.length }
+const nextImage = () => { activeSkuIndex.value = -1; if (galleryItems.value.length > 1) activeImageIndex.value = (activeImageIndex.value + 1) % galleryItems.value.length }
+const prevImage = () => { activeSkuIndex.value = -1; if (galleryItems.value.length > 1) activeImageIndex.value = (activeImageIndex.value - 1 + galleryItems.value.length) % galleryItems.value.length }
 const nextPreview = () => { if (imagesList.value.length > 1) { previewIndex.value = (previewIndex.value + 1) % imagesList.value.length; imgPreviewKey.value++ } }
 const prevPreview = () => { if (imagesList.value.length > 1) { previewIndex.value = (previewIndex.value - 1 + imagesList.value.length) % imagesList.value.length; imgPreviewKey.value++ } }
 
@@ -358,19 +387,23 @@ const handleTouchEnd = (e, next, prev) => {
       <div class="grid md:grid-cols-2 gap-6 lg:gap-12">
         <!-- Image Gallery -->
         <div class="space-y-2 sm:space-y-3">
-          <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group cursor-zoom-in" @touchstart="handleTouchStart" @touchend="e => handleTouchEnd(e, nextImage, prevImage)" @click="openPreview">
-            <img :src="getCleanImageUrl(currentMainImageUrl, strapiUrl)" class="w-full h-full object-cover" :alt="`${getTitle(product) || 'Product'} - TontonSports`" loading="eager" fetchpriority="high" />
-            <button v-if="imagesList.length > 1" @click.stop="prevImage" class="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 bg-black/40 text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group" :class="currentItem.type === 'image' && activeSkuIndex < 0 ? 'cursor-zoom-in' : ''" @touchstart="handleTouchStart" @touchend="e => handleTouchEnd(e, nextImage, prevImage)" @click="currentItem.type === 'image' && activeSkuIndex < 0 && openPreview()">
+            <video v-if="currentItem.type === 'video'" :key="currentItem.url" :src="currentItem.url" :poster="currentItem.poster ? getCleanImageUrl(currentItem.poster, strapiUrl) : undefined" controls playsinline class="w-full h-full object-contain bg-black"></video>
+            <img v-else :src="getCleanImageUrl(mainImageUrl, strapiUrl)" class="w-full h-full object-cover" :alt="`${getTitle(product) || 'Product'} - TontonSports`" loading="eager" fetchpriority="high" />
+            <button v-if="galleryItems.length > 1" @click.stop="prevImage" class="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 bg-black/40 text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             </button>
-            <button v-if="imagesList.length > 1" @click.stop="nextImage" class="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 bg-black/40 text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <button v-if="galleryItems.length > 1" @click.stop="nextImage" class="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 bg-black/40 text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </button>
-            <div class="absolute bottom-2 sm:bottom-3 right-2 sm:right-3 bg-black/60 text-white px-2 sm:px-3 py-1 text-xs rounded-full">{{ activeImageIndex + 1 }} / {{ imagesList.length }}</div>
+            <div class="absolute bottom-2 sm:bottom-3 right-2 sm:right-3 bg-black/60 text-white px-2 sm:px-3 py-1 text-xs rounded-full">{{ activeImageIndex + 1 }} / {{ galleryItems.length }}</div>
           </div>
           <div class="flex gap-1.5 sm:gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-            <button v-for="(url, i) in imagesList" :key="i" @click="activeImageIndex = i" class="w-12 h-12 sm:w-16 sm:h-16 rounded-lg border-2 flex-shrink-0 overflow-hidden transition-colors" :class="activeImageIndex === i ? 'border-brand' : 'border-gray-200 hover:border-gray-300'">
-              <img :src="getCleanImageUrl(url, strapiUrl)" width="64" height="64" class="w-full h-full object-cover" :alt="`${getTitle(product) || 'Product'} thumbnail ${i + 1}`" loading="lazy" />
+            <button v-for="(item, i) in galleryItems" :key="i" @click="selectGalleryItem(i)" class="relative w-12 h-12 sm:w-16 sm:h-16 rounded-lg border-2 flex-shrink-0 overflow-hidden transition-colors" :class="activeSkuIndex < 0 && activeImageIndex === i ? 'border-brand' : 'border-gray-200 hover:border-gray-300'">
+              <img :src="getCleanImageUrl(item.type === 'video' ? item.poster : item.url, strapiUrl)" width="64" height="64" class="w-full h-full object-cover" :alt="`${getTitle(product) || 'Product'} thumbnail ${i + 1}`" loading="lazy" />
+              <span v-if="item.type === 'video'" class="absolute inset-0 flex items-center justify-center bg-black/30">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white drop-shadow" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </span>
             </button>
           </div>
         </div>
@@ -396,6 +429,22 @@ const handleTouchEnd = (e, next, prev) => {
             </div>
 
             <p class="text-xs leading-relaxed text-gray-400 mt-3">{{ priceNote }}</p>
+
+            <button v-if="sizeChartUrl" @click="sizeChartZoomOpen = true" class="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-brand hover:text-brand-dark">
+              View size chart
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </button>
+          </div>
+
+          <!-- SKU 色卡（颜色分类，后台 skuImages 上传，点击在上方主图区预览） -->
+          <div v-if="skuImages.length" class="mb-4 sm:mb-6">
+            <h3 class="font-heading font-semibold text-navy mb-2">Color / SKU</h3>
+            <div class="flex flex-wrap gap-2">
+              <button v-for="(sku, i) in skuImages" :key="i" @click="selectSku(i)" class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg border-2 overflow-hidden transition-colors" :class="activeSkuIndex === i ? 'border-brand' : 'border-gray-200 hover:border-gray-300'" :title="sku.alt || 'Color option'">
+                <img :src="sku.url" class="w-full h-full object-cover" :alt="sku.alt || 'Color option'" loading="lazy" />
+              </button>
+            </div>
+            <p class="text-xs text-gray-400 mt-1.5">Click a color to preview it in the image above</p>
           </div>
 
           <!-- Key Features -->
@@ -453,9 +502,9 @@ const handleTouchEnd = (e, next, prev) => {
 
         <div class="space-y-10 sm:space-y-14 pt-6">
           <!-- 1. 核心参数表 -->
-          <section v-if="specRows.length || sizeChartUrl" id="specs" class="scroll-mt-[170px]">
+          <section v-if="specRows.length" id="specs" class="scroll-mt-[170px]">
             <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4">Technical Specifications</h2>
-            <DetailSpecTable :rows="specRows" :size-chart="sizeChartUrl" />
+            <DetailSpecTable :rows="specRows" />
           </section>
 
           <!-- 2. 产品描述（单品独有，后台 product.description / descriptionHtml） -->
@@ -465,6 +514,11 @@ const handleTouchEnd = (e, next, prev) => {
               <!-- 后台直接粘贴的 HTML 源码（尺码表等），经 DOMPurify 清洗后渲染，显示在 blocks 内容上方 -->
               <div v-if="descriptionHtml" class="description-html" v-html="descriptionHtml"></div>
               <RichTextNode v-for="(node, idx) in descriptionNodes" :key="idx" :node="node" />
+              <!-- 尺码表图片：直接展示，点击放大查看原图 -->
+              <div v-if="sizeChartUrl" class="mt-5">
+                <img :src="sizeChartUrl" @click="sizeChartZoomOpen = true" class="w-full max-w-2xl mx-auto rounded-lg border border-gray-100 cursor-zoom-in" alt="Size chart" loading="lazy" />
+                <p class="text-xs text-gray-400 text-center mt-2">Click the image to view full size</p>
+              </div>
             </div>
           </section>
 
@@ -523,6 +577,14 @@ const handleTouchEnd = (e, next, prev) => {
         <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
       <div class="absolute bottom-4 sm:bottom-6 text-white text-xs sm:text-sm bg-black/50 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full">{{ previewIndex + 1 }} / {{ imagesList.length }}</div>
+    </div>
+
+    <!-- Size Chart Zoom -->
+    <div v-if="sizeChartZoomOpen" class="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center" @click="sizeChartZoomOpen = false">
+      <img :src="sizeChartUrl" class="max-w-[95vw] max-h-[90vh] object-contain" alt="Size chart full size" />
+      <button @click.stop="sizeChartZoomOpen = false" class="absolute top-2 sm:top-4 right-2 sm:right-4 text-white text-2xl sm:text-3xl">
+        <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
     </div>
   </div>
 </template>
