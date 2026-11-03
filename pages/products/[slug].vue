@@ -88,10 +88,10 @@ const videoUrl = computed(() => {
   return raw ? getCleanImageUrl(raw, strapiUrl) : ''
 })
 
-// 画廊条目：图片 + 视频
+// 画廊条目：视频固定在第一位，图片随后（不同产品主图数量不一样）
 const galleryItems = computed(() => {
   const items = imagesList.value.map(u => ({ type: 'image', url: u, poster: '' }))
-  if (videoUrl.value) items.push({ type: 'video', url: videoUrl.value, poster: items[0]?.url || '' })
+  if (videoUrl.value) items.unshift({ type: 'video', url: videoUrl.value, poster: items[0]?.url || '' })
   return items
 })
 const currentItem = computed(() => galleryItems.value[activeImageIndex.value] || { type: 'image', url: '', poster: '' })
