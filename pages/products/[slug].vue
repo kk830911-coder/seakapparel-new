@@ -532,7 +532,7 @@ const handleTouchEnd = (e, next, prev) => {
               <RichTextNode v-for="(node, idx) in descriptionNodes" :key="idx" :node="node" />
               <!-- 尺码表图片：直接展示，点击放大查看原图 -->
               <div v-if="sizeChartUrl" class="mt-5">
-                <img :src="sizeChartUrl" @click="sizeChartZoomOpen = true" class="w-full max-w-2xl mx-auto rounded-lg border border-gray-100 cursor-zoom-in" alt="Size chart" loading="lazy" />
+                <img :src="sizeChartUrl" @click="sizeChartZoomOpen = true" class="w-full rounded-lg border border-gray-100 cursor-zoom-in" alt="Size chart" loading="lazy" />
                 <p class="text-xs text-gray-400 text-center mt-2">Click the image to view full size</p>
               </div>
             </div>
