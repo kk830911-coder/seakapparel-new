@@ -455,7 +455,6 @@ const handleTouchEnd = (e, next, prev) => {
                   <img :src="sku.url" class="w-full h-full object-cover" :alt="sku.alt || 'Color option'" loading="lazy" />
                 </button>
               </div>
-              <p class="text-xs text-gray-400 mt-1.5">Click a color to preview it in the image above</p>
             </div>
 
             <!-- 定制信息 -->
