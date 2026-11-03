@@ -120,10 +120,10 @@ useHead({
           <span class="text-gray-600">{{ activeCategoryName }}</span>
         </template>
       </nav>
-      <h1 class="text-2xl md:text-3xl font-heading font-bold text-navy mb-2">
+      <h1 class="text-xl md:text-2xl font-heading font-bold text-navy mb-2 text-center">
         {{ activeCategoryName ? `Custom ${activeCategoryName} Manufacturer` : 'Custom Sportswear Products' }}
       </h1>
-      <p class="text-sm text-gray-500 leading-relaxed max-w-3xl">
+      <p class="text-sm text-gray-500 leading-relaxed max-w-3xl mx-auto text-center">
         {{ activeCategoryName
           ? `Browse our custom ${activeCategoryName} range — sublimation printing, OEM/ODM production, low MOQ from 1 piece and factory direct pricing. Free design mockup within 24 hours.`
           : 'OEM/ODM custom sportswear direct from our factory — basketball jerseys, football uniforms, hockey jerseys, yoga wear and more. Low MOQ, free design, global shipping.' }}
