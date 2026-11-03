@@ -36,6 +36,14 @@ const allProducts = computed(() => responseData.value?.data || [])
 
 const toSlug = (name) => name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 
+// 产品卡图片 alt：优先用后台填写的 Alternative text，没填才回退产品标题
+const getProductImageAlt = (item) => {
+  const img = item.image || item.attributes?.image
+  const first = Array.isArray(img) ? img[0] : img
+  const alt = first?.alternativeText || first?.attributes?.alternativeText
+  return alt || `${getTitle(item) || 'Custom Sportswear'} - TontonSports`
+}
+
 // 头部搜索框跳转过来的关键词（?q=）
 const searchKeyword = computed(() => (typeof route.query.q === 'string' ? route.query.q.trim() : ''))
 
@@ -164,7 +172,7 @@ useHead({
     <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
       <div v-for="item in pageProducts" :key="item.id" class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 group border border-gray-100">
         <NuxtLink :to="`/products/${getSlug(item) || item.id}`" class="aspect-square overflow-hidden block bg-gray-50 relative">
-          <img :src="getProductImageUrl(item, strapiUrl)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" :alt="`${getTitle(item) || 'Custom Sportswear'} - TontonSports`" loading="lazy" />
+          <img :src="getProductImageUrl(item, strapiUrl)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" :alt="getProductImageAlt(item)" loading="lazy" />
           <div class="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity">
             <span class="bg-brand text-white text-xs font-medium px-2.5 py-1 rounded-full">View Details</span>
           </div>

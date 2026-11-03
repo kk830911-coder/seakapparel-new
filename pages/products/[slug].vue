@@ -81,6 +81,27 @@ const imagesList = computed(() => {
   return list.map(img => (typeof img === 'string' ? img : (img.url || img.attributes?.url))).filter(Boolean)
 })
 
+// 图片 alt：优先用后台填写的 Alternative text，没填才回退产品标题
+const imageAltMap = computed(() => {
+  const data = product.value
+  if (!data) return {}
+  const list = []
+  const imgData = data.image || data.attributes?.image
+  const imagesData = data.images || data.attributes?.images
+  if (imgData) Array.isArray(imgData) ? list.push(...imgData) : list.push(imgData)
+  if (imagesData && Array.isArray(imagesData)) list.push(...imagesData)
+  const map = {}
+  list.forEach(img => {
+    if (typeof img !== 'string') {
+      const url = img.url || img.attributes?.url
+      const alt = img.alternativeText || img.attributes?.alternativeText
+      if (url && alt) map[url] = alt
+    }
+  })
+  return map
+})
+const altFor = (url, fallback) => imageAltMap.value[url] || fallback
+
 // 产品视频（单视频字段，放在图片列表末尾作为一个可选项）
 const videoUrl = computed(() => {
   const v = product.value?.video || product.value?.attributes?.video
@@ -405,7 +426,7 @@ const handleTouchEnd = (e, next, prev) => {
         <div class="space-y-2 sm:space-y-3">
           <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-300 relative group" :class="currentItem.type === 'image' && activeSkuIndex < 0 ? 'cursor-zoom-in' : ''" @touchstart="handleTouchStart" @touchend="e => handleTouchEnd(e, nextImage, prevImage)" @click="currentItem.type === 'image' && activeSkuIndex < 0 && openPreview()">
             <video v-if="currentItem.type === 'video'" :key="currentItem.url" :src="currentItem.url" :poster="currentItem.poster ? getCleanImageUrl(currentItem.poster, strapiUrl) : undefined" controls playsinline preload="metadata" class="w-full h-full object-contain bg-black"></video>
-            <img v-else :src="getCleanImageUrl(mainImageUrl, strapiUrl)" class="w-full h-full object-cover" :alt="`${getTitle(product) || 'Product'} - TontonSports`" loading="eager" fetchpriority="high" />
+            <img v-else :src="getCleanImageUrl(mainImageUrl, strapiUrl)" class="w-full h-full object-cover" :alt="altFor(mainImageUrl, `${getTitle(product) || 'Product'} - TontonSports`)" loading="eager" fetchpriority="high" />
             <button v-if="galleryItems.length > 1" @click.stop="prevImage" class="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 bg-black/40 text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             </button>
@@ -416,7 +437,7 @@ const handleTouchEnd = (e, next, prev) => {
           </div>
           <div class="flex gap-1.5 sm:gap-2 overflow-x-auto pb-1 -mx-1 px-1">
             <button v-for="(item, i) in galleryItems" :key="i" @click="selectGalleryItem(i)" class="relative w-12 h-12 sm:w-16 sm:h-16 rounded-lg border-2 flex-shrink-0 overflow-hidden transition-colors" :class="activeSkuIndex < 0 && activeImageIndex === i ? 'border-brand' : 'border-gray-200 hover:border-gray-300'">
-              <img :src="getCleanImageUrl(item.type === 'video' ? item.poster : item.url, strapiUrl)" width="64" height="64" class="w-full h-full object-cover" :alt="`${getTitle(product) || 'Product'} thumbnail ${i + 1}`" loading="lazy" />
+              <img :src="getCleanImageUrl(item.type === 'video' ? item.poster : item.url, strapiUrl)" width="64" height="64" class="w-full h-full object-cover" :alt="altFor(item.type === 'video' ? item.poster : item.url, `${getTitle(product) || 'Product'} thumbnail ${i + 1}`)" loading="lazy" />
               <span v-if="item.type === 'video'" class="absolute inset-0 flex items-center justify-center bg-black/30">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white drop-shadow" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
               </span>
@@ -603,7 +624,7 @@ const handleTouchEnd = (e, next, prev) => {
       <button @click.stop="prevPreview" class="absolute left-2 sm:left-4 text-white text-3xl sm:text-4xl">
         <svg class="w-8 h-8 sm:w-10 sm:h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
       </button>
-      <img :key="imgPreviewKey" :src="getCleanImageUrl(previewImageUrl, strapiUrl)" class="max-w-[95vw] max-h-[90vh] object-contain" :alt="`${getTitle(product) || 'Product'} preview`" />
+      <img :key="imgPreviewKey" :src="getCleanImageUrl(previewImageUrl, strapiUrl)" class="max-w-[95vw] max-h-[90vh] object-contain" :alt="altFor(previewImageUrl, `${getTitle(product) || 'Product'} preview`)" />
       <button @click.stop="nextPreview" class="absolute right-2 sm:right-4 text-white text-3xl sm:text-4xl">
         <svg class="w-8 h-8 sm:w-10 sm:h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
       </button>
