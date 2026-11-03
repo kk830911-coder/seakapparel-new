@@ -413,7 +413,7 @@ const handleTouchEnd = (e, next, prev) => {
           <h1 class="text-xl sm:text-2xl md:text-3xl font-heading font-bold text-navy mt-1 sm:mt-2">{{ getTitle(product) }}</h1>
 
           <!-- Quantity Pricing -->
-          <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm my-4 sm:my-6">
+          <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm my-2 sm:my-3">
             <template v-if="priceTiers.length">
               <div class="text-xs font-medium uppercase tracking-wide text-gray-400 mb-3">Quantity pricing</div>
               <div class="divide-y divide-gray-200">
@@ -439,7 +439,7 @@ const handleTouchEnd = (e, next, prev) => {
           </div>
 
           <!-- SKU 色卡（颜色分类，后台 skuImages 上传，点击在上方主图区预览） -->
-          <div v-if="skuImages.length" class="bg-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm mb-4 sm:mb-6">
+          <div v-if="skuImages.length" class="bg-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm mb-2 sm:mb-3">
             <h3 class="font-heading font-semibold text-navy mb-2">Color / SKU</h3>
             <div class="flex flex-wrap gap-2">
               <button v-for="(sku, i) in skuImages" :key="i" @click="selectSku(i)" class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg border-2 overflow-hidden transition-colors" :class="activeSkuIndex === i ? 'border-brand' : 'border-gray-200 hover:border-gray-300'" :title="sku.alt || 'Color option'">
@@ -450,7 +450,7 @@ const handleTouchEnd = (e, next, prev) => {
           </div>
 
           <!-- 定制信息卡（Key Features + Customization Options） -->
-          <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm mb-4 sm:mb-6">
+          <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm mb-2 sm:mb-3">
             <div class="space-y-2 sm:space-y-3">
               <h3 class="font-heading font-semibold text-navy">Key Features</h3>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
