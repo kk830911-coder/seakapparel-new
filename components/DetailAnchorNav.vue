@@ -1,6 +1,12 @@
 <script setup lang="ts">
 // 详情页锚点导航：内容多时让客户能一步跳到关心的区块
 defineProps<{ sections: { id: string; label: string }[] }>()
+
+// 点击锚点时，让选中的标签自动水平滚动到导航条中间（手机端不用手动滑动）
+const onTabClick = (e: MouseEvent) => {
+  const el = e.currentTarget as HTMLElement
+  el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+}
 </script>
 
 <template>
@@ -14,6 +20,7 @@ defineProps<{ sections: { id: string; label: string }[] }>()
         <a
           :href="`#${s.id}`"
           class="block whitespace-nowrap px-3 py-1.5 rounded-lg text-gray-600 font-medium hover:text-brand hover:bg-brand/5 transition-colors"
+          @click="onTabClick"
         >{{ s.label }}</a>
       </li>
     </ul>
