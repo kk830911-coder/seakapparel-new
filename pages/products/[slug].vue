@@ -406,17 +406,6 @@ const handleTouchEnd = (e, next, prev) => {
               </span>
             </button>
           </div>
-
-          <!-- SKU 色卡——电脑端位置（主图缩略图下方），手机端由右列卡片显示 -->
-          <div v-if="skuImages.length" class="hidden md:block bg-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm">
-            <h3 class="font-heading font-semibold text-navy mb-2">Color / SKU</h3>
-            <div class="flex flex-wrap gap-2">
-              <button v-for="(sku, i) in skuImages" :key="i" @click="selectSku(i)" class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg border-2 overflow-hidden transition-colors" :class="activeSkuIndex === i ? 'border-brand' : 'border-gray-200 hover:border-gray-300'" :title="sku.alt || 'Color option'">
-                <img :src="sku.url" class="w-full h-full object-cover" :alt="sku.alt || 'Color option'" loading="lazy" />
-              </button>
-            </div>
-            <p class="text-xs text-gray-400 mt-1.5">Click a color to preview it in the image above</p>
-          </div>
         </div>
 
         <!-- Product Info -->
@@ -449,8 +438,8 @@ const handleTouchEnd = (e, next, prev) => {
             </div>
           </div>
 
-          <!-- SKU 色卡（颜色分类，后台 skuImages 上传，点击在上方主图区预览）——手机端位置 -->
-          <div v-if="skuImages.length" class="md:hidden bg-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm mb-2 sm:mb-3">
+          <!-- SKU 色卡（颜色分类，后台 skuImages 上传，点击在上方主图区预览） -->
+          <div v-if="skuImages.length" class="bg-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm mb-2 sm:mb-3">
             <h3 class="font-heading font-semibold text-navy mb-2">Color / SKU</h3>
             <div class="flex flex-wrap gap-2">
               <button v-for="(sku, i) in skuImages" :key="i" @click="selectSku(i)" class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg border-2 overflow-hidden transition-colors" :class="activeSkuIndex === i ? 'border-brand' : 'border-gray-200 hover:border-gray-300'" :title="sku.alt || 'Color option'">
