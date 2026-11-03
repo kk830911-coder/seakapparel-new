@@ -65,6 +65,11 @@ const imgPreviewKey = ref(0)
 const activeSkuIndex = ref(-1)
 const sizeChartZoomOpen = ref(false)
 
+// 全站共用工厂视频（放前端 public/videos/factory.mp4，走 Vercel 边缘 CDN，点击才加载）
+const FACTORY_VIDEO_SRC = '/videos/factory.mp4'
+const factoryVideoVisible = ref(true)
+const onFactoryVideoError = () => (factoryVideoVisible.value = false)
+
 const imagesList = computed(() => {
   const data = product.value
   if (!data) return []
@@ -494,6 +499,20 @@ const handleTouchEnd = (e, next, prev) => {
       <!-- ===== 详情区（内容宽度 1182px，共用块来自 Strapi，后台一次维护全站生效） ===== -->
       <div class="max-w-[1182px] mx-auto">
         <DetailAnchorNav :sections="anchorSections" />
+
+        <!-- 全站共用工厂视频：preload=none + 海报图，点击才开始加载，不影响页面打开速度 -->
+        <video
+          v-if="factoryVideoVisible"
+          :src="FACTORY_VIDEO_SRC"
+          :poster="factoryShots[0]?.url"
+          controls
+          playsinline
+          preload="none"
+          class="w-full max-w-3xl mx-auto aspect-video rounded-xl shadow-sm border border-gray-100 bg-black object-contain mt-6"
+          @error="onFactoryVideoError"
+        >
+          Your browser does not support the video tag.
+        </video>
 
         <div class="space-y-10 sm:space-y-14 pt-6">
           <!-- 1. 核心参数表 -->

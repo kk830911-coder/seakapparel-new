@@ -33,11 +33,6 @@ const openLightbox = (shot: { url: string; alt?: string }) =>
   (lightbox.value = { url: shot.url, alt: shot.alt || 'Factory photo' })
 const closeLightbox = () => (lightbox.value = null)
 
-// 全站共用工厂视频（放前端 public/videos/factory.mp4，走 Vercel 边缘 CDN，点击才加载）
-const FACTORY_VIDEO_SRC = '/videos/factory.mp4'
-const factoryVideoVisible = ref(true)
-const onFactoryVideoError = () => (factoryVideoVisible.value = false)
-
 function onKeydown(e: KeyboardEvent) {
   if (e.key === 'Escape') closeLightbox()
 }
@@ -125,20 +120,6 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
     <section v-if="hasFactory" id="factory" class="scroll-mt-[170px]">
       <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-1">Inside Our Factory</h2>
       <p class="text-sm text-gray-500 mb-5">Real shots from our Hubei manufacturing base.</p>
-
-      <!-- 全站共用工厂视频：preload=none + 海报图，点击才开始加载，不影响页面打开速度 -->
-      <video
-        v-if="factoryVideoVisible"
-        :src="FACTORY_VIDEO_SRC"
-        :poster="factoryShots[0]?.url"
-        controls
-        playsinline
-        preload="none"
-        class="w-full max-w-3xl mx-auto aspect-video rounded-xl shadow-sm border border-gray-100 bg-black object-contain mb-5"
-        @error="onFactoryVideoError"
-      >
-        Your browser does not support the video tag.
-      </video>
 
       <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
         <figure
