@@ -392,10 +392,10 @@ const handleTouchEnd = (e, next, prev) => {
 
     <div v-else class="space-y-8 sm:space-y-12">
       <!-- Product Info -->
-      <div class="grid md:grid-cols-2 gap-6 lg:gap-12">
-        <!-- Image Gallery -->
-        <div class="space-y-2 sm:space-y-3">
-          <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-300 relative group" :class="currentItem.type === 'image' && activeSkuIndex < 0 ? 'cursor-zoom-in' : ''" @touchstart="handleTouchStart" @touchend="e => handleTouchEnd(e, nextImage, prevImage)" @click="currentItem.type === 'image' && activeSkuIndex < 0 && openPreview()">
+      <div class="grid md:grid-cols-2 gap-3 lg:gap-6 items-stretch">
+        <!-- Image Gallery（电脑端包成与右侧等高的卡片） -->
+        <div class="space-y-2 sm:space-y-3 md:bg-white md:rounded-xl md:border md:border-gray-200 md:shadow-sm md:p-3 md:flex md:flex-col">
+          <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square md:aspect-auto md:flex-1 md:min-h-[420px] border border-gray-300 relative group" :class="currentItem.type === 'image' && activeSkuIndex < 0 ? 'cursor-zoom-in' : ''" @touchstart="handleTouchStart" @touchend="e => handleTouchEnd(e, nextImage, prevImage)" @click="currentItem.type === 'image' && activeSkuIndex < 0 && openPreview()">
             <video v-if="currentItem.type === 'video'" :key="currentItem.url" :src="currentItem.url" :poster="currentItem.poster ? getCleanImageUrl(currentItem.poster, strapiUrl) : undefined" controls playsinline preload="metadata" class="w-full h-full object-contain bg-black"></video>
             <img v-else :src="getCleanImageUrl(mainImageUrl, strapiUrl)" class="w-full h-full object-cover" :alt="`${getTitle(product) || 'Product'} - TontonSports`" loading="eager" fetchpriority="high" />
             <button v-if="galleryItems.length > 1" @click.stop="prevImage" class="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 bg-black/40 text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -419,7 +419,7 @@ const handleTouchEnd = (e, next, prev) => {
         <!-- Product Info -->
         <div class="flex flex-col">
           <!-- 产品信息大卡片：标题 / 价格 / SKU / 定制信息，横线分割（类国际站样式） -->
-          <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm my-2 sm:my-3">
+          <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm mb-2 sm:mb-3 flex-1">
             <h1 class="text-lg font-bold text-[#222222]">{{ getTitle(product) }}</h1>
 
             <!-- 价格 -->
