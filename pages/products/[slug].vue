@@ -135,7 +135,7 @@ const hasSharedBlocks = computed(
 const anchorSections = computed(() => {
   const list = []
   if (specRows.value.length || sizeChartUrl.value) list.push({ id: 'specs', label: 'Specifications' })
-  if (descriptionNodes.value.length) list.push({ id: 'description', label: 'Description' })
+  if (hasDescription.value) list.push({ id: 'description', label: 'Description' })
   if (detailShots.value.length) list.push({ id: 'gallery', label: 'Close-ups' })
   if (craft.value.body || craft.value.images.length) list.push({ id: 'craft', label: 'Craft & Fabric' })
   if (certifications.value.length) list.push({ id: 'certifications', label: 'Certifications' })
@@ -273,18 +273,55 @@ const prevPreview = () => { if (imagesList.value.length > 1) { previewIndex.valu
 const openPreview = async () => { previewIndex.value = activeImageIndex.value; imgPreviewKey.value++; await nextTick(); previewOpen.value = true }
 const closePreview = async () => { previewOpen.value = false; await nextTick(); imgPreviewKey.value++ }
 
+// Strapi blocks 节点 → 真实 HTML 标签（heading→h1~h6、list→ul/ol、list-item→li、quote→blockquote）
+const blockTagMap = (node) => {
+  switch (node.type) {
+    case 'paragraph': return 'p'
+    case 'heading': return `h${Math.min(Number(node.level) || 1, 6)}`
+    case 'list': return node.format === 'ordered' ? 'ol' : 'ul'
+    case 'list-item': return 'li'
+    case 'quote': return 'blockquote'
+    case 'code': return 'pre'
+    default: return node.type
+  }
+}
+// 行内文本：按后台设置的加粗/斜体/下划线/删除线/代码映射标签
+const inlineTagMap = (node) => {
+  if (node.code) return 'code'
+  if (node.bold) return 'strong'
+  if (node.italic) return 'em'
+  if (node.underline) return 'u'
+  if (node.strikethrough) return 's'
+  return 'span'
+}
 const renderStrapiRichTextNodes = (nodes) => {
   if (!nodes || !Array.isArray(nodes)) return []
-  return nodes.map(node => ({
-    type: node.type === 'image' ? 'image' : (node.type === 'text' ? 'text' : 'block'),
-    url: node.image?.url ? getCleanImageUrl(node.image.url, strapiUrl) : null,
-    alt: node.image?.alternativeText || 'Product',
-    content: node.text,
-    tag: node.type,
-    children: renderStrapiRichTextNodes(node.children || [])
-  }))
+  return nodes.map(node => {
+    if (node.type === 'image') {
+      return {
+        type: 'image',
+        url: node.image?.url ? getCleanImageUrl(node.image.url, strapiUrl) : null,
+        alt: node.image?.alternativeText || 'Product',
+        content: node.text, tag: 'p', children: []
+      }
+    }
+    return {
+      type: node.type === 'text' ? 'text' : 'block',
+      url: null,
+      alt: '',
+      content: node.text,
+      tag: node.type === 'text' ? inlineTagMap(node) : blockTagMap(node),
+      children: renderStrapiRichTextNodes(node.children || [])
+    }
+  })
 }
 const descriptionNodes = computed(() => renderStrapiRichTextNodes(product.value?.description || product.value?.attributes?.description))
+
+// 后台 descriptionHtml 字段（可直接粘贴 HTML 源码），渲染前用 DOMPurify 清洗防 XSS
+const sanitizeHtml = useSanitizeHtml()
+const rawDescriptionHtml = computed(() => product.value?.descriptionHtml || product.value?.attributes?.descriptionHtml || '')
+const descriptionHtml = computed(() => sanitizeHtml(rawDescriptionHtml.value))
+const hasDescription = computed(() => descriptionNodes.value.length > 0 || !!descriptionHtml.value)
 
 let touchStartX = 0
 const handleTouchStart = (e) => { touchStartX = e.changedTouches[0].screenX }
@@ -421,19 +458,22 @@ const handleTouchEnd = (e, next, prev) => {
             <DetailSpecTable :rows="specRows" :size-chart="sizeChartUrl" />
           </section>
 
-          <!-- 2. 产品描述（单品独有，后台 product.description） -->
-          <section v-if="descriptionNodes.length" id="description" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
+          <!-- 2. 产品描述（单品独有，后台 product.description / descriptionHtml） -->
+          <section v-if="hasDescription" id="description" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
             <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4 sm:mb-6 pb-2 sm:pb-3 border-b border-gray-100">Product Description</h2>
             <div class="prose max-w-none text-gray-600 text-sm sm:text-base">
               <template v-for="(node, idx) in descriptionNodes" :key="idx">
                 <div v-if="node.type === 'image'" class="my-4 sm:my-6"><img :src="node.url" class="max-w-full rounded-lg" :alt="node.alt" loading="lazy" /></div>
-                <component v-else-if="node.type === 'block'" :is="node.tag === 'paragraph' ? 'p' : node.tag">
+                <component v-else-if="node.type === 'block' && node.tag === 'pre'" :is="node.tag"><code>{{ node.children.map(c => c.content).join('\n') }}</code></component>
+                <component v-else-if="node.type === 'block'" :is="node.tag">
                   <template v-for="(child, cIdx) in node.children" :key="cIdx">
                     <img v-if="child.type === 'image'" :src="child.url" class="my-4 sm:my-6 rounded-lg" :alt="child.alt" loading="lazy" />
-                    <span v-else>{{ child.content }}</span>
+                    <component v-else :is="child.tag || 'span'">{{ child.content }}</component>
                   </template>
                 </component>
               </template>
+              <!-- 后台直接粘贴的 HTML 源码（尺码表等），经 DOMPurify 清洗后渲染 -->
+              <div v-if="descriptionHtml" class="description-html" v-html="descriptionHtml"></div>
             </div>
           </section>
 
@@ -497,6 +537,23 @@ const handleTouchEnd = (e, next, prev) => {
 </template>
 
 <style scoped>
-.prose :deep(h1), .prose :deep(h2), .prose :deep(h3) { font-weight: 700; margin: 1.5rem 0 0.75rem; color: #0A1628; }
+.prose :deep(h1) { font-size: 1.75rem; font-weight: 700; margin: 1.75rem 0 0.875rem; color: #0A1628; line-height: 1.3; }
+.prose :deep(h2) { font-size: 1.375rem; font-weight: 700; margin: 1.5rem 0 0.75rem; color: #0A1628; line-height: 1.35; }
+.prose :deep(h3), .prose :deep(h4), .prose :deep(h5), .prose :deep(h6) { font-size: 1.125rem; font-weight: 600; margin: 1.25rem 0 0.625rem; color: #0A1628; }
 .prose :deep(p) { margin-bottom: 0.75rem; line-height: 1.75; }
+.prose :deep(ul), .prose :deep(ol) { margin: 0 0 1rem; padding-left: 1.5rem; }
+.prose :deep(ul) { list-style-type: disc; }
+.prose :deep(ol) { list-style-type: decimal; }
+.prose :deep(li) { margin-bottom: 0.5rem; line-height: 1.75; }
+.prose :deep(blockquote) { border-left: 4px solid #e5e7eb; padding-left: 1rem; color: #4b5563; font-style: italic; margin: 1rem 0; }
+.prose :deep(strong) { font-weight: 700; color: #111827; }
+.prose :deep(pre) { background: #f3f4f6; border-radius: 0.5rem; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
+.prose :deep(code) { font-family: ui-monospace, monospace; font-size: 0.9em; }
+/* 后台粘贴的 HTML（如尺码表）同样套用以上排版规则 */
+.prose :deep(.description-html) table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.prose :deep(.description-html) th, .prose :deep(.description-html) td { border: 1px solid #e5e7eb; padding: 0.5rem 0.75rem; text-align: left; }
+.prose :deep(.description-html) th { background: #f9fafb; font-weight: 600; }
+.prose :deep(.description-html) img { max-width: 100%; border-radius: 0.5rem; margin: 0.5rem 0; }
+.prose :deep(.description-html) ul { list-style-type: disc; padding-left: 1.5rem; margin: 0.5rem 0 1rem; }
+.prose :deep(.description-html) ol { list-style-type: decimal; padding-left: 1.5rem; margin: 0.5rem 0 1rem; }
 </style>
