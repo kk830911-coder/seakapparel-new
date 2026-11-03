@@ -185,6 +185,14 @@ function tierRange(tier) {
   return tier.maxQty ? `${tier.minQty}–${tier.maxQty} pieces` : `≥${tier.minQty} pieces`
 }
 
+// 价格拆成 元/分 两段：$5.9 → { dollars: '5', cents: '90' }；整数 $5 → { dollars: '5', cents: '' }
+function splitPrice(v) {
+  const n = Number(v)
+  if (!isFinite(n)) return { dollars: String(v), cents: '' }
+  const cents = Math.round((n - Math.floor(n)) * 100)
+  return { dollars: String(Math.floor(n)), cents: cents ? String(cents).padStart(2, '0') : '' }
+}
+
 useSeoMeta({
   // 不要手写 "| TontonSports"：nuxt.config 的 titleTemplate 会自动追加，否则线上会出现两个品牌名
   title: () => getTitle(product.value) || 'Custom Sportswear',
@@ -414,15 +422,14 @@ const handleTouchEnd = (e, next, prev) => {
 
           <!-- Quantity Pricing -->
           <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm my-2 sm:my-3">
-            <template v-if="priceTiers.length">
-              <div class="text-xs font-medium uppercase tracking-wide text-gray-400 mb-3">Quantity pricing</div>
-              <div class="divide-y divide-gray-200">
-                <div v-for="tier in priceTiers" :key="tier.minQty" class="flex justify-between items-center py-2">
-                  <span class="text-sm sm:text-base text-gray-600">{{ tierRange(tier) }}</span>
-                  <span class="font-heading font-bold text-brand text-lg sm:text-xl whitespace-nowrap">${{ formatPrice(tier.unitPrice) }}</span>
+            <div v-if="priceTiers.length" class="flex flex-wrap gap-x-6 sm:gap-x-8 gap-y-3">
+              <div v-for="tier in priceTiers" :key="tier.minQty">
+                <div class="text-navy whitespace-nowrap">
+                  <span class="text-sm sm:text-base align-top font-semibold">$</span><span class="font-heading font-bold text-xl sm:text-2xl">{{ splitPrice(tier.unitPrice).dollars }}</span><span v-if="splitPrice(tier.unitPrice).cents" class="text-sm sm:text-base align-top font-semibold">{{ splitPrice(tier.unitPrice).cents }}</span>
                 </div>
+                <div class="text-xs text-gray-500 mt-0.5">{{ tierRange(tier) }}</div>
               </div>
-            </template>
+            </div>
             <div v-else class="flex justify-between items-center">
               <span class="text-gray-500 text-sm">Unit price</span>
               <span class="text-sm font-semibold text-navy">Price on request</span>
