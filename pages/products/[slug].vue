@@ -387,7 +387,7 @@ const handleTouchEnd = (e, next, prev) => {
       <div class="grid md:grid-cols-2 gap-6 lg:gap-12">
         <!-- Image Gallery -->
         <div class="space-y-2 sm:space-y-3">
-          <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-100 relative group" :class="currentItem.type === 'image' && activeSkuIndex < 0 ? 'cursor-zoom-in' : ''" @touchstart="handleTouchStart" @touchend="e => handleTouchEnd(e, nextImage, prevImage)" @click="currentItem.type === 'image' && activeSkuIndex < 0 && openPreview()">
+          <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-300 relative group" :class="currentItem.type === 'image' && activeSkuIndex < 0 ? 'cursor-zoom-in' : ''" @touchstart="handleTouchStart" @touchend="e => handleTouchEnd(e, nextImage, prevImage)" @click="currentItem.type === 'image' && activeSkuIndex < 0 && openPreview()">
             <video v-if="currentItem.type === 'video'" :key="currentItem.url" :src="currentItem.url" :poster="currentItem.poster ? getCleanImageUrl(currentItem.poster, strapiUrl) : undefined" controls playsinline preload="metadata" class="w-full h-full object-contain bg-black"></video>
             <img v-else :src="getCleanImageUrl(mainImageUrl, strapiUrl)" class="w-full h-full object-cover" :alt="`${getTitle(product) || 'Product'} - TontonSports`" loading="eager" fetchpriority="high" />
             <button v-if="galleryItems.length > 1" @click.stop="prevImage" class="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 bg-black/40 text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -413,7 +413,7 @@ const handleTouchEnd = (e, next, prev) => {
           <h1 class="text-xl sm:text-2xl md:text-3xl font-heading font-bold text-navy mt-1 sm:mt-2">{{ getTitle(product) }}</h1>
 
           <!-- Quantity Pricing -->
-          <div class="bg-gray-50 rounded-xl p-4 sm:p-5 my-4 sm:my-6">
+          <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm my-4 sm:my-6">
             <template v-if="priceTiers.length">
               <div class="text-xs font-medium uppercase tracking-wide text-gray-400 mb-3">Quantity pricing</div>
               <div class="divide-y divide-gray-200">
@@ -430,14 +430,16 @@ const handleTouchEnd = (e, next, prev) => {
 
             <p class="text-xs leading-relaxed text-gray-400 mt-3">{{ priceNote }}</p>
 
-            <button v-if="sizeChartUrl" @click="sizeChartZoomOpen = true" class="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-brand hover:text-brand-dark">
-              View size chart
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-            </button>
+            <div v-if="sizeChartUrl" class="mt-2 flex justify-end">
+              <button @click="sizeChartZoomOpen = true" class="inline-flex items-center gap-1.5 text-sm font-medium text-brand hover:text-brand-dark">
+                View size chart
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+              </button>
+            </div>
           </div>
 
           <!-- SKU 色卡（颜色分类，后台 skuImages 上传，点击在上方主图区预览） -->
-          <div v-if="skuImages.length" class="mb-4 sm:mb-6">
+          <div v-if="skuImages.length" class="bg-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm mb-4 sm:mb-6">
             <h3 class="font-heading font-semibold text-navy mb-2">Color / SKU</h3>
             <div class="flex flex-wrap gap-2">
               <button v-for="(sku, i) in skuImages" :key="i" @click="selectSku(i)" class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg border-2 overflow-hidden transition-colors" :class="activeSkuIndex === i ? 'border-brand' : 'border-gray-200 hover:border-gray-300'" :title="sku.alt || 'Color option'">
@@ -447,38 +449,40 @@ const handleTouchEnd = (e, next, prev) => {
             <p class="text-xs text-gray-400 mt-1.5">Click a color to preview it in the image above</p>
           </div>
 
-          <!-- Key Features -->
-          <div class="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
-            <h3 class="font-heading font-semibold text-navy">Key Features</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
-              <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
-                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                Custom Design & Logo
-              </div>
-              <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
-                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                Sublimation / Screen Print
-              </div>
-              <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
-                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                Quick-dry & Breathable
-              </div>
-              <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
-                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                Custom Size & Label
+          <!-- 定制信息卡（Key Features + Customization Options） -->
+          <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm mb-4 sm:mb-6">
+            <div class="space-y-2 sm:space-y-3">
+              <h3 class="font-heading font-semibold text-navy">Key Features</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
+                <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+                  <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  Custom Design & Logo
+                </div>
+                <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+                  <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  Sublimation / Screen Print
+                </div>
+                <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+                  <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  Quick-dry & Breathable
+                </div>
+                <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+                  <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  Custom Size & Label
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Customization Options -->
-          <div class="border-t border-gray-100 pt-4 sm:pt-5 mb-4 sm:mb-6">
-            <h3 class="font-heading font-semibold text-navy mb-2 sm:mb-3">Customization Options</h3>
-            <div class="flex flex-wrap gap-1.5 sm:gap-2">
-              <span class="text-xs bg-brand/10 text-brand px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full font-medium">Custom Logo</span>
-              <span class="text-xs bg-brand/10 text-brand px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full font-medium">Custom Colors</span>
-              <span class="text-xs bg-brand/10 text-brand px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full font-medium">Custom Labels</span>
-              <span class="text-xs bg-brand/10 text-brand px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full font-medium">Custom Packaging</span>
-              <span class="text-xs bg-brand/10 text-brand px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full font-medium">Custom Sizes</span>
+            <!-- Customization Options -->
+            <div class="border-t border-gray-100 pt-4 sm:pt-5 mt-4 sm:mt-5">
+              <h3 class="font-heading font-semibold text-navy mb-2 sm:mb-3">Customization Options</h3>
+              <div class="flex flex-wrap gap-1.5 sm:gap-2">
+                <span class="text-xs bg-brand/10 text-brand px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full font-medium">Custom Logo</span>
+                <span class="text-xs bg-brand/10 text-brand px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full font-medium">Custom Colors</span>
+                <span class="text-xs bg-brand/10 text-brand px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full font-medium">Custom Labels</span>
+                <span class="text-xs bg-brand/10 text-brand px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full font-medium">Custom Packaging</span>
+                <span class="text-xs bg-brand/10 text-brand px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full font-medium">Custom Sizes</span>
+              </div>
             </div>
           </div>
 
