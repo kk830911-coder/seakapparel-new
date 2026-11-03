@@ -462,18 +462,9 @@ const handleTouchEnd = (e, next, prev) => {
           <section v-if="hasDescription" id="description" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
             <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4 sm:mb-6 pb-2 sm:pb-3 border-b border-gray-100">Product Description</h2>
             <div class="prose max-w-none text-gray-600 text-sm sm:text-base">
-              <template v-for="(node, idx) in descriptionNodes" :key="idx">
-                <div v-if="node.type === 'image'" class="my-4 sm:my-6"><img :src="node.url" class="max-w-full rounded-lg" :alt="node.alt" loading="lazy" /></div>
-                <component v-else-if="node.type === 'block' && node.tag === 'pre'" :is="node.tag"><code>{{ node.children.map(c => c.content).join('\n') }}</code></component>
-                <component v-else-if="node.type === 'block'" :is="node.tag">
-                  <template v-for="(child, cIdx) in node.children" :key="cIdx">
-                    <img v-if="child.type === 'image'" :src="child.url" class="my-4 sm:my-6 rounded-lg" :alt="child.alt" loading="lazy" />
-                    <component v-else :is="child.tag || 'span'">{{ child.content }}</component>
-                  </template>
-                </component>
-              </template>
-              <!-- 后台直接粘贴的 HTML 源码（尺码表等），经 DOMPurify 清洗后渲染 -->
+              <!-- 后台直接粘贴的 HTML 源码（尺码表等），经 DOMPurify 清洗后渲染，显示在 blocks 内容上方 -->
               <div v-if="descriptionHtml" class="description-html" v-html="descriptionHtml"></div>
+              <RichTextNode v-for="(node, idx) in descriptionNodes" :key="idx" :node="node" />
             </div>
           </section>
 
