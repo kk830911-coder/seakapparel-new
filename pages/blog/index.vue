@@ -83,9 +83,9 @@ useHead({
           <div class="p-6 flex-1 flex flex-col justify-between">
             <div>
               <span class="text-xs font-semibold text-brand tracking-wider uppercase mb-2 block">{{ item.blog_category || item.attributes?.blog_category || 'New Products' }}</span>
-              <h3 class="font-bold text-xl text-gray-800 line-clamp-2 hover:text-brand transition-colors">
+              <h2 class="font-bold text-xl text-gray-800 line-clamp-2 hover:text-brand transition-colors">
                 <NuxtLink :to="`/blog/${item.slug || item.attributes?.slug}`">{{ item.title || item.attributes?.title }}</NuxtLink>
-              </h3>
+              </h2>
               <p class="text-sm text-gray-500 line-clamp-3 mt-2 leading-relaxed">{{ item.description || item.attributes?.description || 'Click to read full story...' }}</p>
             </div>
             <div class="mt-5 pt-4 border-t border-gray-100 flex justify-between items-center">

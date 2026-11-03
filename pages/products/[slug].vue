@@ -195,10 +195,10 @@ function splitPrice(v) {
 
 useSeoMeta({
   // 不要手写 "| TontonSports"：nuxt.config 的 titleTemplate 会自动追加，否则线上会出现两个品牌名
-  title: () => getTitle(product.value) || 'Custom Sportswear',
-  ogTitle: () => `${getTitle(product.value) || 'Custom Sportswear'} - TontonSports`,
+  title: () => (getTitle(product.value) || 'Custom Sportswear').trim(),
+  ogTitle: () => `${(getTitle(product.value) || 'Custom Sportswear').trim()} - TontonSports`,
   description: () => {
-    const title = getTitle(product.value) || 'Custom sportswear'
+    const title = (getTitle(product.value) || 'Custom sportswear').trim()
     const moq = getMoq(product.value)
     return priceFrom.value === null
       ? `Custom ${title} from TontonSports. OEM/ODM manufacturer, MOQ ${moq} pcs, free design and a detailed quote within 24 hours.`
@@ -216,11 +216,13 @@ const productJsonLd = computed(() => {
   const node = {
     '@context': 'https://schema.org',
     '@type': 'Product',
-    name: getTitle(product.value) || '',
-    description: `Custom ${getTitle(product.value)} from TontonSports. Professional OEM/ODM sportswear manufacturer.`,
-    image: imagesList.value[0] ? getCleanImageUrl(imagesList.value[0], strapiUrl) : '',
-    brand: { '@type': 'Brand', name: 'TontonSports' },
-    manufacturer: { '@type': 'Organization', name: 'TontonSports' }
+    name: (getTitle(product.value) || '').trim(),
+    description: `Custom ${(getTitle(product.value) || '').trim()} from TontonSports. Professional OEM/ODM sportswear manufacturer.`,
+    // 多图有助于 Google 图片搜索与商品富摘要
+    image: imagesList.value.slice(0, 6).map(u => getCleanImageUrl(u, strapiUrl)).filter(Boolean),
+    url: `https://www.tutesports.com/products/${route.params.slug}`,
+    brand: { '@type': 'Brand', name: 'TontonSports', url: 'https://www.tutesports.com' },
+    manufacturer: { '@type': 'Organization', name: 'TontonSports', url: 'https://www.tutesports.com' }
   }
 
   // 参数表同步进结构化数据，让 Google 能读到具体规格
@@ -234,7 +236,8 @@ const productJsonLd = computed(() => {
 
   // 无价产品不输出 offers，避免出现 price: 0
   if (range) {
-    const seller = { '@type': 'Organization', name: 'TontonSports' }
+    const seller = { '@type': 'Organization', name: 'TontonSports', url: 'https://www.tutesports.com' }
+    const productUrl = `https://www.tutesports.com/products/${route.params.slug}`
     node.offers = range.count > 1
       ? {
           '@type': 'AggregateOffer',
@@ -243,6 +246,8 @@ const productJsonLd = computed(() => {
           highPrice: formatPrice(range.high),
           offerCount: range.count,
           availability: 'https://schema.org/InStock',
+          itemCondition: 'https://schema.org/NewCondition',
+          url: productUrl,
           seller
         }
       : {
@@ -250,6 +255,8 @@ const productJsonLd = computed(() => {
           priceCurrency: 'USD',
           price: formatPrice(range.low),
           availability: 'https://schema.org/InStock',
+          itemCondition: 'https://schema.org/NewCondition',
+          url: productUrl,
           seller
         }
   }
@@ -319,7 +326,8 @@ const closePreview = async () => { previewOpen.value = false; await nextTick(); 
 const blockTagMap = (node) => {
   switch (node.type) {
     case 'paragraph': return 'p'
-    case 'heading': return `h${Math.min(Number(node.level) || 1, 6)}`
+    // 详情页已有产品标题作为唯一 H1，CMS 里的标题最低降为 H2，避免一页多个 H1
+    case 'heading': return `h${Math.min(Math.max(Number(node.level) || 2, 2), 6)}`
     case 'list': return node.format === 'ordered' ? 'ol' : 'ul'
     case 'list-item': return 'li'
     case 'quote': return 'blockquote'

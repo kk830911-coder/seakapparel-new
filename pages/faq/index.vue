@@ -78,7 +78,7 @@ useHead({
     <div v-else class="space-y-5">
       <div v-for="item in faqList" :key="item.id" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
         <NuxtLink :to="`/faq/${item.slug || item.attributes?.slug}`" class="block group">
-          <h3 class="font-bold text-lg text-gray-900 group-hover:text-brand transition-colors mb-3">{{ item.title || item.attributes?.title }}</h3>
+          <h2 class="font-bold text-lg text-gray-900 group-hover:text-brand transition-colors mb-3">{{ item.title || item.attributes?.title }}</h2>
         </NuxtLink>
         <div class="text-gray-600 leading-relaxed"><span v-html="renderFaqContent(item.content || item.attributes?.content)"></span></div>
         <div class="mt-4 pt-3 border-t border-gray-100">

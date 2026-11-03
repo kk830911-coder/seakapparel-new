@@ -35,7 +35,8 @@ export default defineNuxtConfig({
         { property: 'og:title', content: 'Custom Sportswear Manufacturer | OEM Activewear | TontonSports' },
         { property: 'og:description', content: '20+ years professional custom sportswear manufacturer. OEM/ODM, low MOQ 1pc, SEDEX SMETA audited. Global shipping.' },
         { property: 'og:image', content: 'https://www.tutesports.com/og-image.jpg' },
-        { property: 'og:url', content: 'https://www.tutesports.com' },
+        // og:url 由每个页面通过 useCanonicalUrl 自动生成，这里不能写死，
+        // 否则所有子页面（尤其产品详情页）的 og:url 都会指向首页
         { property: 'og:locale', content: 'en_US' },
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:title', content: 'Custom Sportswear Manufacturer | OEM Activewear | TontonSports' },

@@ -42,6 +42,17 @@ const isMenuOpen = ref(false)
 const toggleMenu = () => { isMenuOpen.value = !isMenuOpen.value }
 const scrollToTop = () => { window.scrollTo({ top: 0, behavior: 'smooth' }) }
 
+// 产品搜索：提交后跳到 /products?q=，由产品列表页过滤标题/描述
+const route = useRoute()
+const router = useRouter()
+const searchQuery = ref(typeof route.query.q === 'string' ? route.query.q : '')
+watch(() => route.query.q, (q) => { searchQuery.value = typeof q === 'string' ? q : '' })
+const submitSearch = () => {
+  const q = searchQuery.value.trim()
+  isMenuOpen.value = false
+  router.push(q ? { path: '/products', query: { q } } : { path: '/products' })
+}
+
 const isProductsDropdownOpen = ref(false)
 const dropdownTimeout = ref(null)
 
@@ -207,10 +218,25 @@ const declineCookies = () => {
           <NuxtLink to="/contact" active-class="!text-white bg-brand" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">CONTACT US</NuxtLink>
         </nav>
 
-        <NuxtLink to="/contact" class="hidden md:inline-flex items-center gap-2 bg-accent hover:bg-accent-dark text-white font-bold text-sm px-5 py-2 rounded transition-colors ml-auto">
-          GET QUOTE
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-        </NuxtLink>
+        <div class="hidden md:flex items-center gap-3 ml-auto">
+          <!-- 产品搜索框 -->
+          <form @submit.prevent="submitSearch" class="flex items-center" role="search">
+            <input
+              v-model="searchQuery"
+              type="search"
+              placeholder="Search products..."
+              aria-label="Search products"
+              class="w-32 lg:w-44 bg-white/10 border border-white/20 rounded-l px-3 py-1.5 text-sm text-white placeholder-white/50 focus:outline-none focus:bg-white focus:text-gray-800 focus:placeholder-gray-400 transition-colors"
+            />
+            <button type="submit" class="bg-brand hover:bg-brand-dark text-white px-2.5 py-[7px] rounded-r border border-brand transition-colors" aria-label="Search">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z"/></svg>
+            </button>
+          </form>
+          <NuxtLink to="/contact" class="inline-flex items-center gap-2 bg-accent hover:bg-accent-dark text-white font-bold text-sm px-5 py-2 rounded transition-colors">
+            GET QUOTE
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </NuxtLink>
+        </div>
       </div>
 
       <!-- Mobile menu -->
@@ -223,6 +249,19 @@ const declineCookies = () => {
         leave-to-class="opacity-0 -translate-y-2"
       >
         <nav v-if="isMenuOpen" class="md:hidden absolute top-full left-0 w-full bg-white border-b border-gray-200 shadow-lg py-4 px-6 flex flex-col gap-3 z-50 font-medium text-gray-700 max-h-[70vh] overflow-y-auto">
+          <!-- 产品搜索框 -->
+          <form @submit.prevent="submitSearch" class="flex items-center gap-2 pb-3 border-b border-gray-100" role="search">
+            <input
+              v-model="searchQuery"
+              type="search"
+              placeholder="Search products..."
+              aria-label="Search products"
+              class="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand"
+            />
+            <button type="submit" class="bg-navy text-white px-3 py-2 rounded-lg hover:bg-navy-light transition-colors" aria-label="Search">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z"/></svg>
+            </button>
+          </form>
           <NuxtLink to="/" active-class="!text-brand font-semibold" @click="isMenuOpen = false" class="py-1">Home</NuxtLink>
           <div>
             <button @click="isMobileProductsOpen = !isMobileProductsOpen" class="flex items-center justify-between w-full py-1 text-left">

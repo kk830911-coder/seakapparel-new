@@ -6,6 +6,8 @@ definePageMeta({
 
 useCanonicalUrl()
 
+// WebSite / Organization 结构化数据由 nuxt-schema-org 统一输出，
+// 这里不再手写，避免同一页面出现两个 WebSite 节点（含无效的站内搜索 SearchAction）
 useHead({
   title: 'Custom Sportswear Manufacturer | OEM Activewear & Gym Wear',
   meta: [
@@ -13,25 +15,7 @@ useHead({
     { name: 'keywords', content: 'custom sportswear manufacturer, activewear OEM, gym wear supplier, custom athletic clothing, team uniform manufacturer' },
     { property: 'og:title', content: 'Custom Sportswear Manufacturer | OEM Activewear | TontonSports' },
     { property: 'og:description', content: '20+ years professional custom sportswear manufacturer. OEM/ODM, low MOQ 1pc, SEDEX SMETA audited. Global shipping.' },
-    { property: 'og:type', content: 'website' },
-    { property: 'og:url', content: 'https://www.tutesports.com' }
-  ],
-  script: [
-    {
-      type: 'application/ld+json',
-      innerHTML: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "TontonSports",
-        "url": "https://www.tutesports.com",
-        "description": "Professional Custom Sportswear Manufacturer Since 2002",
-        "potentialAction": {
-          "@type": "SearchAction",
-          "target": "https://www.tutesports.com/products?q={search_term_string}",
-          "query-input": "required name=search_term_string"
-        }
-      })
-    }
+    { property: 'og:type', content: 'website' }
   ]
 })
 

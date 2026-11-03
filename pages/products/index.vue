@@ -36,15 +36,35 @@ const allProducts = computed(() => responseData.value?.data || [])
 
 const toSlug = (name) => name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 
+// 头部搜索框跳转过来的关键词（?q=）
+const searchKeyword = computed(() => (typeof route.query.q === 'string' ? route.query.q.trim() : ''))
+
 const filteredProducts = computed(() => {
-  if (!activeCategorySlug.value) return allProducts.value
-  return allProducts.value.filter(item => {
-    const cat = item.category || item.attributes?.category
-    if (!cat) return false
-    const catSlug = cat.slug || toSlug(cat.name || '')
-    return catSlug === activeCategorySlug.value
-  })
+  let list = allProducts.value
+  if (activeCategorySlug.value) {
+    list = list.filter(item => {
+      const cat = item.category || item.attributes?.category
+      if (!cat) return false
+      const catSlug = cat.slug || toSlug(cat.name || '')
+      return catSlug === activeCategorySlug.value
+    })
+  }
+  if (searchKeyword.value) {
+    const q = searchKeyword.value.toLowerCase()
+    list = list.filter(item => {
+      const desc = item.description || item.attributes?.description
+      return (getTitle(item) || '').toLowerCase().includes(q) ||
+        (typeof desc === 'string' ? desc.toLowerCase().includes(q) : false)
+    })
+  }
+  return list
 })
+
+const clearSearch = () => {
+  const query = { ...route.query }
+  delete query.q
+  router.push({ path: '/products', query })
+}
 
 const totalPage = computed(() => Math.ceil(filteredProducts.value.length / pageSize))
 const pageProducts = computed(() => {
@@ -61,7 +81,12 @@ const selectCategory = (slug) => {
   }
 }
 
-watch(() => route.query.category, () => { currentPage.value = 1 })
+watch(() => [route.query.category, route.query.q], () => { currentPage.value = 1 })
+
+// 搜索结果页不收录，避免产生大量低质索引页
+useHead({
+  meta: computed(() => searchKeyword.value ? [{ name: 'robots', content: 'noindex, follow' }] : [])
+})
 watch(currentPage, () => window.scrollTo({ top: 0, behavior: 'smooth' }))
 
 const pageTitle = computed(() => activeCategoryName.value ? `${activeCategoryName.value}` : 'Custom Sportswear Products')
@@ -95,12 +120,26 @@ useHead({
           <span class="text-gray-600">{{ activeCategoryName }}</span>
         </template>
       </nav>
+      <h1 class="text-2xl md:text-3xl font-heading font-bold text-navy mb-2">
+        {{ activeCategoryName ? `Custom ${activeCategoryName} Manufacturer` : 'Custom Sportswear Products' }}
+      </h1>
+      <p class="text-sm text-gray-500 leading-relaxed max-w-3xl">
+        {{ activeCategoryName
+          ? `Browse our custom ${activeCategoryName} range — sublimation printing, OEM/ODM production, low MOQ from 1 piece and factory direct pricing. Free design mockup within 24 hours.`
+          : 'OEM/ODM custom sportswear direct from our factory — basketball jerseys, football uniforms, hockey jerseys, yoga wear and more. Low MOQ, free design, global shipping.' }}
+      </p>
     </div>
 
     <!-- Category Filter -->
     <div class="flex flex-wrap gap-2 mb-8 pb-6 border-b border-gray-100">
       <button @click="selectCategory(null)" :class="['px-4 py-2 rounded-lg text-sm font-medium transition-all', !activeCategorySlug ? 'bg-brand text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200']">All Products</button>
       <button v-for="cat in productCategories" :key="cat.slug" @click="selectCategory(cat.slug)" :class="['px-4 py-2 rounded-lg text-sm font-medium transition-all', activeCategorySlug === cat.slug ? 'bg-brand text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200']">{{ cat.name }}</button>
+    </div>
+
+    <!-- Search results notice -->
+    <div v-if="searchKeyword" class="mb-6 -mt-2 text-sm text-gray-600">
+      Search results for <span class="font-semibold text-navy">“{{ searchKeyword }}”</span> — {{ filteredProducts.length }} product{{ filteredProducts.length === 1 ? '' : 's' }} found.
+      <button @click="clearSearch" class="ml-2 text-brand hover:underline font-medium">Clear search</button>
     </div>
 
     <!-- Loading -->
