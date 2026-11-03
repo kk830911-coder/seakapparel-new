@@ -418,46 +418,48 @@ const handleTouchEnd = (e, next, prev) => {
 
         <!-- Product Info -->
         <div class="flex flex-col">
-          <h1 class="text-lg font-bold text-[#222222] mt-1 sm:mt-2">{{ getTitle(product) }}</h1>
-
-          <!-- Quantity Pricing -->
+          <!-- 产品信息大卡片：标题 / 价格 / SKU / 定制信息，横线分割（类国际站样式） -->
           <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm my-2 sm:my-3">
-            <div v-if="priceTiers.length" class="flex flex-wrap gap-x-6 sm:gap-x-8 gap-y-3">
-              <div v-for="tier in priceTiers" :key="tier.minQty">
-                <div class="text-navy whitespace-nowrap">
-                  <span class="text-sm sm:text-base align-top font-semibold">$</span><span class="font-heading font-bold text-xl sm:text-2xl">{{ splitPrice(tier.unitPrice).dollars }}</span><span v-if="splitPrice(tier.unitPrice).cents" class="text-sm sm:text-base align-top font-semibold">{{ splitPrice(tier.unitPrice).cents }}</span>
+            <h1 class="text-lg font-bold text-[#222222]">{{ getTitle(product) }}</h1>
+
+            <!-- 价格 -->
+            <div class="border-t border-gray-100 pt-3 sm:pt-4 mt-3 sm:mt-4">
+              <div v-if="priceTiers.length" class="flex flex-wrap gap-x-6 sm:gap-x-8 gap-y-3">
+                <div v-for="tier in priceTiers" :key="tier.minQty">
+                  <div class="text-navy whitespace-nowrap">
+                    <span class="text-sm sm:text-base align-top font-semibold">$</span><span class="font-heading font-bold text-xl sm:text-2xl">{{ splitPrice(tier.unitPrice).dollars }}</span><span v-if="splitPrice(tier.unitPrice).cents" class="text-sm sm:text-base align-top font-semibold">{{ splitPrice(tier.unitPrice).cents }}</span>
+                  </div>
+                  <div class="text-xs text-gray-500 mt-0.5">{{ tierRange(tier) }}</div>
                 </div>
-                <div class="text-xs text-gray-500 mt-0.5">{{ tierRange(tier) }}</div>
+              </div>
+              <div v-else class="flex justify-between items-center">
+                <span class="text-gray-500 text-sm">Unit price</span>
+                <span class="text-sm font-semibold text-navy">Price on request</span>
+              </div>
+
+              <p class="text-xs leading-relaxed text-gray-400 mt-3">{{ priceNote }}</p>
+
+              <div v-if="sizeChartUrl" class="mt-2 flex justify-end">
+                <button @click="sizeChartZoomOpen = true" class="inline-flex items-center gap-1.5 text-sm font-medium text-brand hover:text-brand-dark">
+                  View size chart
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </button>
               </div>
             </div>
-            <div v-else class="flex justify-between items-center">
-              <span class="text-gray-500 text-sm">Unit price</span>
-              <span class="text-sm font-semibold text-navy">Price on request</span>
+
+            <!-- SKU 色卡（颜色分类，后台 skuImages 上传，点击在上方主图区预览） -->
+            <div v-if="skuImages.length" class="border-t border-gray-100 pt-3 sm:pt-4 mt-3 sm:mt-4">
+              <h3 class="font-heading font-semibold text-navy mb-2">Color / SKU</h3>
+              <div class="flex flex-wrap gap-2">
+                <button v-for="(sku, i) in skuImages" :key="i" @click="selectSku(i)" class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg border-2 overflow-hidden transition-colors" :class="activeSkuIndex === i ? 'border-brand' : 'border-gray-200 hover:border-gray-300'" :title="sku.alt || 'Color option'">
+                  <img :src="sku.url" class="w-full h-full object-cover" :alt="sku.alt || 'Color option'" loading="lazy" />
+                </button>
+              </div>
+              <p class="text-xs text-gray-400 mt-1.5">Click a color to preview it in the image above</p>
             </div>
 
-            <p class="text-xs leading-relaxed text-gray-400 mt-3">{{ priceNote }}</p>
-
-            <div v-if="sizeChartUrl" class="mt-2 flex justify-end">
-              <button @click="sizeChartZoomOpen = true" class="inline-flex items-center gap-1.5 text-sm font-medium text-brand hover:text-brand-dark">
-                View size chart
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-              </button>
-            </div>
-          </div>
-
-          <!-- SKU 色卡（颜色分类，后台 skuImages 上传，点击在上方主图区预览） -->
-          <div v-if="skuImages.length" class="bg-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm mb-2 sm:mb-3">
-            <h3 class="font-heading font-semibold text-navy mb-2">Color / SKU</h3>
-            <div class="flex flex-wrap gap-2">
-              <button v-for="(sku, i) in skuImages" :key="i" @click="selectSku(i)" class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg border-2 overflow-hidden transition-colors" :class="activeSkuIndex === i ? 'border-brand' : 'border-gray-200 hover:border-gray-300'" :title="sku.alt || 'Color option'">
-                <img :src="sku.url" class="w-full h-full object-cover" :alt="sku.alt || 'Color option'" loading="lazy" />
-              </button>
-            </div>
-            <p class="text-xs text-gray-400 mt-1.5">Click a color to preview it in the image above</p>
-          </div>
-
-          <!-- 定制信息卡（Key Features + Customization Options） -->
-          <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm mb-2 sm:mb-3">
+            <!-- 定制信息 -->
+            <div class="border-t border-gray-100 pt-3 sm:pt-4 mt-3 sm:mt-4">
             <div class="space-y-2 sm:space-y-3">
               <h3 class="font-heading font-semibold text-navy">Key Features</h3>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
@@ -491,6 +493,7 @@ const handleTouchEnd = (e, next, prev) => {
                 <span class="text-xs bg-brand/10 text-brand px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full font-medium">Custom Sizes</span>
               </div>
             </div>
+          </div>
           </div>
 
           <!-- CTA Buttons -->
