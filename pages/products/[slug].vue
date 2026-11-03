@@ -509,23 +509,24 @@ const handleTouchEnd = (e, next, prev) => {
         </div>
       </div>
 
-      <!-- ===== 详情区（内容宽度 1182px，共用块来自 Strapi，后台一次维护全站生效） ===== -->
-      <div class="max-w-[1182px] mx-auto">
+      <!-- ===== 详情区（与顶部同宽，共用块来自 Strapi，后台一次维护全站生效） ===== -->
+      <div>
         <DetailAnchorNav :sections="anchorSections" />
 
-        <!-- 全站共用工厂视频：preload=none + 海报图，点击才开始加载，不影响页面打开速度 -->
-        <video
-          v-if="factoryVideoVisible"
-          :src="FACTORY_VIDEO_SRC"
-          :poster="factoryShots[0]?.url"
-          controls
-          playsinline
-          preload="none"
-          class="w-full max-w-3xl mx-auto aspect-video rounded-xl shadow-sm border border-gray-100 bg-black object-contain mt-6"
-          @error="onFactoryVideoError"
-        >
-          Your browser does not support the video tag.
-        </video>
+        <!-- 全站共用工厂视频：背景卡片与页面同宽，preload=none + 海报图，点击才加载 -->
+        <div v-if="factoryVideoVisible" class="mt-6 bg-white rounded-xl border border-gray-200 shadow-sm p-3 sm:p-4">
+          <video
+            :src="FACTORY_VIDEO_SRC"
+            :poster="factoryShots[0]?.url"
+            controls
+            playsinline
+            preload="none"
+            class="w-full aspect-video rounded-lg bg-black object-contain"
+            @error="onFactoryVideoError"
+          >
+            Your browser does not support the video tag.
+          </video>
+        </div>
 
         <div class="space-y-10 sm:space-y-14 pt-6">
           <!-- 1. 核心参数表 -->
