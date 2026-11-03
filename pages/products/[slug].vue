@@ -418,7 +418,7 @@ const handleTouchEnd = (e, next, prev) => {
 
         <!-- Product Info -->
         <div class="flex flex-col">
-          <h1 class="text-xl sm:text-2xl md:text-3xl font-heading font-bold text-navy mt-1 sm:mt-2">{{ getTitle(product) }}</h1>
+          <h1 class="text-lg font-bold text-[#222222] mt-1 sm:mt-2">{{ getTitle(product) }}</h1>
 
           <!-- Quantity Pricing -->
           <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm my-2 sm:my-3">
