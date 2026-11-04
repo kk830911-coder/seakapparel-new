@@ -8,20 +8,14 @@ export default defineNuxtConfig({
     revalidateSecret: process.env.REVALIDATE_SECRET || '',
     revalidateBypassToken: process.env.REVALIDATE_BYPASS_TOKEN || '',
     deployHookUrl: process.env.DEPLOY_HOOK_URL || '',
-    // 询盘服务端接收（server/api/inquiry.post.ts）
-    // 三个都配齐后，前端自动从"浏览器直连 Web3Forms"切到"服务端接收 + 人机验证"
-    turnstileSecretKey: process.env.TURNSTILE_SECRET_KEY || '',
-    resendApiKey: process.env.RESEND_API_KEY || '',
-    // Resend 要求 from 域名已验证；未验证时先留 onboarding@resend.dev 可测试
-    resendFrom: process.env.RESEND_FROM || '',
-    inquiryTo: process.env.INQUIRY_TO || 'Marc@tutesports.com',
     public: {
       strapiUrl: 'https://tutesportswear-strapi-us.onrender.com',
-      // 为空时表单走浏览器直连 Web3Forms（当前线上的可用方案）；
-      // 填了 Turnstile site key 就走 /api/inquiry，密钥只留在服务端。
-      turnstileSiteKey: process.env.TURNSTILE_SITE_KEY || '',
-      // 直连模式下的 Web3Forms access_key（官方设计即前端使用）
-      web3formsKey: process.env.WEB3FORMS_KEY || 'f74fd901-0b24-4634-8a2f-95c549480b83'
+      // Web3Forms 的 access_key：官方设计即前端使用。
+      // 防滥用靠三件套：honeypot + Web3Forms 后台的 Allowed Domains + hCaptcha。
+      web3formsKey: process.env.WEB3FORMS_KEY || 'f74fd901-0b24-4634-8a2f-95c549480b83',
+      // 在 Web3Forms 后台开启 hCaptcha 后拿到的 site key；
+      // 配上后表单出现验证框，提交时必须带有效 token，机器人刷不了额度。
+      hcaptchaSiteKey: process.env.HCAPTCHA_SITE_KEY || ''
     }
   },
 
