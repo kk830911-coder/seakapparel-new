@@ -81,6 +81,9 @@ const milestones = [
   { year: '2023', event: 'Hubei manufacturing base opened, 5,000m+ facility' },
   { year: '2025', event: 'Serving 500+ brands across 60+ countries' }
 ]
+
+// 工厂概览视频（32MB）：点击才加载，避免拖慢页面首屏
+const overviewPlaying = ref(false)
 </script>
 
 <template>
@@ -119,7 +122,24 @@ const milestones = [
             </div>
           </div>
           <div class="relative">
-            <img src="/factory/00Group photo of Hu Xinzhen, Chairman of Totem Group, and Jack Ma of Alibaba at Jiangnan Club on May 9, 2013.jpg" alt="Group photo of Hu Xinzhen, Chairman of Totem Group, and Jack Ma of Alibaba at Jiangnan Club on May 9, 2013" class="w-full rounded-xl shadow-lg" loading="lazy" />
+            <!-- 集团工厂概览视频：封面 + 播放按钮，点击后才加载视频源 -->
+            <video
+              v-if="overviewPlaying"
+              src="/videos/tonton-overview.mp4"
+              controls
+              autoplay
+              playsinline
+              class="w-full rounded-xl shadow-lg bg-black"
+            ></video>
+            <button v-else type="button" class="relative block w-full text-left group cursor-pointer" aria-label="Play factory overview video" @click="overviewPlaying = true">
+              <img src="/factory/04Hanger Sewing Workshop.png" alt="Tonton Sportswear (Hubei) production base — click to play the factory overview video" class="w-full rounded-xl shadow-lg" loading="lazy" />
+              <span class="absolute inset-0 rounded-xl bg-navy/25 group-hover:bg-navy/10 transition-colors flex items-center justify-center">
+                <span class="w-16 h-16 bg-white/95 rounded-full shadow-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <svg class="w-7 h-7 text-brand ml-1" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+                </span>
+              </span>
+              <span class="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-2.5 py-1 rounded-md">Factory overview video</span>
+            </button>
             <div class="absolute -bottom-4 -left-4 bg-brand text-white p-4 rounded-xl shadow-lg">
               <div class="text-2xl font-heading font-black">2002</div>
               <div class="text-sm">Manufacturing since</div>
