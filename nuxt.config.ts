@@ -68,7 +68,7 @@ export default defineNuxtConfig({
   site: {
     url: 'https://www.tutesports.com',
     name: 'TontonSports',
-    description: 'Custom Sportswear Manufacturer - OEM/ODM Activewear, Low MOQ, ISO Certified',
+    description: 'Custom Sportswear Manufacturer - OEM/ODM Activewear, Low MOQ, SEDEX SMETA 4-Pillar Audited',
     defaultLocale: 'en'
   },
 
