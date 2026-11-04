@@ -11,11 +11,11 @@ export default defineNuxtConfig({
     public: {
       strapiUrl: 'https://tutesportswear-strapi-us.onrender.com',
       // Web3Forms 的 access_key：官方设计即前端使用。
-      // 防滥用靠三件套：honeypot + Web3Forms 后台的 Allowed Domains + hCaptcha。
+      // 防滥用靠三件套：honeypot + Web3Forms 后台的 hCaptcha + Advanced Spam Filter。
       web3formsKey: process.env.WEB3FORMS_KEY || 'f74fd901-0b24-4634-8a2f-95c549480b83',
-      // 在 Web3Forms 后台开启 hCaptcha 后拿到的 site key；
-      // 配上后表单出现验证框，提交时必须带有效 token，机器人刷不了额度。
-      hcaptchaSiteKey: process.env.HCAPTCHA_SITE_KEY || ''
+      // hCaptcha site key：免费计划必须用 Web3Forms 提供的公共 key（官方文档钦定，
+      // 所有免费用户共用，无需注册 hCaptcha）。后台开启 hCaptcha 校验前，这里必须先配好。
+      hcaptchaSiteKey: process.env.HCAPTCHA_SITE_KEY || '50b2fe65-b00b-4b9e-ad62-3ba471098be2'
     }
   },
 
