@@ -244,7 +244,7 @@ useHead({
 <template>
   <div>
     <!-- Hero -->
-    <section class="bg-navy py-14 md:py-20">
+    <section class="bg-navy-light py-14 md:py-20">
       <div class="max-w-7xl mx-auto px-4 text-center">
         <h1 class="text-3xl md:text-5xl font-heading font-black text-white mb-4">Let's Start Your Project</h1>
         <p class="text-gray-300 text-lg max-w-2xl mx-auto">Tell us about your custom sportswear needs. We'll respond with a detailed quote within 24 hours.</p>

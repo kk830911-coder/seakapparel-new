@@ -71,7 +71,7 @@ const fabrics = [
 <template>
   <div>
     <!-- Hero -->
-    <section class="bg-navy py-16 md:py-24">
+    <section class="bg-navy-light py-16 md:py-24">
       <div class="max-w-7xl mx-auto px-4 text-center">
         <h1 class="text-3xl md:text-5xl font-heading font-black text-white mb-4">From Idea to Delivery</h1>
         <p class="text-gray-300 text-lg md:text-xl max-w-3xl mx-auto mb-8">Your complete custom sportswear manufacturing partner. We handle every step — design, sampling, production, quality control, and global shipping.</p>

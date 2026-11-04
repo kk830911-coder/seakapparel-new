@@ -88,7 +88,7 @@ const overviewPlaying = ref(false)
 <template>
   <div>
     <!-- Hero -->
-    <section class="bg-navy py-16 md:py-24">
+    <section class="bg-navy-light py-16 md:py-24">
       <div class="max-w-7xl mx-auto px-4 text-center">
         <h1 class="text-3xl md:text-5xl font-heading font-black text-white mb-4">Two Decades of<br>Sportswear Excellence</h1>
         <p class="text-gray-300 text-lg max-w-3xl mx-auto">From a small workshop to a 5,000m+ smart factory — our journey has been driven by one mission: helping brands create the best sportswear possible.</p>
