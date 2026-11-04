@@ -29,3 +29,6 @@ logs
 # 本地保留的旧构建产物（调试用，绝不入库）
 .output_old_*/
 .output-prev-*/
+
+# 原始素材（带空格/括号文件名），重命名后的正式版本已在库中
+public/videos/Tonton*.mp4
