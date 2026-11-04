@@ -76,7 +76,9 @@ const testimonials = [
     <!-- Section 1: Hero Banner -->
     <section class="relative w-full overflow-hidden">
       <div class="relative h-[45vh] min-h-[350px] md:h-[50vh] lg:h-[calc(100vw*600/1920)] lg:max-h-[600px]">
-        <NuxtImg :src="bannerImage" format="avif" fallbackFormat="webp" class="w-full h-full object-cover" alt="Custom Sportswear Manufacturing" width="1920" height="600" sizes="100vw" preload fetchpriority="high" />
+        <!-- 响应式多档 srcset：不传 width（传了会退化成单一 640px 变体导致大屏发糊），
+             sizes 用 @nuxt/image 的断点语法逐档声明 100vw -->
+        <NuxtImg :src="bannerImage" format="avif" fallbackFormat="webp" class="w-full h-full object-cover" alt="Custom Sportswear Manufacturing" sizes="sm:100vw md:100vw lg:100vw xl:100vw 2xl:100vw" preload fetchpriority="high" />
 
         <!-- Hero Content Overlay -->
         <div class="absolute inset-0 flex items-start justify-center pt-2.5 md:pt-12 lg:pt-16">

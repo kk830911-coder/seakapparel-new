@@ -139,7 +139,8 @@ const overviewPlaying = ref(false)
               </span>
               <span class="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-2.5 py-1 rounded-md">Factory overview video</span>
             </button>
-            <div class="absolute -bottom-4 -left-4 bg-brand text-white p-4 rounded-xl shadow-lg">
+            <!-- 2002 角标：只在封面态显示，视频播放时会盖住控制条 -->
+            <div v-if="!overviewPlaying" class="absolute -bottom-4 -left-4 bg-brand text-white p-4 rounded-xl shadow-lg">
               <div class="text-2xl font-heading font-black">2002</div>
               <div class="text-sm">Manufacturing since</div>
             </div>
