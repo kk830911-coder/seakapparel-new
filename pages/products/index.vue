@@ -173,9 +173,6 @@ useHead({
       <div v-for="item in pageProducts" :key="item.id" class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 group border border-gray-100">
         <NuxtLink :to="`/products/${getSlug(item) || item.id}`" class="aspect-square overflow-hidden block bg-gray-50 relative">
           <img :src="getProductImageUrl(item, strapiUrl)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" :alt="getProductImageAlt(item)" loading="lazy" />
-          <div class="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity">
-            <span class="bg-brand text-white text-xs font-medium px-2.5 py-1 rounded-full">View Details</span>
-          </div>
         </NuxtLink>
         <div class="p-2 sm:p-3 flex flex-col">
           <NuxtLink :to="`/products/${getSlug(item) || item.id}`" class="block">
