@@ -29,16 +29,39 @@
         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
         <span class="text-[11px] font-medium">E-mail</span>
       </a>
-      <button
-        type="button"
-        class="flex flex-col items-center gap-1 py-3 text-green-600 hover:bg-green-50 transition-colors"
-        title="Copy WeChat ID"
-        aria-label="Copy WeChat ID"
-        @click="copyWechat"
-      >
-        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 576 512" aria-hidden="true"><path d="M385.2 167.6c6.4 0 12.6.3 18.8 1.1C387.4 90.3 303.3 32 207.7 32 100.5 32 13 104.8 13 197.4c0 53.4 29.3 97.5 77.9 131.6l-19.3 58.6 68-34.1c24.4 4.8 43.8 9.7 68.2 9.7 6.2 0 12.1-.3 18.3-.8-4-12.9-6.2-26.6-6.2-40.8-.1-84.1 72.9-154 165.3-154zm-104.5-52.9c14.5 0 24.2 9.7 24.2 24.4 0 14.5-9.7 24.2-24.2 24.2-14.8 0-29.3-9.7-29.3-24.2.1-14.7 14.6-24.4 29.3-24.4zm-136.4 48.6c-14.5 0-29.3-9.7-29.3-24.2 0-14.8 14.8-24.4 29.3-24.4 14.8 0 24.4 9.7 24.4 24.4 0 14.6-9.6 24.2-24.4 24.2zM563 319.4c0-77.9-77.9-141.3-165.4-141.3-92.7 0-165.4 63.4-165.4 141.3S305 460.7 397.6 460.7c19.3 0 38.9-5.1 58.6-9.7l53.4 29.3-14.8-48.6C534 402.1 563 363.2 563 319.4zm-219.1-24.5c-9.7 0-19.3-9.7-19.3-19.6 0-9.7 9.7-19.3 19.3-19.3 14.8 0 24.4 9.7 24.4 19.3 0 10-9.7 19.6-24.4 19.6zm107.1 0c-9.7 0-19.3-9.7-19.3-19.6 0-9.7 9.7-19.3 19.3-19.3 14.5 0 24.4 9.7 24.4 19.3 0 10-9.9 19.6-24.4 19.6z"/></svg>
-        <span class="text-[11px] font-medium">WeChat</span>
-      </button>
+      <div class="relative">
+        <button
+          type="button"
+          class="w-full flex flex-col items-center gap-1 py-3 text-green-600 hover:bg-green-50 transition-colors"
+          :aria-expanded="wechatOpen ? 'true' : 'false'"
+          aria-label="Show WeChat QR code"
+          @click="wechatOpen = !wechatOpen"
+        >
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 576 512" aria-hidden="true"><path d="M385.2 167.6c6.4 0 12.6.3 18.8 1.1C387.4 90.3 303.3 32 207.7 32 100.5 32 13 104.8 13 197.4c0 53.4 29.3 97.5 77.9 131.6l-19.3 58.6 68-34.1c24.4 4.8 43.8 9.7 68.2 9.7 6.2 0 12.1-.3 18.3-.8-4-12.9-6.2-26.6-6.2-40.8-.1-84.1 72.9-154 165.3-154zm-104.5-52.9c14.5 0 24.2 9.7 24.2 24.4 0 14.5-9.7 24.2-24.2 24.2-14.8 0-29.3-9.7-29.3-24.2.1-14.7 14.6-24.4 29.3-24.4zm-136.4 48.6c-14.5 0-29.3-9.7-29.3-24.2 0-14.8 14.8-24.4 29.3-24.4 14.8 0 24.4 9.7 24.4 24.4 0 14.6-9.6 24.2-24.4 24.2zM563 319.4c0-77.9-77.9-141.3-165.4-141.3-92.7 0-165.4 63.4-165.4 141.3S305 460.7 397.6 460.7c19.3 0 38.9-5.1 58.6-9.7l53.4 29.3-14.8-48.6C534 402.1 563 363.2 563 319.4zm-219.1-24.5c-9.7 0-19.3-9.7-19.3-19.6 0-9.7 9.7-19.3 19.3-19.3 14.8 0 24.4 9.7 24.4 19.3 0 10-9.7 19.6-24.4 19.6zm107.1 0c-9.7 0-19.3-9.7-19.3-19.6 0-9.7 9.7-19.3 19.3-19.3 14.5 0 24.4 9.7 24.4 19.3 0 10-9.9 19.6-24.4 19.6z"/></svg>
+          <span class="text-[11px] font-medium">WeChat</span>
+        </button>
+
+        <!-- 二维码弹层：向右边缘外侧展开 -->
+        <transition
+          enter-active-class="transition duration-200 ease-out"
+          enter-from-class="opacity-0 translate-x-2"
+          enter-to-class="opacity-100 translate-x-0"
+          leave-active-class="transition duration-150 ease-in"
+          leave-from-class="opacity-100"
+          leave-to-class="opacity-0"
+        >
+          <div
+            v-if="wechatOpen"
+            class="absolute right-full top-1/2 -translate-y-1/2 mr-3 w-[176px] bg-white rounded-xl shadow-2xl border border-gray-100 p-3"
+          >
+            <img src="/WeChat.png" alt="TontonSports WeChat QR code — scan to add us" class="w-full rounded-lg" loading="lazy" />
+            <p class="text-[11px] text-center text-gray-600 mt-2 leading-tight">Scan to add us on WeChat</p>
+            <button type="button" class="mt-1.5 w-full text-[10px] text-brand hover:underline" @click="copyWechat">
+              Copy ID: 182 7197 1983
+            </button>
+          </div>
+        </transition>
+      </div>
       <NuxtLink
         to="/contact"
         class="flex flex-col items-center gap-1 py-3 text-navy hover:bg-blue-50 transition-colors"
@@ -110,6 +133,9 @@
     </div>
   </nav>
 
+  <!-- 点击二维码以外区域关闭弹层 -->
+  <div v-if="wechatOpen" class="fixed inset-0 z-[880]" aria-hidden="true" @click="wechatOpen = false"></div>
+
   <!-- 复制微信号的轻提示 -->
   <transition
     enter-active-class="transition duration-200 ease-out"
@@ -136,6 +162,7 @@ defineProps({
 })
 
 const wechatCopied = ref(false)
+const wechatOpen = ref(false)
 let copyTimer = null
 
 const copyWechat = async () => {
