@@ -8,12 +8,19 @@ export default defineNuxtConfig({
     revalidateSecret: process.env.REVALIDATE_SECRET || '',
     revalidateBypassToken: process.env.REVALIDATE_BYPASS_TOKEN || '',
     deployHookUrl: process.env.DEPLOY_HOOK_URL || '',
+    // 询盘服务端接收（server/api/inquiry.post.ts）
+    // 三个都配齐后，前端自动从"浏览器直连 Web3Forms"切到"服务端接收 + 人机验证"
+    turnstileSecretKey: process.env.TURNSTILE_SECRET_KEY || '',
+    resendApiKey: process.env.RESEND_API_KEY || '',
+    // Resend 要求 from 域名已验证；未验证时先留 onboarding@resend.dev 可测试
+    resendFrom: process.env.RESEND_FROM || '',
+    inquiryTo: process.env.INQUIRY_TO || 'Marc@tutesports.com',
     public: {
       strapiUrl: 'https://tutesportswear-strapi-us.onrender.com',
-      // Web3Forms 的 access_key 官方设计就是前端使用——其 API 挂在 Cloudflare 后面，
-      // 对所有"服务器对服务器"请求强制人机验证（实测 cf-mitigated: challenge），
-      // 走服务端代理必然 403。防滥用请在 Web3Forms 后台把 Allowed Domains 设为
-      // www.tutesports.com，需要更强防护时再开 hCaptcha。
+      // 为空时表单走浏览器直连 Web3Forms（当前线上的可用方案）；
+      // 填了 Turnstile site key 就走 /api/inquiry，密钥只留在服务端。
+      turnstileSiteKey: process.env.TURNSTILE_SITE_KEY || '',
+      // 直连模式下的 Web3Forms access_key（官方设计即前端使用）
       web3formsKey: process.env.WEB3FORMS_KEY || 'f74fd901-0b24-4634-8a2f-95c549480b83'
     }
   },

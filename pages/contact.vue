@@ -35,6 +35,8 @@ onMounted(() => {
   if (title) {
     form.value.message = `I'm interested in: ${title}${categoryName ? ` (${categoryName})` : ''}\n\n`
   }
+  // 配了 Turnstile 才加载验证框
+  if (turnstileSiteKey) mountTurnstile()
 })
 
 // 邮箱按"错在哪"给具体提示，而不是一句笼统的 invalid
@@ -87,12 +89,111 @@ const validateForm = () => {
   return Object.keys(next).length === 0
 }
 
+/* ---------- 人机验证（Cloudflare Turnstile）----------
+ * 配了 TURNSTILE_SITE_KEY 就渲染验证框，并改走服务端 /api/inquiry：
+ * 服务端校验 token 之后才发信，密钥不进浏览器，机器人也过不了验证，刷不了额度。
+ * 没配则维持浏览器直连 Web3Forms，表单永远可用。
+ */
+const runtimeConfig = useRuntimeConfig()
+const turnstileSiteKey = String(runtimeConfig.public.turnstileSiteKey || '')
+const turnstileToken = ref('')
+const turnstileReady = ref(false)
+let turnstileWidget = null
+
+const ensureTurnstileScript = () => new Promise((resolve) => {
+  if (window.turnstile) return resolve(true)
+  const existing = document.querySelector('script[data-turnstile]')
+  if (existing) {
+    existing.addEventListener('load', () => resolve(true), { once: true })
+    return
+  }
+  const s = document.createElement('script')
+  s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
+  s.async = true
+  s.defer = true
+  s.setAttribute('data-turnstile', '1')
+  s.addEventListener('load', () => resolve(true), { once: true })
+  document.head.appendChild(s)
+})
+
+const mountTurnstile = async () => {
+  await nextTick()
+  await ensureTurnstileScript()
+  const el = document.getElementById('turnstile-slot')
+  if (!el || !window.turnstile || turnstileWidget) return
+  turnstileWidget = window.turnstile.render(el, {
+    sitekey: turnstileSiteKey,
+    theme: 'light',
+    callback: (token) => {
+      turnstileToken.value = token
+      clearError('turnstile')
+    },
+    'expired-callback': () => { turnstileToken.value = '' },
+    'error-callback': () => { turnstileToken.value = '' }
+  })
+  turnstileReady.value = true
+}
+
+const resetTurnstile = () => {
+  turnstileToken.value = ''
+  if (turnstileWidget && window.turnstile) window.turnstile.reset(turnstileWidget)
+}
+
+// 服务端通道：Turnstile 在服务端校验，密钥只在服务端
+const sendViaServer = async () => {
+  await $fetch('/api/inquiry', {
+    method: 'POST',
+    body: {
+      name: form.value.name,
+      email: form.value.email,
+      company: form.value.company,
+      phone: form.value.phone,
+      product: form.value.product,
+      quantity: form.value.quantity,
+      message: form.value.message,
+      botfield: form.value.botfield,
+      turnstileToken: turnstileToken.value
+    }
+  })
+}
+
+// 直连通道：服务端未配置时的兜底，保证询盘不丢
+const sendViaWeb3Forms = async () => {
+  const result = await $fetch('https://api.web3forms.com/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: {
+      access_key: runtimeConfig.public.web3formsKey,
+      subject: `Inquiry from ${form.value.name} - ${form.value.company || 'Individual'}`,
+      from_name: 'TontonSports Website',
+      replyto: form.value.email,
+      name: form.value.name,
+      email: form.value.email,
+      company: form.value.company || 'N/A',
+      phone: form.value.phone || 'N/A',
+      product: form.value.product || 'N/A',
+      quantity: form.value.quantity || 'N/A',
+      message: form.value.message
+    }
+  })
+  // Web3Forms 可能返回 200 + success:false（例如它判定邮箱不可用）
+  if (result && result.success === false) {
+    const msg = String(result.message || '')
+    throw Object.assign(new Error(msg || 'delivery failed'), { data: {}, statusCode: 0, _serverMsg: msg })
+  }
+}
+
 const submitForm = async () => {
   formError.value = ''
   // 机器人命中 honeypot：静默丢弃，不消耗表单额度
   if (form.value.botfield) return
 
-  if (!validateForm()) {
+  const valid = validateForm()
+  // 配了验证框就必须先过验证
+  if (turnstileSiteKey && !turnstileToken.value) {
+    errors.value = { ...errors.value, turnstile: 'Please tick the box to verify you are human' }
+  }
+  if (!valid || (turnstileSiteKey && !turnstileToken.value)) {
     // 聚焦到第一个出错的具体字段
     const firstInvalid = Object.keys(errors.value)[0]
     const map = { name: 'inquiry-name', email: 'inquiry-email', message: 'inquiry-message', privacy: 'inquiry-privacy' }
@@ -102,39 +203,20 @@ const submitForm = async () => {
 
   formSubmitting.value = true
   try {
-    // 浏览器直连 Web3Forms：其 API 在 Cloudflare 后面，对所有"服务器对服务器"请求
-    // 强制人机验证（cf-mitigated: challenge），服务端代理必然 403。
-    // access_key 官方设计就是前端使用；防滥用靠 honeypot + Web3Forms 后台的域名白名单。
-    const config = useRuntimeConfig()
-    const result = await $fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: {
-        access_key: config.public.web3formsKey,
-        subject: `Inquiry from ${form.value.name} - ${form.value.company || 'Individual'}`,
-        from_name: 'TontonSports Website',
-        replyto: form.value.email,
-        name: form.value.name,
-        email: form.value.email,
-        company: form.value.company || 'N/A',
-        phone: form.value.phone || 'N/A',
-        product: form.value.product || 'N/A',
-        quantity: form.value.quantity || 'N/A',
-        message: form.value.message
+    if (turnstileSiteKey) {
+      try {
+        await sendViaServer()
+      } catch (serverErr) {
+        // 服务端还没配好（501）→ 自动回退直连，不让客户白填
+        const code = serverErr?.statusCode || serverErr?.response?.status || 0
+        if (code === 501 || serverErr?.data?.fallback) {
+          await sendViaWeb3Forms()
+        } else {
+          throw serverErr
+        }
       }
-    })
-
-    // Web3Forms 也可能返回 200 + success:false（例如它判定邮箱不可用），
-    // 这种情况同样要落到具体字段，而不是给一句笼统的失败提示
-    if (result && result.success === false) {
-      const serverMsg = String(result.message || '')
-      if (/email/i.test(serverMsg)) {
-        errors.value.email = serverMsg
-        await focusField('inquiry-email')
-      } else {
-        formError.value = serverMsg || 'We could not send your message just now. Please try again, or reach us on WhatsApp / email.'
-      }
-      return
+    } else {
+      await sendViaWeb3Forms()
     }
 
     formSubmitted.value = true
@@ -147,18 +229,27 @@ const submitForm = async () => {
     }
   } catch (err) {
     const status = err?.statusCode || err?.response?.status || 0
-    const serverMsg = String(err?.data?.message || err?.data?.statusMessage || '')
-    if (/email/i.test(serverMsg)) {
-      // 服务端指出是邮箱问题 → 提示到 Email 输入框下面
+    const field = err?.data?.field
+    const serverMsg = String(err?.data?.message || err?._serverMsg || err?.data?.statusMessage || '')
+
+    if (field === 'turnstile') {
+      errors.value.turnstile = serverMsg || 'Verification failed, please tick the box again'
+      resetTurnstile()
+    } else if (field === 'name' || field === 'email' || field === 'message') {
+      // 服务端明确指出哪个字段有问题 → 就提示在那个字段下面
+      errors.value[field] = serverMsg
+      await focusField(`inquiry-${field}`)
+    } else if (status === 429) {
+      formError.value = serverMsg || 'Too many submissions from this network. Please wait a few minutes, or message us on WhatsApp.'
+    } else if (/email/i.test(serverMsg)) {
       errors.value.email = serverMsg
       await focusField('inquiry-email')
-    } else if (status === 429) {
-      formError.value = 'Too many submissions from this network just now. Please wait a couple of minutes, or message us on WhatsApp.'
     } else {
-      formError.value = 'We could not send your message just now. Please try again, or reach us on WhatsApp / email directly.'
+      formError.value = serverMsg || 'We could not send your message just now. Please try again, or reach us on WhatsApp / email directly.'
     }
   } finally {
     formSubmitting.value = false
+    if (turnstileSiteKey) resetTurnstile()
   }
 }
 
@@ -309,6 +400,11 @@ useHead({
                     </span>
                   </label>
                   <p v-if="errors.privacy" id="inquiry-privacy-error" class="mt-1 text-xs text-red-600">{{ errors.privacy }}</p>
+                </div>
+                <!-- 人机验证：仅当配置了 Turnstile site key 时显示 -->
+                <div v-if="turnstileSiteKey" class="space-y-1">
+                  <div id="turnstile-slot" class="min-h-[65px]"></div>
+                  <p v-if="errors.turnstile" role="alert" class="text-xs text-red-600">{{ errors.turnstile }}</p>
                 </div>
                 <p v-if="formError" role="alert" class="text-sm text-red-700 bg-red-50 border border-red-100 rounded-lg p-3">{{ formError }}</p>
                 <!-- honeypot：真人看不到，填了就判定为机器人 -->
