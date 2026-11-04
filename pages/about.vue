@@ -74,7 +74,6 @@ const factoryAreas = [
 const milestones = [
   { year: '2002', event: 'Predecessor factory founded in Shenzhen' },
   { year: '2008', event: 'Expanded to 2,000m+ factory, 50+ workers' },
-  { year: '2012', event: 'Obtained ISO 9001 certification' },
   { year: '2015', event: 'Launched sublimation printing division' },
   { year: '2018', event: 'Reached 300+ global clients milestone' },
   { year: '2020', event: 'Upgraded to AI-powered smart factory' },

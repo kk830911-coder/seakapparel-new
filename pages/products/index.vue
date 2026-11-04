@@ -225,7 +225,7 @@ useHead({
     <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
       <div v-for="item in pageProducts" :key="item.id" class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 group border border-gray-100">
         <NuxtLink :to="`/products/${getSlug(item) || item.id}`" class="aspect-square overflow-hidden block bg-gray-50 relative">
-          <img :src="getProductImageUrl(item, strapiUrl)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" :alt="getProductImageAlt(item)" width="600" height="600" loading="lazy" decoding="async" />
+          <NuxtImg :src="getProductImageUrl(item, strapiUrl)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" :alt="getProductImageAlt(item)" width="600" height="600" loading="lazy" decoding="async" />
         </NuxtLink>
         <div class="p-2 sm:p-3 flex flex-col">
           <NuxtLink :to="`/products/${getSlug(item) || item.id}`" class="block">

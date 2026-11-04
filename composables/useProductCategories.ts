@@ -6,20 +6,22 @@
 export interface ProductCategory {
   name: string
   slug: string
+  /** 首页分类卡片的配图（public/category/ 下） */
+  img?: string
 }
 
 export const productCategories: ProductCategory[] = [
-  { name: 'Basketball Uniform', slug: 'basketball-uniform' },
-  { name: 'Football Uniform', slug: 'football-uniform' },
-  { name: 'Badminton Jersey', slug: 'badminton-jersey' },
-  { name: 'Baseball Jersey', slug: 'baseball-jersey' },
-  { name: 'Wrestling Singlet', slug: 'wrestling-singlet' },
-  { name: 'Ice Hockey Jersey', slug: 'ice-hockey-jersey' },
-  { name: 'Rugby Jersey', slug: 'rugby-jersey' },
-  { name: 'American Football Jersey', slug: 'american-football-jersey' },
-  { name: 'Boxing Outfit', slug: 'boxing-outfit' },
-  { name: 'Sports Hoodie', slug: 'sports-hoodie' },
-  { name: 'Yoga Wear', slug: 'yoga-wear' }
+  { name: 'Basketball Uniform', slug: 'basketball-uniform', img: '/category/basketball.png' },
+  { name: 'Football Uniform', slug: 'football-uniform', img: '/category/football.png' },
+  { name: 'Badminton Jersey', slug: 'badminton-jersey', img: '/category/BadmintonJersey.png' },
+  { name: 'Baseball Jersey', slug: 'baseball-jersey', img: '/category/BaseballJersey.png' },
+  { name: 'Wrestling Singlet', slug: 'wrestling-singlet', img: '/category/WrestlingSinglet.png' },
+  { name: 'Ice Hockey Jersey', slug: 'ice-hockey-jersey', img: '/category/IceHockeyJersey.png' },
+  { name: 'Rugby Jersey', slug: 'rugby-jersey', img: '/category/RugbyJersey.png' },
+  { name: 'American Football Jersey', slug: 'american-football-jersey', img: '/category/AmericanFootball.png' },
+  { name: 'Boxing Outfit', slug: 'boxing-outfit', img: '/category/BoxingOutfit.png' },
+  { name: 'Sports Hoodie', slug: 'sports-hoodie', img: '/category/SportsHoodie.png' },
+  { name: 'Yoga Wear', slug: 'yoga-wear', img: '/category/YogaWear.png' }
 ]
 
 export function getCategoryName(slug?: string | null): string | null {

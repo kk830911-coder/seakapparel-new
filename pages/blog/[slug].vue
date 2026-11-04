@@ -56,7 +56,10 @@ const renderMarkdownContent = (content) => {
       } else if (block.type === 'image' && block.image?.url) {
         // CMS 有可能返回相对路径，统一拼成完整 URL，避免正文图片全挂
         const src = block.image.url.startsWith('/') ? `${strapiUrl}${block.image.url}` : block.image.url
-        html += `<div class="blog-image-wrapper"><img src="${src}" alt="${postTitle}" loading="lazy" /></div>`
+        // 标题/替代文本里的引号必须转义，否则会截断 alt 属性甚至注入属性
+        const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')
+        const alt = esc(block.image.alternativeText || postTitle)
+        html += `<div class="blog-image-wrapper"><img src="${esc(src)}" alt="${alt}" loading="lazy" /></div>`
       }
     })
     return html

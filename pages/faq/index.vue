@@ -29,7 +29,7 @@ const renderFaqContent = (content) => {
 }
 
 useHead({
-  title: 'FAQ | Custom Sportswear Manufacturing Questions',
+  title: 'Custom Sportswear FAQ & Manufacturing Answers',
   meta: [
     { name: 'description', content: 'Find answers to common questions about custom sportswear manufacturing — MOQ, lead times, pricing, OEM/ODM process, shipping, and more.' },
     { name: 'keywords', content: 'sportswear FAQ, custom sportswear questions, MOQ, OEM ODM, shipping, manufacturing process' },

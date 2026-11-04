@@ -45,7 +45,7 @@ const getBlogImageUrl = (item) => {
 }
 
 useHead({
-  title: 'Sportswear Industry Blog | Manufacturing Tips & Trends',
+  title: 'Sportswear Industry Blog & Manufacturing Tips',
   meta: [
     { name: 'description', content: 'Expert insights on custom sportswear manufacturing — fabric guides, printing techniques, industry trends, and tips for launching your activewear brand.' },
     { name: 'keywords', content: 'sportswear blog, activewear manufacturing tips, custom sportswear guide, fabric technology, printing techniques' },
@@ -78,7 +78,7 @@ useHead({
       <div class="grid grid-cols-1 gap-8">
         <div v-for="item in blogs" :key="item.id" class="bg-white rounded-xl shadow overflow-hidden flex flex-col md:flex-row border border-gray-100">
           <NuxtLink :to="`/blog/${item.slug || item.attributes?.slug}`" class="w-full md:w-64 lg:w-72 aspect-square overflow-hidden block bg-gray-50 relative flex-shrink-0">
-            <img :src="getBlogImageUrl(item)" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" :alt="`${item.title || item.attributes?.title || 'Blog'} - TontonSports`" loading="lazy" />
+            <NuxtImg :src="getBlogImageUrl(item)" width="400" height="400" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" :alt="`${item.title || item.attributes?.title || 'Blog'} - TontonSports`" loading="lazy" />
           </NuxtLink>
           <div class="p-6 flex-1 flex flex-col justify-between">
             <div>
@@ -96,11 +96,11 @@ useHead({
         </div>
       </div>
       <div v-if="pagination.pageCount > 1" class="mt-14 flex justify-center items-center gap-2">
-        <button @click="currentPage--" :disabled="currentPage === 1" class="px-4 py-2 border rounded-lg text-sm font-medium transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed border-gray-200 text-gray-600 hover:bg-gray-50">← Previous</button>
+        <button @click="currentPage--" :disabled="currentPage === 1" aria-label="Previous page" class="px-4 py-2 border rounded-lg text-sm font-medium transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed border-gray-200 text-gray-600 hover:bg-gray-50">← Previous</button>
         <div class="flex items-center gap-1 mx-2">
-          <button v-for="page in pagination.pageCount" :key="page" @click="currentPage = page" :class="['w-10 h-10 text-sm font-medium rounded-lg border transition-colors duration-200', currentPage === page ? 'bg-brand text-white border-brand shadow-sm shadow-blue-100' : 'border-gray-200 text-gray-600 hover:bg-gray-50']">{{ page }}</button>
+          <button v-for="page in pagination.pageCount" :key="page" @click="currentPage = page" :aria-current="currentPage === page ? 'page' : undefined" :aria-label="`Go to page ${page}`" :class="['w-10 h-10 text-sm font-medium rounded-lg border transition-colors duration-200', currentPage === page ? 'bg-brand text-white border-brand shadow-sm shadow-blue-100' : 'border-gray-200 text-gray-600 hover:bg-gray-50']">{{ page }}</button>
         </div>
-        <button @click="currentPage++" :disabled="currentPage === pagination.pageCount" class="px-4 py-2 border rounded-lg text-sm font-medium transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed border-gray-200 text-gray-600 hover:bg-gray-50">Next →</button>
+        <button @click="currentPage++" :disabled="currentPage === pagination.pageCount" aria-label="Next page" class="px-4 py-2 border rounded-lg text-sm font-medium transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed border-gray-200 text-gray-600 hover:bg-gray-50">Next →</button>
       </div>
     </div>
   </div>

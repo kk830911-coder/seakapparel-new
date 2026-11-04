@@ -34,24 +34,14 @@ const trustItems = [
   { icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', number: '20+', label: 'Years Experience' },
   { icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z', number: '500+', label: 'Global Clients' },
   { icon: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01', number: 'Multiple', label: 'Custom Processes' },
-  { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', number: 'ISO', label: '9001 Certified' },
+  { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', number: 'SEDEX', label: 'SMETA 4-Pillar Audited' },
   { icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', number: '1pc', label: 'Low MOQ' },
   { icon: 'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z', number: '60+', label: 'Countries Served' }
 ]
 
-const categories = [
-  { name: 'Basketball Uniform', slug: 'basketball-uniform', img: '/category/basketball.png' },
-  { name: 'Football Uniform', slug: 'football-uniform', img: '/category/football.png' },
-  { name: 'Badminton Jersey', slug: 'badminton-jersey', img: '/category/BadmintonJersey.png' },
-  { name: 'Baseball Jersey', slug: 'baseball-jersey', img: '/category/BaseballJersey.png' },
-  { name: 'Wrestling Singlet', slug: 'wrestling-singlet', img: '/category/WrestlingSinglet.png' },
-  { name: 'Ice Hockey Jersey', slug: 'ice-hockey-jersey', img: '/category/IceHockeyJersey.png' },
-  { name: 'Rugby Jersey', slug: 'rugby-jersey', img: '/category/RugbyJersey.png' },
-  { name: 'American Football Jersey', slug: 'american-football-jersey', img: '/category/AmericanFootball.png' },
-  { name: 'Boxing Outfit', slug: 'boxing-outfit', img: '/category/BoxingOutfit.png' },
-  { name: 'Sports Hoodie', slug: 'sports-hoodie', img: '/category/SportsHoodie.png' },
-  { name: 'Yoga Wear', slug: 'yoga-wear', img: '/category/YogaWear.png' }
-]
+// 分类卡直接复用全站唯一的分类数据源（useProductCategories.ts），
+// 之前这里手写了一份 11 条的副本，分类改名要改两处。
+const categories = productCategories
 
 const processSteps = [
   { num: '01', title: 'Inquiry', desc: 'Share your design ideas, quantities, and requirements', icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
@@ -222,7 +212,7 @@ const testimonials = [
         <div v-else class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div v-for="item in hotProducts" :key="item.documentId || item.id" class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 group border border-gray-100">
             <NuxtLink :to="`/products/${getSlug(item)}`" class="aspect-square overflow-hidden block bg-gray-50 relative">
-              <img :src="getProductImageUrl(item, strapiUrl)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" :alt="`${getTitle(item) || 'Custom Sportswear'} - TontonSports`" width="600" height="600" loading="lazy" decoding="async" />
+              <NuxtImg :src="getProductImageUrl(item, strapiUrl)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" :alt="`${getTitle(item) || 'Custom Sportswear'} - TontonSports`" width="600" height="600" loading="lazy" decoding="async" />
             </NuxtLink>
             <div class="p-2 sm:p-4">
               <NuxtLink :to="`/products/${getSlug(item)}`" class="block">

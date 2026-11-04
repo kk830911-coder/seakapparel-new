@@ -73,7 +73,7 @@ useHead({
       <div class="animate-spin inline-block w-8 h-8 border-4 border-brand border-t-transparent rounded-full mb-4"></div>
       <p>Loading FAQ content...</p>
     </div>
-    <div v-else-if="fetchError || !faqItem" class="text-center py-12 text-red-500 bg-red-50 rounded-xl">This FAQ question not found. Return to FAQ list.</div>
+    <div v-else-if="fetchError || !faqItem" class="text-center py-12 text-red-500 bg-red-50 rounded-xl">This FAQ question was not found. Return to FAQ list.</div>
     <article v-else class="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
       <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6">{{ faqItem.title || faqItem.attributes?.title }}</h1>
       <div class="text-gray-700 leading-relaxed text-base" v-html="renderFaqContent(faqItem.content || faqItem.attributes?.content)"></div>
