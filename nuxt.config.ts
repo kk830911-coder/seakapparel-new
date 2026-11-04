@@ -11,11 +11,14 @@ export default defineNuxtConfig({
     public: {
       strapiUrl: 'https://tutesportswear-strapi-us.onrender.com',
       // Web3Forms 的 access_key：官方设计即前端使用。
-      // 防滥用靠三件套：honeypot + Web3Forms 后台的 hCaptcha + Advanced Spam Filter。
+      // 防滥用靠 honeypot + Web3Forms 后台的 Advanced Spam Filter；
+      // hCaptcha 的图题对真人偏难（2026-11 实测劝退），已默认关闭。
       web3formsKey: process.env.WEB3FORMS_KEY || 'f74fd901-0b24-4634-8a2f-95c549480b83',
-      // hCaptcha site key：免费计划必须用 Web3Forms 提供的公共 key（官方文档钦定，
-      // 所有免费用户共用，无需注册 hCaptcha）。后台开启 hCaptcha 校验前，这里必须先配好。
-      hcaptchaSiteKey: process.env.HCAPTCHA_SITE_KEY || '50b2fe65-b00b-4b9e-ad62-3ba471098be2'
+      // hCaptcha 开关：默认关。哪天额度真被刷了，两步重新打开——
+      // 1) Vercel 配 HCAPTCHA_SITE_KEY=50b2fe65-b00b-4b9e-ad62-3ba471098be2（Web3Forms 官方公共 key）
+      // 2) Web3Forms 后台 Security Settings 把 Captcha Protection 选成 hCaptcha 并 Save
+      // 注意顺序：先配变量部署（前端出验证框），再开后台校验，否则客户提交会被拒。
+      hcaptchaSiteKey: process.env.HCAPTCHA_SITE_KEY || ''
     }
   },
 
