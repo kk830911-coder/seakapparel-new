@@ -23,6 +23,10 @@ const faqItem = computed(() => {
   return null
 })
 
+// 问题不存在时返回真正的 404（否则页面显示"未找到"但状态码 200，属软 404）
+const event = useRequestEvent()
+if (!faqItem.value && event) setResponseStatus(event, 404)
+
 const renderFaqContent = (content) => {
   if (!content) return ''
   if (typeof content === 'string') return content
@@ -33,27 +37,32 @@ const renderFaqContent = (content) => {
 }
 
 useHead({
-  title: computed(() => `${faqItem.value?.title || faqItem.value?.attributes?.title || 'FAQ Detail'} | TontonSports`),
+  // 品牌后缀由 titleTemplate 统一追加
+  title: computed(() => `${faqItem.value?.title || faqItem.value?.attributes?.title || 'FAQ Detail'}`),
   meta: computed(() => [
     { name: 'description', content: `Answer to: ${faqItem.value?.title || faqItem.value?.attributes?.title || 'FAQ question'} - TontonSports` },
     { property: 'og:title', content: faqItem.value?.title || faqItem.value?.attributes?.title || 'FAQ Detail' },
     { property: 'og:type', content: 'article' }
   ]),
-  script: computed(() => [{
-    type: 'application/ld+json',
-    innerHTML: JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [{
-        "@type": "Question",
-        "name": faqItem.value?.title || faqItem.value?.attributes?.title || '',
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": renderFaqContent(faqItem.value?.content || faqItem.value?.attributes?.content)
-        }
-      }]
-    })
-  }])
+  // 无内容时不输出单题 FAQPage，避免大量空壳结构化数据
+  script: computed(() => {
+    if (!faqItem.value) return []
+    return [{
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [{
+          "@type": "Question",
+          "name": faqItem.value?.title || faqItem.value?.attributes?.title || '',
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": renderFaqContent(faqItem.value?.content || faqItem.value?.attributes?.content)
+          }
+        }]
+      })
+    }]
+  })
 })
 </script>
 

@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url'
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
 
@@ -6,6 +8,9 @@ export default defineNuxtConfig({
     revalidateSecret: process.env.REVALIDATE_SECRET || '',
     revalidateBypassToken: process.env.REVALIDATE_BYPASS_TOKEN || '',
     deployHookUrl: process.env.DEPLOY_HOOK_URL || '',
+    // Web3Forms 密钥只在服务端使用（server/api/inquiry.post.ts），不会进浏览器 bundle。
+    // 建议在 Vercel 配 WEB3FORMS_KEY；未配置时使用现有 key 保证表单可用。
+    web3formsKey: process.env.WEB3FORMS_KEY || 'f74fd901-0b24-4634-8a2f-95c549480b83',
     public: {
       strapiUrl: 'https://tutesportswear-strapi-us.onrender.com'
     }
@@ -63,22 +68,25 @@ export default defineNuxtConfig({
 
   sitemap: {
     sources: ['/api/sitemap-dynamic-routes'],
+    // noindex 页面不进 sitemap
+    exclude: ['/privacy-policy', '/terms-conditions'],
     defaults: {
       changefreq: 'weekly',
-      priority: 0.5,
-      lastmod: new Date().toISOString()
+      priority: 0.5
+      // 不再给静态页写 lastmod：构建时 new Date() 会让每次部署全站 lastmod 全变，
+      // 等于没有参考价值。动态内容页由 /api/sitemap-dynamic-routes 提供真实时间。
     }
   },
 
   schemaOrg: {
+    // 全站唯一的 Organization 实体：品牌口径 since 2002 / 邮编 518000
     identity: {
       type: 'Organization',
       name: 'TontonSports',
       alternateName: 'Tonton Sports (Shenzhen) Co., Ltd.',
       url: 'https://www.tutesports.com',
       logo: 'https://www.tutesports.com/logo.png',
-      description: 'Professional custom sportswear manufacturer since 2002. OEM/ODM activewear, gym wear, team uniforms.',
-      foundingDate: '2008-07-23',
+      description: 'Professional custom sportswear manufacturer since 2002. OEM/ODM activewear, gym wear, team uniforms. SEDEX SMETA 4-Pillar audited factory.',
       address: {
         type: 'PostalAddress',
         streetAddress: 'Room 208, Building A, Phase 3, Jiewei Industrial City, Shangmugu Community, Pinghu',
@@ -94,6 +102,8 @@ export default defineNuxtConfig({
         email: 'Marc@tutesports.com',
         availableLanguage: ['English']
       },
+      areaServed: ['North America', 'Europe', 'Australia', 'South America'],
+      knowsAbout: ['Custom Sportswear', 'Activewear Manufacturing', 'OEM', 'ODM', 'Team Uniforms'],
       sameAs: [
         'https://www.facebook.com/profile.php?id=61596052913953',
         'https://www.instagram.com/tonton_sports',
@@ -106,7 +116,9 @@ export default defineNuxtConfig({
   image: {
     domains: [
       'localhost:1337',
-      'res.cloudinary.com'
+      'res.cloudinary.com',
+      // Strapi 媒体兜底域名：不加上 NuxtImg 引用后台图会直接报错
+      'tutesportswear-strapi-us.onrender.com'
     ],
     format: ['avif', 'webp'],
     quality: 75,
@@ -146,6 +158,15 @@ export default defineNuxtConfig({
   },
 
   hooks: {
+    // 同一个列表组件挂两个路由：/products 与 /products/category/<slug>。
+    // 分类页因此有独立 URL（可收录、可分享、单独缓存），又不用复制一份 200 行模板。
+    'pages:extend'(pages) {
+      pages.push({
+        name: 'products-category',
+        path: '/products/category/:slug',
+        file: fileURLToPath(new URL('./pages/products/index.vue', import.meta.url))
+      })
+    },
     async 'nitro:config'(nitroConfig) {
       if (nitroConfig.dev) return
       
@@ -198,6 +219,16 @@ export default defineNuxtConfig({
       ? { config: { bypassToken: process.env.REVALIDATE_BYPASS_TOKEN } }
       : undefined,
     routeRules: {
+      // 全站安全响应头（未加 CSP：GA4 / Web3Forms / Cloudflare 注入脚本需要逐条放行，
+      // 需要单独一轮改造 + 线上验证，避免直接上线把转化表单打挂）
+      '/**': {
+        headers: {
+          'x-content-type-options': 'nosniff',
+          'x-frame-options': 'SAMEORIGIN',
+          'referrer-policy': 'strict-origin-when-cross-origin',
+          'permissions-policy': 'camera=(), microphone=(), geolocation=(), payment=()'
+        }
+      },
       // 有 Webhook 主动通知后，ISR 只作为兜底，周期放长减少无效唤醒
       '/':            { isr: 120 },
       '/products':    { isr: 120 },

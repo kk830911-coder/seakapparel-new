@@ -38,23 +38,22 @@ useHead({
     { property: 'og:type', content: 'website' },
     { property: 'og:url', content: 'https://www.tutesports.com/faq' }
   ],
-  script: [
-    {
-      type: 'application/ld+json',
-      innerHTML: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": faqList.value.map(item => ({
-          "@type": "Question",
-          "name": item.title || item.attributes?.title || '',
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": renderFaqContent(item.content || item.attributes?.content)
-          }
-        }))
-      })
-    }
-  ]
+  // FAQ 一条都没有时不要输出 mainEntity: [] 的空壳
+  script: computed(() => faqList.value.length ? [{
+    type: 'application/ld+json',
+    innerHTML: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": faqList.value.map(item => ({
+        "@type": "Question",
+        "name": item.title || item.attributes?.title || '',
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": renderFaqContent(item.content || item.attributes?.content)
+        }
+      }))
+    })
+  }] : [])
 })
 </script>
 

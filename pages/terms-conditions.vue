@@ -129,7 +129,7 @@
           <p class="font-semibold text-slate-800 mb-2">TontonSports Office</p>
           <ul class="space-y-1 text-sm text-slate-600">
             <li><strong>Email:</strong> <a href="mailto:Marc@tutesports.com" class="text-blue-600 hover:underline">Marc@tutesports.com</a></li>
-            <li><strong>Website:</strong> <a href="https://www.tutesports.com/" class="text-blue-600 hover:underline" target="_blank">https://www.tutesports.com/</a></li>
+            <li><strong>Website:</strong> <a href="https://www.tutesports.com/" class="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">https://www.tutesports.com/</a></li>
             <li><strong>Working Hours:</strong> Monday – Saturday: 7:00 A.M. to 5:00 P.M (Pacific Standard Time)</li>
           </ul>
         </div>
@@ -146,7 +146,7 @@
 <script setup>
 useCanonicalUrl()
 useHead({
-  title: 'Terms & Conditions - TontonSports',
+  title: 'Terms & Conditions',
   meta: [
     { name: 'description', content: 'Terms and Conditions for TontonSports custom sportswear services. Read our guidelines on ordering, payment, returns, and more.' },
     { name: 'robots', content: 'noindex, follow' }

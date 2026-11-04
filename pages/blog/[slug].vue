@@ -22,6 +22,10 @@ const { data: responseData, pending: loading, error: fetchError } = await useFet
 
 const post = computed(() => responseData.value?.data?.[0] || null)
 
+// 文章不存在时返回真正的 404，避免软 404 被搜索引擎当低质页收录
+const event = useRequestEvent()
+if (!post.value && event) setResponseStatus(event, 404)
+
 const formatDate = (item) => {
   const publishedAt = item?.publishedAt || item?.attributes?.publishedAt
   if (!publishedAt) return ''
@@ -50,7 +54,9 @@ const renderMarkdownContent = (content) => {
         block.children?.forEach(child => { p += child.bold ? `<strong>${child.text}</strong>` : child.text })
         html += p + '</p>'
       } else if (block.type === 'image' && block.image?.url) {
-        html += `<div class="blog-image-wrapper"><img src="${block.image.url}" alt="${postTitle}" /></div>`
+        // CMS 有可能返回相对路径，统一拼成完整 URL，避免正文图片全挂
+        const src = block.image.url.startsWith('/') ? `${strapiUrl}${block.image.url}` : block.image.url
+        html += `<div class="blog-image-wrapper"><img src="${src}" alt="${postTitle}" loading="lazy" /></div>`
       }
     })
     return html
@@ -60,7 +66,8 @@ const renderMarkdownContent = (content) => {
 }
 
 useHead({
-  title: computed(() => `${post.value?.title || post.value?.attributes?.title || 'Blog Detail'} | TontonSports`),
+  // 品牌后缀交给 nuxt.config 的 titleTemplate，这里手写会出现 "... | TontonSports | TontonSports"
+  title: computed(() => `${post.value?.title || post.value?.attributes?.title || 'Blog Detail'}`),
   meta: computed(() => [
     { name: 'description', content: post.value?.description || post.value?.attributes?.description || 'Read the full article on TontonSports blog.' },
     { property: 'og:title', content: post.value?.title || post.value?.attributes?.title || 'Blog Detail' },
@@ -68,7 +75,10 @@ useHead({
     { property: 'og:type', content: 'article' },
     { property: 'article:published_time', content: post.value?.publishedAt || post.value?.attributes?.publishedAt || '' }
   ]),
-  script: computed(() => [{
+  // 文章不存在（404）时不要输出 headline 为空的 Article
+  script: computed(() => {
+    if (!post.value) return []
+    return [{
     type: 'application/ld+json',
     innerHTML: JSON.stringify({
       "@context": "https://schema.org",
@@ -112,7 +122,8 @@ useHead({
         "item": `https://www.tutesports.com/blog/${post.value?.slug || post.value?.attributes?.slug || ''}`
       }]
     })
-  }])
+  }]
+  })
 })
 </script>
 

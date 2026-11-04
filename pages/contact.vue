@@ -18,56 +18,76 @@ const form = ref({
 })
 const formSubmitted = ref(false)
 const formSubmitting = ref(false)
+const formError = ref('')
+const errors = ref({})
+const agreedToPrivacy = ref(false)
 
-// 从产品页点"Send Email Inquiry"过来时自动带出产品，客户不用重新描述需求
+// 从产品页点"Send Email Inquiry"过来时自动带出产品和分类，客户不用重新描述需求
 onMounted(() => {
-  const slug = typeof route.query.product === 'string' ? route.query.product : ''
+  const productSlug = typeof route.query.product === 'string' ? route.query.product : ''
   const title = typeof route.query.title === 'string' ? route.query.title : ''
-  const categoryName = getCategoryName(slug)
+  // 产品页会额外带上 category=<分类 slug>；只带 product 时按分类 slug 兜底匹配
+  const categorySlug = typeof route.query.category === 'string' && route.query.category
+    ? route.query.category
+    : productSlug
+  const categoryName = getCategoryName(categorySlug) || getCategoryName(productSlug)
   if (categoryName) form.value.product = categoryName
   if (title) {
     form.value.message = `I'm interested in: ${title}${categoryName ? ` (${categoryName})` : ''}\n\n`
   }
 })
 
+// 内联校验：以前是静默 return，客户点了提交没反应不知道为什么
+const validateForm = () => {
+  const next = {}
+  if (!form.value.name.trim()) next.name = 'Please enter your name'
+  if (!form.value.email.trim()) next.email = 'Please enter your email'
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.value.email.trim())) next.email = 'Please enter a valid email address'
+  if (!form.value.message.trim()) next.message = 'Please tell us what you need'
+  if (!agreedToPrivacy.value) next.privacy = 'Please accept the Privacy Policy before submitting'
+  errors.value = next
+  return Object.keys(next).length === 0
+}
+
 const submitForm = async () => {
-  if (!form.value.name || !form.value.email || !form.value.message) return
-  // 机器人命中 honeypot：静默丢弃，不消耗 Web3Forms 的月度额度
+  formError.value = ''
+  // 机器人命中 honeypot：静默丢弃，不消耗表单额度
   if (form.value.botfield) return
+
+  if (!validateForm()) {
+    await nextTick()
+    const firstInvalid = document.querySelector('[aria-invalid="true"]')
+    firstInvalid?.focus()
+    return
+  }
+
   formSubmitting.value = true
   try {
-    const res = await fetch('https://api.web3forms.com/submit', {
+    // 走自己的服务端接口：Web3Forms 密钥不再暴露在浏览器
+    await $fetch('/api/inquiry', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({
-        access_key: 'f74fd901-0b24-4634-8a2f-95c549480b83',
-        subject: `Inquiry from ${form.value.name} - ${form.value.company || 'Individual'}`,
-        from_name: 'TontonSports Website',
+      body: {
         name: form.value.name,
         email: form.value.email,
-        company: form.value.company || 'N/A',
-        phone: form.value.phone || 'N/A',
-        product: form.value.product || 'N/A',
-        quantity: form.value.quantity || 'N/A',
-        message: form.value.message
-      })
-    })
-    const data = await res.json()
-    if (data.success) {
-      formSubmitted.value = true
-      // GA4 转化事件：没有它，广告和 SEO 的询盘无法归因
-      if (process.client && window.gtag) {
-        window.gtag('event', 'generate_lead', {
-          event_category: 'inquiry',
-          event_label: form.value.product || 'general'
-        })
+        company: form.value.company,
+        phone: form.value.phone,
+        product: form.value.product,
+        quantity: form.value.quantity,
+        message: form.value.message,
+        botfield: form.value.botfield
       }
-    } else {
-      alert('Sorry, there was an error sending your message. Please try WhatsApp or email us directly.')
+    })
+
+    formSubmitted.value = true
+    // GA4 转化事件：没有它，广告和 SEO 的询盘无法归因
+    if (process.client && window.gtag) {
+      window.gtag('event', 'generate_lead', {
+        event_category: 'inquiry',
+        event_label: form.value.product || 'general'
+      })
     }
   } catch (err) {
-    console.error('Form submission error:', err)
-    alert('Sorry, there was an error sending your message. Please try WhatsApp or email us directly.')
+    formError.value = 'Sorry, we could not send your message. Please try WhatsApp or email us directly.'
   } finally {
     formSubmitting.value = false
   }
@@ -112,7 +132,7 @@ useHead({
     <section class="bg-white border-b border-gray-100">
       <div class="max-w-7xl mx-auto px-4 py-6">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <a href="https://wa.me/8618271971983" target="_blank" class="flex items-center gap-3 p-4 rounded-xl bg-green-50 border border-green-100 hover:shadow-md transition-all group">
+          <a href="https://wa.me/8618271971983" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-4 rounded-xl bg-green-50 border border-green-100 hover:shadow-md transition-all group">
             <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 group-hover:bg-green-200 transition-colors">
               <svg class="w-5 h-5 text-green-700" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471.145-.575.297-.101.15-.39.54-.72 1.09-.134.212-.249.227-.46.082-.16-.074-.729-.27-1.393-.866-.515-.462-.862-1.029-.968-1.248-.099-.21.01-.325.083-.46.075-.134.15-.247.299-.492.099-.168.049-.312-.024-.439-.075-.126-.67-1.611-.916-2.206-.242-.59-.487-.511-.67-.52-.16-.008-.341-.01-.52-.01-.18 0-.47.07-.719.347-.248.277-.944.92-1.433 1.798-.49.878-.49 1.933.028 3.774.52 1.84 1.56 3.582 2.994 4.828 1.433 1.247 3.174 1.943 4.919 2.429.64.14 1.225.227 1.655.273.695.086 1.331.074 1.843-.04 1.05-.23 3.393-1.324 3.896-2.61.503-1.287.503-2.399.354-2.61-.149-.21-.54-.339-1.13-.59z"/></svg>
             </div>
@@ -153,45 +173,47 @@ useHead({
               <h2 class="text-2xl font-heading font-bold text-navy mb-2">Send Us an Inquiry</h2>
               <p class="text-gray-500 text-sm mb-6">Fill out the form below and we'll get back to you within 24 hours.</p>
 
-              <div v-if="formSubmitted" class="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
+              <div v-if="formSubmitted" role="status" aria-live="polite" class="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
                 <svg class="w-12 h-12 text-green-500 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 <h3 class="font-heading font-bold text-green-800 text-lg mb-2">Inquiry Sent!</h3>
                 <p class="text-green-600 text-sm">Thank you for reaching out. We'll respond within 24 hours.</p>
               </div>
 
-              <form v-else @submit.prevent="submitForm" class="space-y-4">
+              <form v-else @submit.prevent="submitForm" novalidate class="space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Name *</label>
-                    <input v-model="form.name" type="text" required placeholder="Your full name" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm" />
+                    <label for="inquiry-name" class="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                    <input id="inquiry-name" v-model="form.name" type="text" required autocomplete="name" placeholder="Your full name" :aria-invalid="errors.name ? 'true' : 'false'" :aria-describedby="errors.name ? 'inquiry-name-error' : undefined" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm" />
+                    <p v-if="errors.name" id="inquiry-name-error" class="mt-1 text-xs text-red-600">{{ errors.name }}</p>
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                    <input v-model="form.email" type="email" required placeholder="your@email.com" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm" />
+                    <label for="inquiry-email" class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                    <input id="inquiry-email" v-model="form.email" type="email" required autocomplete="email" placeholder="your@email.com" :aria-invalid="errors.email ? 'true' : 'false'" :aria-describedby="errors.email ? 'inquiry-email-error' : undefined" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm" />
+                    <p v-if="errors.email" id="inquiry-email-error" class="mt-1 text-xs text-red-600">{{ errors.email }}</p>
                   </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Company</label>
-                    <input v-model="form.company" type="text" placeholder="Company name" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm" />
+                    <label for="inquiry-company" class="block text-sm font-medium text-gray-700 mb-1">Company</label>
+                    <input id="inquiry-company" v-model="form.company" type="text" autocomplete="organization" maxlength="200" placeholder="Company name" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm" />
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Phone / WhatsApp</label>
-                    <input v-model="form.phone" type="text" placeholder="+1 234 567 8900" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm" />
+                    <label for="inquiry-phone" class="block text-sm font-medium text-gray-700 mb-1">Phone / WhatsApp</label>
+                    <input id="inquiry-phone" v-model="form.phone" type="tel" autocomplete="tel" maxlength="60" placeholder="+1 234 567 8900" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm" />
                   </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Product Interest</label>
-                    <select v-model="form.product" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm bg-white">
+                    <label for="inquiry-product" class="block text-sm font-medium text-gray-700 mb-1">Product Interest</label>
+                    <select id="inquiry-product" v-model="form.product" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm bg-white">
                       <option value="">Select a category</option>
                       <option v-for="cat in productCategories" :key="cat.slug" :value="cat.name">{{ cat.name }}</option>
                       <option value="Other">Other</option>
                     </select>
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Estimated Quantity</label>
-                    <select v-model="form.quantity" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm bg-white">
+                    <label for="inquiry-quantity" class="block text-sm font-medium text-gray-700 mb-1">Estimated Quantity</label>
+                    <select id="inquiry-quantity" v-model="form.quantity" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm bg-white">
                       <option value="">Select quantity range</option>
                       <option value="1-50">1 - 50 pieces</option>
                       <option value="50-200">50 - 200 pieces</option>
@@ -202,9 +224,22 @@ useHead({
                   </div>
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Message *</label>
-                  <textarea v-model="form.message" required rows="4" placeholder="Tell us about your project: design ideas, fabric preferences, timeline, etc." class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm resize-none"></textarea>
+                  <label for="inquiry-message" class="block text-sm font-medium text-gray-700 mb-1">Message *</label>
+                  <textarea id="inquiry-message" v-model="form.message" required rows="4" maxlength="5000" placeholder="Tell us about your project: design ideas, fabric preferences, timeline, etc." :aria-invalid="errors.message ? 'true' : 'false'" :aria-describedby="errors.message ? 'inquiry-message-error' : undefined" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm resize-none"></textarea>
+                  <p v-if="errors.message" id="inquiry-message-error" class="mt-1 text-xs text-red-600">{{ errors.message }}</p>
                 </div>
+                <div>
+                  <label for="inquiry-privacy" class="flex items-start gap-2 text-xs text-gray-600">
+                    <input id="inquiry-privacy" v-model="agreedToPrivacy" type="checkbox" class="mt-0.5 flex-shrink-0" :aria-invalid="errors.privacy ? 'true' : 'false'" :aria-describedby="errors.privacy ? 'inquiry-privacy-error' : undefined" />
+                    <span>
+                      I agree to the
+                      <NuxtLink to="/privacy-policy" class="text-brand hover:underline">Privacy Policy</NuxtLink>
+                      and consent to being contacted about this inquiry.
+                    </span>
+                  </label>
+                  <p v-if="errors.privacy" id="inquiry-privacy-error" class="mt-1 text-xs text-red-600">{{ errors.privacy }}</p>
+                </div>
+                <p v-if="formError" role="alert" class="text-sm text-red-700 bg-red-50 border border-red-100 rounded-lg p-3">{{ formError }}</p>
                 <!-- honeypot：真人看不到，填了就判定为机器人 -->
                 <input
                   v-model="form.botfield"
@@ -267,14 +302,20 @@ useHead({
               </ul>
             </div>
 
-            <!-- Map Placeholder -->
+            <!-- Map：深圳办公室（原来只是灰色占位框，一眼半成品） -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-              <div class="bg-gray-100 h-48 flex items-center justify-center">
-                <div class="text-center text-gray-400">
-                  <svg class="w-10 h-10 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                  <p class="text-sm">Google Maps</p>
-                  <p class="text-xs">Shenzhen office · Xiantao factory</p>
-                </div>
+              <iframe
+                title="TontonSports Shenzhen office location"
+                src="https://maps.google.com/maps?q=Jiewei%20Industrial%20City%2C%20Shangmugu%2C%20Pinghu%2C%20Longgang%2C%20Shenzhen&z=13&output=embed"
+                width="100%"
+                height="240"
+                style="border:0"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                allowfullscreen
+              ></iframe>
+              <div class="px-4 py-3 text-xs text-gray-500 border-t border-gray-100">
+                Shenzhen office · Xiantao factory
               </div>
             </div>
 

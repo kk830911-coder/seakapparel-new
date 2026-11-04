@@ -80,7 +80,7 @@ const fabrics = [
             Start Your Custom Project
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
           </NuxtLink>
-          <a href="https://wa.me/8618271971983" target="_blank" class="inline-flex items-center justify-center gap-2 bg-white/10 border border-white/20 hover:bg-white/20 text-white font-semibold px-7 py-3.5 rounded-lg transition-colors">
+          <a href="https://wa.me/8618271971983" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 bg-white/10 border border-white/20 hover:bg-white/20 text-white font-semibold px-7 py-3.5 rounded-lg transition-colors">
             Chat on WhatsApp
           </a>
         </div>
@@ -195,7 +195,7 @@ const fabrics = [
             Get Free Mockup
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
           </NuxtLink>
-          <a href="https://wa.me/8618271971983" target="_blank" class="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-7 py-3.5 rounded-lg transition-colors">
+          <a href="https://wa.me/8618271971983" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-7 py-3.5 rounded-lg transition-colors">
             Chat on WhatsApp
           </a>
         </div>

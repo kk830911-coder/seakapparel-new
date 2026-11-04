@@ -10,24 +10,26 @@ export function useStrapi() {
 
 export function getCleanImageUrl(rawUrl: string, strapiUrl: string): string {
   if (!rawUrl) return FALLBACK_IMG
-  if (rawUrl.startsWith('/')) return `${strapiUrl}${rawUrl}`
-  return rawUrl.split('?')[0]
+  const url = rawUrl.startsWith('/') ? `${strapiUrl}${rawUrl}` : rawUrl
+  return optimizeCloudinary(url.split('?')[0])
 }
 
-export function getProductImageUrl(item: any, strapiUrl: string): string {
+export function getProductImageUrl(item: any, strapiUrl: string, width = 800): string {
   let url = ''
   if (item?.image?.url) url = item.image.url
   else if (Array.isArray(item?.image) && item.image[0]?.url) url = item.image[0].url
   else if (item?.attributes?.image?.data?.attributes?.url) url = item.attributes.image.data.attributes.url
-  return getCleanImageUrl(url, strapiUrl)
+  if (!url) return FALLBACK_IMG
+  const absolute = url.startsWith('/') ? `${strapiUrl}${url}` : url
+  return optimizeCloudinary(absolute.split('?')[0], width)
 }
 
 /** Cloudinary 原图 → 自动格式 + 压缩（后台走 Cloudinary 上传，URL 形如 .../upload/v123/xxx.png） */
-export function optimizeCloudinary(url: string): string {
+export function optimizeCloudinary(url: string, width = 1200): string {
   if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url
   if (url.includes('/f_auto')) return url
   const [base, rest] = url.split('/upload/')
-  return `${base}/upload/f_auto,q_auto,w_1200/${rest}`
+  return `${base}/upload/f_auto,q_auto,w_${width}/${rest}`
 }
 
 /** 单个媒体字段（可传数组，取第一张）→ 完整可访问 URL */

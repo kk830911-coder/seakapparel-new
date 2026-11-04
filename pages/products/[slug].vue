@@ -214,10 +214,19 @@ function splitPrice(v) {
   return { dollars: String(Math.floor(n)), cents: cents ? String(cents).padStart(2, '0') : '' }
 }
 
+// 产品标题常有 100+ 字符，搜索结果会被截断；按词边界截到 ~58 字符，品牌后缀由 titleTemplate 追加
+function shortenTitle(text, max = 58) {
+  if (text.length <= max) return text
+  const cut = text.slice(0, max + 1)
+  const lastSpace = cut.lastIndexOf(' ')
+  return (lastSpace > 30 ? cut.slice(0, lastSpace) : cut.slice(0, max)).trim() + '…'
+}
+const seoTitle = computed(() => shortenTitle((getTitle(product.value) || 'Custom Sportswear').trim(), 58))
+
 useSeoMeta({
   // 不要手写 "| TontonSports"：nuxt.config 的 titleTemplate 会自动追加，否则线上会出现两个品牌名
-  title: () => (getTitle(product.value) || 'Custom Sportswear').trim(),
-  ogTitle: () => `${(getTitle(product.value) || 'Custom Sportswear').trim()} - TontonSports`,
+  title: () => seoTitle.value,
+  ogTitle: () => `${seoTitle.value} - TontonSports`,
   description: () => {
     const title = (getTitle(product.value) || 'Custom sportswear').trim()
     const moq = getMoq(product.value)
@@ -407,7 +416,7 @@ const handleTouchEnd = (e, next, prev) => {
       <template v-if="product">
         <template v-if="product.category?.name">
           <span class="mx-2">/</span>
-          <NuxtLink :to="`/products?category=${product.category.slug}`" class="hover:text-brand transition-colors">{{ product.category.name }}</NuxtLink>
+          <NuxtLink :to="`/products/category/${product.category.slug}`" class="hover:text-brand transition-colors">{{ product.category.name }}</NuxtLink>
         </template>
         <span class="mx-2">/</span>
         <span class="text-gray-600">{{ getTitle(product) }}</span>
@@ -426,7 +435,7 @@ const handleTouchEnd = (e, next, prev) => {
         <div class="space-y-2 sm:space-y-3">
           <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-300 relative group" :class="currentItem.type === 'image' && activeSkuIndex < 0 ? 'cursor-zoom-in' : ''" @touchstart="handleTouchStart" @touchend="e => handleTouchEnd(e, nextImage, prevImage)" @click="currentItem.type === 'image' && activeSkuIndex < 0 && openPreview()">
             <video v-if="currentItem.type === 'video'" :key="currentItem.url" :src="currentItem.url" :poster="currentItem.poster ? getCleanImageUrl(currentItem.poster, strapiUrl) : undefined" controls playsinline preload="metadata" class="w-full h-full object-contain bg-black"></video>
-            <img v-else :src="getCleanImageUrl(mainImageUrl, strapiUrl)" class="w-full h-full object-cover" :alt="altFor(mainImageUrl, `${getTitle(product) || 'Product'} - TontonSports`)" loading="eager" fetchpriority="high" />
+            <img v-else :src="getCleanImageUrl(mainImageUrl, strapiUrl)" class="w-full h-full object-cover" :alt="altFor(mainImageUrl, `${getTitle(product) || 'Product'} - TontonSports`)" width="900" height="900" loading="eager" fetchpriority="high" decoding="async" />
             <button v-if="galleryItems.length > 1" @click.stop="prevImage" class="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 bg-black/40 text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             </button>
@@ -526,11 +535,11 @@ const handleTouchEnd = (e, next, prev) => {
 
           <!-- CTA Buttons -->
           <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-auto">
-            <a :href="`https://wa.me/8618271971983?text=Interested: ${getTitle(product)}`" target="_blank" class="flex-1 inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 sm:py-3.5 rounded-lg transition-colors text-sm sm:text-base">
+            <a :href="`https://wa.me/8618271971983?text=Interested: ${getTitle(product)}`" target="_blank" rel="noopener noreferrer" class="flex-1 inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 sm:py-3.5 rounded-lg transition-colors text-sm sm:text-base">
               <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471.145-.575.297-.101.15-.39.54-.72 1.09-.134.212-.249.227-.46.082-.16-.074-.729-.27-1.393-.866-.515-.462-.862-1.029-.968-1.248-.099-.21.01-.325.083-.46.075-.134.15-.247.299-.492.099-.168.049-.312-.024-.439-.075-.126-.67-1.611-.916-2.206-.242-.59-.487-.511-.67-.52-.16-.008-.341-.01-.52-.01-.18 0-.47.07-.719.347-.248.277-.944.92-1.433 1.798-.49.878-.49 1.933.028 3.774.52 1.84 1.56 3.582 2.994 4.828 1.433 1.247 3.174 1.943 4.919 2.429.64.14 1.225.227 1.655.273.695.086 1.331.074 1.843-.04 1.05-.23 3.393-1.324 3.896-2.61.503-1.287.503-2.399.354-2.61-.149-.21-.54-.339-1.13-.59z"/></svg>
               WhatsApp Inquiry
             </a>
-            <NuxtLink :to="`/contact?product=${getSlug(product)}&title=${encodeURIComponent(getTitle(product) || '')}`" class="flex-1 inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white font-semibold py-3 sm:py-3.5 rounded-lg transition-colors text-sm sm:text-base">
+            <NuxtLink :to="`/contact?product=${getSlug(product)}&title=${encodeURIComponent(getTitle(product) || '')}&category=${encodeURIComponent(product?.category?.slug || product?.attributes?.category?.data?.attributes?.slug || '')}`" class="flex-1 inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white font-semibold py-3 sm:py-3.5 rounded-lg transition-colors text-sm sm:text-base">
               <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
               Send Email Inquiry
             </NuxtLink>

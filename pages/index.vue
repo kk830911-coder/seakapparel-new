@@ -86,7 +86,7 @@ const testimonials = [
     <!-- Section 1: Hero Banner -->
     <section class="relative w-full overflow-hidden">
       <div class="relative h-[45vh] min-h-[350px] md:h-[50vh] lg:h-[calc(100vw*600/1920)] lg:max-h-[600px]">
-        <NuxtImg :src="bannerImage" format="avif" fallbackFormat="webp" class="w-full h-full object-cover" alt="Custom Sportswear Manufacturing" preload fetchpriority="high" />
+        <NuxtImg :src="bannerImage" format="avif" fallbackFormat="webp" class="w-full h-full object-cover" alt="Custom Sportswear Manufacturing" width="1920" height="600" sizes="100vw" preload fetchpriority="high" />
 
         <!-- Hero Content Overlay -->
         <div class="absolute inset-0 flex items-start justify-center pt-2.5 md:pt-12 lg:pt-16">
@@ -136,8 +136,17 @@ const testimonials = [
           <p class="text-gray-500 max-w-2xl mx-auto">Custom designs for every sport. Click a category to explore our capabilities.</p>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-          <NuxtLink v-for="cat in categories" :key="cat.slug" :to="`/products?category=${cat.slug}`" class="group relative overflow-hidden rounded-xl aspect-[4/3] shadow-sm hover:shadow-lg transition-all duration-300">
-            <img :src="cat.img" :alt="`${cat.name} Custom Sportswear`" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
+          <NuxtLink v-for="cat in categories" :key="cat.slug" :to="`/products/category/${cat.slug}`" class="group relative overflow-hidden rounded-xl aspect-[4/3] shadow-sm hover:shadow-lg transition-all duration-300">
+            <NuxtImg
+              :src="cat.img"
+              :alt="`${cat.name} Custom Sportswear`"
+              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              width="600"
+              height="450"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              loading="lazy"
+              decoding="async"
+            />
             <div class="absolute inset-0 bg-gradient-to-t from-navy/80 via-navy/20 to-transparent"></div>
             <div class="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
               <h3 class="text-white font-heading font-semibold text-sm sm:text-lg">{{ cat.name }}</h3>
@@ -213,7 +222,7 @@ const testimonials = [
         <div v-else class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div v-for="item in hotProducts" :key="item.documentId || item.id" class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 group border border-gray-100">
             <NuxtLink :to="`/products/${getSlug(item)}`" class="aspect-square overflow-hidden block bg-gray-50 relative">
-              <img :src="getProductImageUrl(item, strapiUrl)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" :alt="`${getTitle(item) || 'Custom Sportswear'} - TontonSports`" loading="lazy" />
+              <img :src="getProductImageUrl(item, strapiUrl)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" :alt="`${getTitle(item) || 'Custom Sportswear'} - TontonSports`" width="600" height="600" loading="lazy" decoding="async" />
             </NuxtLink>
             <div class="p-2 sm:p-4">
               <NuxtLink :to="`/products/${getSlug(item)}`" class="block">
