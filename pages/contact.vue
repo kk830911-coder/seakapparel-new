@@ -37,14 +37,52 @@ onMounted(() => {
   }
 })
 
-// 内联校验：以前是静默 return，客户点了提交没反应不知道为什么
+// 邮箱按"错在哪"给具体提示，而不是一句笼统的 invalid
+const validateEmail = (value) => {
+  const v = String(value || '').trim()
+  if (!v) return 'Please enter your email address'
+  if (/\s/.test(v)) return 'Email address cannot contain spaces'
+  if (!v.includes('@')) return 'This email is missing "@" — e.g. name@company.com'
+  const [local, domain] = v.split('@')
+  if (!local) return 'This email is missing the name before "@"'
+  if (!domain) return 'This email is missing the domain after "@" — e.g. gmail.com'
+  if (!domain.includes('.')) return 'This email domain has no ending like ".com"'
+  if (!/\.[A-Za-z]{2,}$/.test(domain)) return 'This email domain ending looks incomplete (e.g. ".com")'
+  if (!/^[A-Za-z0-9._%+-]+$/.test(local)) return 'This email has an invalid character before "@"'
+  if (/\.\./.test(v) || /^\./.test(local) || /\.$/.test(local)) return 'This email has a misplaced dot — please check it'
+  return ''
+}
+
+// 改动某个字段就立刻清掉它自己的旧报错，避免"改了还红着"
+const clearError = (field) => {
+  if (!errors.value[field]) return
+  const next = { ...errors.value }
+  delete next[field]
+  errors.value = next
+}
+
+// 失焦就校验邮箱，不必等到点提交
+const checkEmailField = () => {
+  const msg = validateEmail(form.value.email)
+  const next = { ...errors.value }
+  if (msg) next.email = msg
+  else delete next.email
+  errors.value = next
+}
+
+const focusField = async (id) => {
+  await nextTick()
+  document.getElementById(id)?.focus()
+}
+
+// 只校验必填项；Company / Phone / Product / Quantity 都是选填，永不报错
 const validateForm = () => {
   const next = {}
   if (!form.value.name.trim()) next.name = 'Please enter your name'
-  if (!form.value.email.trim()) next.email = 'Please enter your email'
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.value.email.trim())) next.email = 'Please enter a valid email address'
+  const emailMsg = validateEmail(form.value.email)
+  if (emailMsg) next.email = emailMsg
   if (!form.value.message.trim()) next.message = 'Please tell us what you need'
-  if (!agreedToPrivacy.value) next.privacy = 'Please accept the Privacy Policy before submitting'
+  if (!agreedToPrivacy.value) next.privacy = 'Please tick the box to accept the Privacy Policy'
   errors.value = next
   return Object.keys(next).length === 0
 }
@@ -55,28 +93,49 @@ const submitForm = async () => {
   if (form.value.botfield) return
 
   if (!validateForm()) {
-    await nextTick()
-    const firstInvalid = document.querySelector('[aria-invalid="true"]')
-    firstInvalid?.focus()
+    // 聚焦到第一个出错的具体字段
+    const firstInvalid = Object.keys(errors.value)[0]
+    const map = { name: 'inquiry-name', email: 'inquiry-email', message: 'inquiry-message', privacy: 'inquiry-privacy' }
+    if (firstInvalid && map[firstInvalid]) await focusField(map[firstInvalid])
     return
   }
 
   formSubmitting.value = true
   try {
-    // 走自己的服务端接口：Web3Forms 密钥不再暴露在浏览器
-    await $fetch('/api/inquiry', {
+    // 浏览器直连 Web3Forms：其 API 在 Cloudflare 后面，对所有"服务器对服务器"请求
+    // 强制人机验证（cf-mitigated: challenge），服务端代理必然 403。
+    // access_key 官方设计就是前端使用；防滥用靠 honeypot + Web3Forms 后台的域名白名单。
+    const config = useRuntimeConfig()
+    const result = await $fetch('https://api.web3forms.com/submit', {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: {
+        access_key: config.public.web3formsKey,
+        subject: `Inquiry from ${form.value.name} - ${form.value.company || 'Individual'}`,
+        from_name: 'TontonSports Website',
+        replyto: form.value.email,
         name: form.value.name,
         email: form.value.email,
-        company: form.value.company,
-        phone: form.value.phone,
-        product: form.value.product,
-        quantity: form.value.quantity,
-        message: form.value.message,
-        botfield: form.value.botfield
+        company: form.value.company || 'N/A',
+        phone: form.value.phone || 'N/A',
+        product: form.value.product || 'N/A',
+        quantity: form.value.quantity || 'N/A',
+        message: form.value.message
       }
     })
+
+    // Web3Forms 也可能返回 200 + success:false（例如它判定邮箱不可用），
+    // 这种情况同样要落到具体字段，而不是给一句笼统的失败提示
+    if (result && result.success === false) {
+      const serverMsg = String(result.message || '')
+      if (/email/i.test(serverMsg)) {
+        errors.value.email = serverMsg
+        await focusField('inquiry-email')
+      } else {
+        formError.value = serverMsg || 'We could not send your message just now. Please try again, or reach us on WhatsApp / email.'
+      }
+      return
+    }
 
     formSubmitted.value = true
     // GA4 转化事件：没有它，广告和 SEO 的询盘无法归因
@@ -87,7 +146,17 @@ const submitForm = async () => {
       })
     }
   } catch (err) {
-    formError.value = 'Sorry, we could not send your message. Please try WhatsApp or email us directly.'
+    const status = err?.statusCode || err?.response?.status || 0
+    const serverMsg = String(err?.data?.message || err?.data?.statusMessage || '')
+    if (/email/i.test(serverMsg)) {
+      // 服务端指出是邮箱问题 → 提示到 Email 输入框下面
+      errors.value.email = serverMsg
+      await focusField('inquiry-email')
+    } else if (status === 429) {
+      formError.value = 'Too many submissions from this network just now. Please wait a couple of minutes, or message us on WhatsApp.'
+    } else {
+      formError.value = 'We could not send your message just now. Please try again, or reach us on WhatsApp / email directly.'
+    }
   } finally {
     formSubmitting.value = false
   }
@@ -177,34 +246,36 @@ useHead({
                 <svg class="w-12 h-12 text-green-500 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 <h3 class="font-heading font-bold text-green-800 text-lg mb-2">Inquiry Sent!</h3>
                 <p class="text-green-600 text-sm">Thank you for reaching out. We'll respond within 24 hours.</p>
+                <!-- 把收件地址显示出来：填错了客户当场能发现，不至于白等 24 小时 -->
+                <p class="text-green-700 text-sm mt-2">A confirmation will go to <strong>{{ form.email }}</strong> — please double-check the spelling.</p>
               </div>
 
               <form v-else @submit.prevent="submitForm" novalidate class="space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label for="inquiry-name" class="block text-sm font-medium text-gray-700 mb-1">Name *</label>
-                    <input id="inquiry-name" v-model="form.name" type="text" required autocomplete="name" placeholder="Your full name" :aria-invalid="errors.name ? 'true' : 'false'" :aria-describedby="errors.name ? 'inquiry-name-error' : undefined" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm" />
-                    <p v-if="errors.name" id="inquiry-name-error" class="mt-1 text-xs text-red-600">{{ errors.name }}</p>
+                    <input id="inquiry-name" v-model="form.name" type="text" required autocomplete="name" placeholder="Your full name" :aria-invalid="errors.name ? 'true' : 'false'" :aria-describedby="errors.name ? 'inquiry-name-error' : undefined" @input="clearError('name')" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm" :class="errors.name ? 'border-red-300 bg-red-50/40' : ''" />
+                    <p v-if="errors.name" id="inquiry-name-error" role="alert" class="mt-1 text-xs text-red-600">{{ errors.name }}</p>
                   </div>
                   <div>
                     <label for="inquiry-email" class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                    <input id="inquiry-email" v-model="form.email" type="email" required autocomplete="email" placeholder="your@email.com" :aria-invalid="errors.email ? 'true' : 'false'" :aria-describedby="errors.email ? 'inquiry-email-error' : undefined" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm" />
-                    <p v-if="errors.email" id="inquiry-email-error" class="mt-1 text-xs text-red-600">{{ errors.email }}</p>
+                    <input id="inquiry-email" v-model="form.email" type="email" required autocomplete="email" placeholder="your@email.com" :aria-invalid="errors.email ? 'true' : 'false'" :aria-describedby="errors.email ? 'inquiry-email-error' : undefined" @input="clearError('email')" @blur="checkEmailField" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm" :class="errors.email ? 'border-red-300 bg-red-50/40' : ''" />
+                    <p v-if="errors.email" id="inquiry-email-error" role="alert" class="mt-1 text-xs text-red-600">{{ errors.email }}</p>
                   </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label for="inquiry-company" class="block text-sm font-medium text-gray-700 mb-1">Company</label>
+                    <label for="inquiry-company" class="block text-sm font-medium text-gray-700 mb-1">Company <span class="text-gray-400 font-normal">(optional)</span></label>
                     <input id="inquiry-company" v-model="form.company" type="text" autocomplete="organization" maxlength="200" placeholder="Company name" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm" />
                   </div>
                   <div>
-                    <label for="inquiry-phone" class="block text-sm font-medium text-gray-700 mb-1">Phone / WhatsApp</label>
+                    <label for="inquiry-phone" class="block text-sm font-medium text-gray-700 mb-1">Phone / WhatsApp <span class="text-gray-400 font-normal">(optional)</span></label>
                     <input id="inquiry-phone" v-model="form.phone" type="tel" autocomplete="tel" maxlength="60" placeholder="+1 234 567 8900" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm" />
                   </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label for="inquiry-product" class="block text-sm font-medium text-gray-700 mb-1">Product Interest</label>
+                    <label for="inquiry-product" class="block text-sm font-medium text-gray-700 mb-1">Product Interest <span class="text-gray-400 font-normal">(optional)</span></label>
                     <select id="inquiry-product" v-model="form.product" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm bg-white">
                       <option value="">Select a category</option>
                       <option v-for="cat in productCategories" :key="cat.slug" :value="cat.name">{{ cat.name }}</option>
@@ -212,7 +283,7 @@ useHead({
                     </select>
                   </div>
                   <div>
-                    <label for="inquiry-quantity" class="block text-sm font-medium text-gray-700 mb-1">Estimated Quantity</label>
+                    <label for="inquiry-quantity" class="block text-sm font-medium text-gray-700 mb-1">Estimated Quantity <span class="text-gray-400 font-normal">(optional)</span></label>
                     <select id="inquiry-quantity" v-model="form.quantity" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm bg-white">
                       <option value="">Select quantity range</option>
                       <option value="1-50">1 - 50 pieces</option>
@@ -225,12 +296,12 @@ useHead({
                 </div>
                 <div>
                   <label for="inquiry-message" class="block text-sm font-medium text-gray-700 mb-1">Message *</label>
-                  <textarea id="inquiry-message" v-model="form.message" required rows="4" maxlength="5000" placeholder="Tell us about your project: design ideas, fabric preferences, timeline, etc." :aria-invalid="errors.message ? 'true' : 'false'" :aria-describedby="errors.message ? 'inquiry-message-error' : undefined" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm resize-none"></textarea>
-                  <p v-if="errors.message" id="inquiry-message-error" class="mt-1 text-xs text-red-600">{{ errors.message }}</p>
+                  <textarea id="inquiry-message" v-model="form.message" required rows="4" maxlength="5000" placeholder="Tell us about your project: design ideas, fabric preferences, timeline, etc." :aria-invalid="errors.message ? 'true' : 'false'" :aria-describedby="errors.message ? 'inquiry-message-error' : undefined" @input="clearError('message')" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-sm resize-none" :class="errors.message ? 'border-red-300 bg-red-50/40' : ''"></textarea>
+                  <p v-if="errors.message" id="inquiry-message-error" role="alert" class="mt-1 text-xs text-red-600">{{ errors.message }}</p>
                 </div>
                 <div>
                   <label for="inquiry-privacy" class="flex items-start gap-2 text-xs text-gray-600">
-                    <input id="inquiry-privacy" v-model="agreedToPrivacy" type="checkbox" class="mt-0.5 flex-shrink-0" :aria-invalid="errors.privacy ? 'true' : 'false'" :aria-describedby="errors.privacy ? 'inquiry-privacy-error' : undefined" />
+                    <input id="inquiry-privacy" v-model="agreedToPrivacy" type="checkbox" class="mt-0.5 flex-shrink-0" :aria-invalid="errors.privacy ? 'true' : 'false'" :aria-describedby="errors.privacy ? 'inquiry-privacy-error' : undefined" @change="clearError('privacy')" />
                     <span>
                       I agree to the
                       <NuxtLink to="/privacy-policy" class="text-brand hover:underline">Privacy Policy</NuxtLink>

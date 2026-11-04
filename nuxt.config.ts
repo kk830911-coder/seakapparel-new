@@ -8,11 +8,13 @@ export default defineNuxtConfig({
     revalidateSecret: process.env.REVALIDATE_SECRET || '',
     revalidateBypassToken: process.env.REVALIDATE_BYPASS_TOKEN || '',
     deployHookUrl: process.env.DEPLOY_HOOK_URL || '',
-    // Web3Forms 密钥只在服务端使用（server/api/inquiry.post.ts），不会进浏览器 bundle。
-    // 建议在 Vercel 配 WEB3FORMS_KEY；未配置时使用现有 key 保证表单可用。
-    web3formsKey: process.env.WEB3FORMS_KEY || 'f74fd901-0b24-4634-8a2f-95c549480b83',
     public: {
-      strapiUrl: 'https://tutesportswear-strapi-us.onrender.com'
+      strapiUrl: 'https://tutesportswear-strapi-us.onrender.com',
+      // Web3Forms 的 access_key 官方设计就是前端使用——其 API 挂在 Cloudflare 后面，
+      // 对所有"服务器对服务器"请求强制人机验证（实测 cf-mitigated: challenge），
+      // 走服务端代理必然 403。防滥用请在 Web3Forms 后台把 Allowed Domains 设为
+      // www.tutesports.com，需要更强防护时再开 hCaptcha。
+      web3formsKey: process.env.WEB3FORMS_KEY || 'f74fd901-0b24-4634-8a2f-95c549480b83'
     }
   },
 
