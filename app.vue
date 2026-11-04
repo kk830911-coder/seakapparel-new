@@ -395,34 +395,11 @@ const openCookieSettings = () => {
       </div>
     </footer>
 
-    <!-- Floating Action Buttons：移动端只留 WhatsApp + 回到顶部，避免遮挡内容 -->
-    <div
-      class="fixed right-4 z-[900] shadow-lg rounded-lg overflow-hidden transition-all duration-300"
-      :class="showCookieBanner ? 'bottom-40 md:bottom-32' : 'bottom-8'"
-    >
-      <div class="flex flex-col">
-        <a href="https://wa.me/8618271971983" target="_blank" rel="noopener noreferrer" class="w-10 h-10 flex items-center justify-center transition-all duration-300 hover:brightness-110 group" style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);" aria-label="WhatsApp">
-          <svg width="20" height="20" fill="#fff" viewBox="0 0 24 24" class="transition-transform duration-300 group-hover:scale-110">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471.145-.575.297-.101.15-.39.54-.72 1.09-.134.212-.249.227-.46.082-.16-.074-.729-.27-1.393-.866-.515-.462-.862-1.029-.968-1.248-.099-.21.01-.325.083-.46.075-.134.15-.247.299-.492.099-.168.049-.312-.024-.439-.075-.126-.67-1.611-.916-2.206-.242-.59-.487-.511-.67-.52-.16-.008-.341-.01-.52-.01-.18 0-.47.07-.719.347-.248.277-.944.92-1.433 1.798-.49.878-.49 1.933.028 3.774.52 1.84 1.56 3.582 2.994 4.828 1.433 1.247 3.174 1.943 4.919 2.429.64.14 1.225.227 1.655.273.695.086 1.331.074 1.843-.04 1.05-.23 3.393-1.324 3.896-2.61.503-1.287.503-2.399.354-2.61-.149-.21-.54-.339-1.13-.59zm-4.92 6.53c-1.635 0-3.24-.437-4.64-1.266l-.33-.195-1.156.304.31-1.127-.214-.341c-.87-1.402-1.333-3.024-1.333-4.682 0-5.733 4.667-10.4 10.4-10.4 5.733 0 10.4 4.667 10.4 10.4 0 5.733-4.667 10.4-10.4 10.4z"/>
-          </svg>
-        </a>
-        <a href="mailto:Marc@tutesports.com" class="hidden md:flex w-10 h-10 items-center justify-center transition-all duration-300 hover:brightness-110 group" style="background: linear-gradient(135deg, #046BD2 0%, #0354A8 100%);" aria-label="Email">
-          <svg width="18" height="18" fill="#fff" viewBox="0 0 24 24" class="transition-transform duration-300 group-hover:scale-110">
-            <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-          </svg>
-        </a>
-        <NuxtLink to="/" class="hidden md:flex w-10 h-10 items-center justify-center transition-all duration-300 hover:brightness-110 group" style="background: linear-gradient(135deg, #0A1628 0%, #1B2A4A 100%);" aria-label="Home">
-          <svg width="18" height="18" fill="#fff" viewBox="0 0 24 24" class="transition-transform duration-300 group-hover:scale-110">
-            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-          </svg>
-        </NuxtLink>
-        <button @click="scrollToTop" class="w-10 h-10 flex items-center justify-center transition-all duration-300 hover:brightness-110 group" style="background: linear-gradient(135deg, #FF6B00 0%, #CC5500 100%);" aria-label="Scroll to top">
-          <svg width="18" height="18" fill="#fff" viewBox="0 0 24 24" class="transition-transform duration-300 group-hover:scale-110">
-            <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/>
-          </svg>
-        </button>
-      </div>
-    </div>
+    <!-- 移动端底部安全占位：底部固定联系栏不遮住页脚版权 -->
+    <div class="h-[64px] md:hidden" aria-hidden="true"></div>
+
+    <!-- 全站悬浮联系：桌面右侧竖排卡 / 移动底部固定栏（components/FloatingContact.vue） -->
+    <FloatingContact :show-cookie-banner="showCookieBanner" />
 
     <!-- Cookie Banner -->
     <transition
