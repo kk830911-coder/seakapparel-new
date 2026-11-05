@@ -569,12 +569,17 @@ const handleTouchEnd = (e, next, prev) => {
         </div>
 
         <div class="space-y-5 sm:space-y-7 pt-6">
-          <!-- 1. 核心参数区：无标题，specIntro 引言 + 参数表直接展示；白卡样式与 description 等板块对齐 -->
-          <section v-if="specRows.length || specIntroNodes.length" id="specs" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
-            <div v-if="specIntroNodes.length" class="prose max-w-none text-gray-600 text-sm sm:text-base" :class="specRows.length ? 'mb-5 sm:mb-6' : ''">
+          <!-- 1a. 全站富文本引言：独立卡片、无标题，后台填了才显示 -->
+          <section v-if="specIntroNodes.length" id="spec-intro" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
+            <div class="prose max-w-none text-gray-600 text-sm sm:text-base">
               <RichTextNode v-for="(node, idx) in specIntroNodes" :key="idx" :node="node" />
             </div>
-            <DetailSpecTable v-if="specRows.length" :rows="specRows" />
+          </section>
+
+          <!-- 1b. 核心参数表：独立卡片，标题只属于参数表 -->
+          <section v-if="specRows.length" id="specs" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
+            <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4 sm:mb-6 pb-2 sm:pb-3 border-b border-gray-100">Technical Specifications</h2>
+            <DetailSpecTable :rows="specRows" />
           </section>
 
           <!-- 2. 产品描述（单品独有，后台 product.description） -->
