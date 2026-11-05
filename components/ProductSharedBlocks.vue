@@ -178,7 +178,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-        <figure class="max-w-[95vw] max-h-[90vh] flex flex-col items-center gap-3" @click.stop>
+        <figure class="max-w-[95vw] max-h-[90vh] flex flex-col items-center gap-3">
           <img :src="lightbox.url" :alt="lightbox.alt" class="max-h-[80vh] w-auto max-w-full object-contain rounded-lg" />
           <figcaption v-if="lightbox.alt" class="text-xs sm:text-sm text-white/70 text-center">{{ lightbox.alt }}</figcaption>
         </figure>
