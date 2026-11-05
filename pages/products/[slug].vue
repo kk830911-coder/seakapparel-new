@@ -572,20 +572,20 @@ const handleTouchEnd = (e, next, prev) => {
 
         <div class="space-y-2.5 sm:space-y-3.5 pt-6">
           <!-- 1a. 全站富文本引言：独立卡片、无标题，后台填了才显示 -->
-          <section v-if="specIntroNodes.length" id="spec-intro" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
+          <section v-if="specIntroNodes.length" id="spec-intro" class="scroll-mt-[170px] bg-white rounded-xl p-2 sm:p-6 md:p-8 shadow-sm border border-gray-100">
             <div class="prose max-w-none text-gray-600 text-sm sm:text-base">
               <RichTextNode v-for="(node, idx) in specIntroNodes" :key="idx" :node="node" />
             </div>
           </section>
 
           <!-- 1b. 核心参数表：独立卡片，标题只属于参数表 -->
-          <section v-if="specRows.length" id="specs" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
+          <section v-if="specRows.length" id="specs" class="scroll-mt-[170px] bg-white rounded-xl p-2 sm:p-6 md:p-8 shadow-sm border border-gray-100">
             <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4 sm:mb-6 pb-2 sm:pb-3 border-b border-gray-100">Technical Specifications</h2>
             <DetailSpecTable :rows="specRows" />
           </section>
 
           <!-- 2. 产品描述（单品独有，后台 product.description） -->
-          <section v-if="hasDescription" id="description" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
+          <section v-if="hasDescription" id="description" class="scroll-mt-[170px] bg-white rounded-xl p-2 sm:p-6 md:p-8 shadow-sm border border-gray-100">
             <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4 sm:mb-6 pb-2 sm:pb-3 border-b border-gray-100">Product Description</h2>
             <div class="prose max-w-none text-gray-600 text-sm sm:text-base">
               <RichTextNode v-for="(node, idx) in descriptionNodes" :key="idx" :node="node" />
@@ -625,7 +625,7 @@ const handleTouchEnd = (e, next, prev) => {
           />
 
           <!-- 5. 交易条款 + FAQ（CTA 统一用页脚那条，不在页内重复） -->
-          <section v-if="tradeTerms || detailFaqs.length" id="terms" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100 space-y-6">
+          <section v-if="tradeTerms || detailFaqs.length" id="terms" class="scroll-mt-[170px] bg-white rounded-xl p-2 sm:p-6 md:p-8 shadow-sm border border-gray-100 space-y-6">
             <div v-if="tradeTerms">
               <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-3 pb-2 sm:pb-3 border-b border-gray-100">Trade Terms</h2>
               <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{{ tradeTerms }}</p>

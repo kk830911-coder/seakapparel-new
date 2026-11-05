@@ -45,7 +45,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 <template>
   <div class="space-y-2.5 sm:space-y-3.5">
     <!-- 工艺与面料：白卡样式与其他板块对齐 -->
-    <section v-if="hasCraft" id="craft" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
+    <section v-if="hasCraft" id="craft" class="scroll-mt-[170px] bg-white rounded-xl p-2 sm:p-6 md:p-8 shadow-sm border border-gray-100">
       <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4 sm:mb-6 pb-2 sm:pb-3 border-b border-gray-100">{{ craft.title }}</h2>
       <!-- 分类级富文本：独占全宽（图墙一并隐藏，整块完全替换） -->
       <div v-if="craftBodyNodes?.length" class="prose max-w-none text-sm sm:text-base text-gray-600 leading-relaxed">
@@ -69,7 +69,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
     </section>
 
     <!-- 认证与资质 -->
-    <section v-if="hasCerts" id="certifications" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
+    <section v-if="hasCerts" id="certifications" class="scroll-mt-[170px] bg-white rounded-xl p-2 sm:p-6 md:p-8 shadow-sm border border-gray-100">
       <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-1 pb-2 sm:pb-3 border-b border-gray-100">Certifications & Compliance</h2>
       <p class="text-sm text-gray-500 mb-5 mt-3">Verifiable certificates — click any image to open the full scan.</p>
       <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -101,7 +101,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
     </section>
 
     <!-- 客户品牌墙 -->
-    <section v-if="hasClients" id="clients" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
+    <section v-if="hasClients" id="clients" class="scroll-mt-[170px] bg-white rounded-xl p-2 sm:p-6 md:p-8 shadow-sm border border-gray-100">
       <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-1 pb-2 sm:pb-3 border-b border-gray-100">Trusted by Global Brands</h2>
       <p class="text-sm text-gray-500 mb-5 mt-3">Brands and teams we manufacture for.</p>
       <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
@@ -124,7 +124,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
     </section>
 
     <!-- 工厂实拍 -->
-    <section v-if="hasFactory" id="factory" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
+    <section v-if="hasFactory" id="factory" class="scroll-mt-[170px] bg-white rounded-xl p-2 sm:p-6 md:p-8 shadow-sm border border-gray-100">
       <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-1 pb-2 sm:pb-3 border-b border-gray-100">Inside Our Factory</h2>
       <p class="text-sm text-gray-500 mb-5 mt-3">Real shots from our Hubei manufacturing base.</p>
 
@@ -157,7 +157,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
     </section>
 
     <!-- 付款 / 物流 / 包装 -->
-    <section v-if="hasInfoBlocks" id="logistics" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
+    <section v-if="hasInfoBlocks" id="logistics" class="scroll-mt-[170px] bg-white rounded-xl p-2 sm:p-6 md:p-8 shadow-sm border border-gray-100">
       <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4 sm:mb-6 pb-2 sm:pb-3 border-b border-gray-100">Payment, Shipping & Packaging</h2>
       <DetailAccordion :items="accordionItems" />
     </section>
