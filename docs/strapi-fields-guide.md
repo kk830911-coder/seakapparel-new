@@ -15,6 +15,7 @@
 
 | 字段 | 作用 | 出现位置 | 可被覆盖？ |
 |---|---|---|---|
+| **specIntro** | 参数区上方的**全站富文本引言**（富文本块，支持文字、加粗、列表、图片上传）。适合放测量说明、公差说明、通用定制说明。**后台没填内容时前端自动隐藏**，不占位、不显示空标题 | 详情页「Technical Specifications」标题下方、参数表格**上方** | ❌ 仅全站 |
 | **specDefaults** (8) | 全站默认参数表 8 行（所有产品共有的规格）。优先级**最低**：产品/分类有同名行就不显示这条 | 详情页 Specifications 参数表 | ✅ 产品、分类 |
 | **craftTitle** | 工艺/面料区标题（默认 "Craft & Fabric"） | Craft & Fabric 区块标题 | ✅ 分类 |
 | **craftBody** | 工艺/面料区正文介绍 | Craft & Fabric 区块正文 | ✅ 分类 |
@@ -68,7 +69,10 @@ Specifications 表格 = 产品 specRows（最优先）
 
 ## 注意事项
 
-1. **craftImages / certifications / clients / factoryShots / infoBlocks / tradeTerms / detailFaqs 只有全站版**，想改内容直接改 Global Product Blocks 这一条记录。
+1. **specIntro / craftImages / certifications / clients / factoryShots / infoBlocks / tradeTerms / detailFaqs 只有全站版**，想改内容直接改 Global Product Blocks 这一条记录。
 2. 某个区块在后台**没填内容时页面自动隐藏**该区块（不会显示空标题），也不会报错。
 3. detailFaqs 填了之后，Google Search Console 里可以用「网址检查 → 请求编入索引」加速富摘要生效。
 4. 参数表 label 请保持简短统一（如 `Fabric`、`MOQ`），同名 label 在不同层级会被去重。
+5. **specIntro 的图片走 Cloudinary 自动优化**（自动压缩、响应式尺寸），直接在后台上传原图即可，不用手动压。
+6. 后台编辑页字段顺序由「视图布局配置」控制（编辑页右上角 ⚙️），与代码里的 schema 顺序是两套；新加字段会默认排在布局末尾，需要时在 ⚙️ 里拖到想要的位置。
+7. 编辑页顶部大标题显示的是 **Entry title** 字段（当前为 `craftTitle`）的值，属于后台管理便利设置，**不影响前台展示**。
