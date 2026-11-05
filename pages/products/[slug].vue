@@ -396,6 +396,8 @@ const renderStrapiRichTextNodes = (nodes) => {
   })
 }
 const descriptionNodes = computed(() => renderStrapiRichTextNodes(product.value?.description || product.value?.attributes?.description))
+// 全站参数区引言（后台 Global Product Blocks 的 specIntro 富文本，显示在参数表上方）
+const specIntroNodes = computed(() => renderStrapiRichTextNodes(globalBlocks.value?.specIntro))
 const hasDescription = computed(() => descriptionNodes.value.length > 0)
 
 let touchStartX = 0
@@ -568,9 +570,13 @@ const handleTouchEnd = (e, next, prev) => {
 
         <div class="space-y-5 sm:space-y-7 pt-6">
           <!-- 1. 核心参数表 -->
-          <section v-if="specRows.length" id="specs" class="scroll-mt-[170px]">
+          <section v-if="specRows.length || specIntroNodes.length" id="specs" class="scroll-mt-[170px]">
             <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4">Technical Specifications</h2>
-            <DetailSpecTable :rows="specRows" />
+            <!-- 全站富文本引言：后台填了才显示，位于参数表上方 -->
+            <div v-if="specIntroNodes.length" class="prose max-w-none text-gray-600 text-sm sm:text-base mb-5 sm:mb-6">
+              <RichTextNode v-for="(node, idx) in specIntroNodes" :key="idx" :node="node" />
+            </div>
+            <DetailSpecTable v-if="specRows.length" :rows="specRows" />
           </section>
 
           <!-- 2. 产品描述（单品独有，后台 product.description） -->
