@@ -625,14 +625,14 @@ const handleTouchEnd = (e, next, prev) => {
           />
 
           <!-- 5. 交易条款 + FAQ（CTA 统一用页脚那条，不在页内重复） -->
-          <section v-if="tradeTerms || detailFaqs.length" id="terms" class="scroll-mt-[170px] space-y-6">
+          <section v-if="tradeTerms || detailFaqs.length" id="terms" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100 space-y-6">
             <div v-if="tradeTerms">
-              <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-3">Trade Terms</h2>
+              <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-3 pb-2 sm:pb-3 border-b border-gray-100">Trade Terms</h2>
               <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{{ tradeTerms }}</p>
             </div>
 
             <div v-if="detailFaqs.length">
-              <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4">FAQ</h2>
+              <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4 pb-2 sm:pb-3 border-b border-gray-100" :class="tradeTerms ? '' : 'mb-4'">FAQ</h2>
               <DetailFaq :items="detailFaqs" />
             </div>
           </section>

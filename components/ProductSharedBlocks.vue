@@ -69,9 +69,9 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
     </section>
 
     <!-- 认证与资质 -->
-    <section v-if="hasCerts" id="certifications" class="scroll-mt-[170px]">
-      <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-1">Certifications & Compliance</h2>
-      <p class="text-sm text-gray-500 mb-5">Verifiable certificates — click any image to open the full scan.</p>
+    <section v-if="hasCerts" id="certifications" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
+      <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-1 pb-2 sm:pb-3 border-b border-gray-100">Certifications & Compliance</h2>
+      <p class="text-sm text-gray-500 mb-5 mt-3">Verifiable certificates — click any image to open the full scan.</p>
       <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
         <a
           v-for="cert in certifications"
@@ -101,9 +101,9 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
     </section>
 
     <!-- 客户品牌墙 -->
-    <section v-if="hasClients" id="clients" class="scroll-mt-[170px]">
-      <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-1">Trusted by Global Brands</h2>
-      <p class="text-sm text-gray-500 mb-5">Brands and teams we manufacture for.</p>
+    <section v-if="hasClients" id="clients" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
+      <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-1 pb-2 sm:pb-3 border-b border-gray-100">Trusted by Global Brands</h2>
+      <p class="text-sm text-gray-500 mb-5 mt-3">Brands and teams we manufacture for.</p>
       <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
         <div
           v-for="client in clients"
@@ -124,9 +124,9 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
     </section>
 
     <!-- 工厂实拍 -->
-    <section v-if="hasFactory" id="factory" class="scroll-mt-[170px]">
-      <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-1">Inside Our Factory</h2>
-      <p class="text-sm text-gray-500 mb-5">Real shots from our Hubei manufacturing base.</p>
+    <section v-if="hasFactory" id="factory" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
+      <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-1 pb-2 sm:pb-3 border-b border-gray-100">Inside Our Factory</h2>
+      <p class="text-sm text-gray-500 mb-5 mt-3">Real shots from our Hubei manufacturing base.</p>
 
       <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
         <figure
@@ -157,8 +157,8 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
     </section>
 
     <!-- 付款 / 物流 / 包装 -->
-    <section v-if="hasInfoBlocks" id="logistics" class="scroll-mt-[170px]">
-      <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4">Payment, Shipping & Packaging</h2>
+    <section v-if="hasInfoBlocks" id="logistics" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
+      <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4 sm:mb-6 pb-2 sm:pb-3 border-b border-gray-100">Payment, Shipping & Packaging</h2>
       <DetailAccordion :items="accordionItems" />
     </section>
 
