@@ -44,9 +44,9 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 
 <template>
   <div class="space-y-5 sm:space-y-7">
-    <!-- 工艺与面料 -->
-    <section v-if="hasCraft" id="craft" class="scroll-mt-[170px]">
-      <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4">{{ craft.title }}</h2>
+    <!-- 工艺与面料：白卡样式与其他板块对齐 -->
+    <section v-if="hasCraft" id="craft" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
+      <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4 sm:mb-6 pb-2 sm:pb-3 border-b border-gray-100">{{ craft.title }}</h2>
       <!-- 分类级富文本：独占全宽（图墙一并隐藏，整块完全替换） -->
       <div v-if="craftBodyNodes?.length" class="prose max-w-none text-sm sm:text-base text-gray-600 leading-relaxed">
         <RichTextNode v-for="(node, i) in craftBodyNodes" :key="i" :node="node" />
