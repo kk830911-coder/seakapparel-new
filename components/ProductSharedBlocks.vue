@@ -54,7 +54,8 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
         </div>
         <!-- 全站纯文本回退 -->
         <p v-else-if="craft.body" class="text-sm sm:text-base text-gray-600 leading-relaxed whitespace-pre-line">{{ craft.body }}</p>
-        <div v-if="craft.images?.length" class="grid grid-cols-2 gap-3">
+        <!-- 全站图墙：分类填了富文本时一并隐藏，整块完全替换 -->
+        <div v-if="!craftBodyNodes?.length && craft.images?.length" class="grid grid-cols-2 gap-3">
           <img
             v-for="img in craft.images"
             :key="img.url"
