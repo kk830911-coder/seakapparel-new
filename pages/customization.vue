@@ -72,7 +72,7 @@ const fabrics = [
   <div>
     <!-- Hero -->
     <section class="bg-navy-light py-16 md:py-24">
-      <div class="max-w-7xl mx-auto px-4 text-center">
+      <div class="max-w-7xl mx-auto px-3 text-center">
         <h1 class="text-3xl md:text-5xl font-heading font-black text-white mb-4">From Idea to Delivery</h1>
         <p class="text-gray-300 text-lg md:text-xl max-w-3xl mx-auto mb-8">Your complete custom sportswear manufacturing partner. We handle every step — design, sampling, production, quality control, and global shipping.</p>
         <div class="flex flex-col sm:flex-row gap-3 justify-center">
@@ -89,7 +89,7 @@ const fabrics = [
 
     <!-- Process Steps -->
     <section class="py-16 md:py-20 bg-white">
-      <div class="max-w-7xl mx-auto px-4">
+      <div class="max-w-7xl mx-auto px-3">
         <div class="text-center mb-14">
           <h2 class="text-3xl md:text-4xl font-heading font-bold text-navy mb-3">Our 8-Step Process</h2>
           <p class="text-gray-500 max-w-2xl mx-auto">A proven workflow refined over 20 years — designed to deliver exactly what you need, on time and on budget.</p>
@@ -109,7 +109,7 @@ const fabrics = [
 
     <!-- Printing Methods -->
     <section class="py-16 md:py-20 bg-gray-50">
-      <div class="max-w-7xl mx-auto px-4">
+      <div class="max-w-7xl mx-auto px-3">
         <div class="text-center mb-14">
           <h2 class="text-3xl md:text-4xl font-heading font-bold text-navy mb-3">Printing & Decoration Methods</h2>
           <p class="text-gray-500 max-w-2xl mx-auto">We offer a full range of printing and decoration techniques to match your design requirements and budget.</p>
@@ -128,7 +128,7 @@ const fabrics = [
 
     <!-- Fabrics -->
     <section class="py-16 md:py-20 bg-white">
-      <div class="max-w-7xl mx-auto px-4">
+      <div class="max-w-7xl mx-auto px-3">
         <div class="text-center mb-14">
           <h2 class="text-3xl md:text-4xl font-heading font-bold text-navy mb-3">Fabric & Material Options</h2>
           <p class="text-gray-500 max-w-2xl mx-auto">Premium performance fabrics sourced from trusted mills. We help you choose the right material for your sport and budget.</p>
@@ -147,7 +147,7 @@ const fabrics = [
 
     <!-- Services Grid -->
     <section class="py-16 md:py-20 bg-gray-50">
-      <div class="max-w-7xl mx-auto px-4">
+      <div class="max-w-7xl mx-auto px-3">
         <div class="text-center mb-14">
           <h2 class="text-3xl md:text-4xl font-heading font-bold text-navy mb-3">Full-Service Manufacturing</h2>
           <p class="text-gray-500 max-w-2xl mx-auto">Everything you need to launch or grow your sportswear brand — under one roof.</p>

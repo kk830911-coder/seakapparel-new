@@ -105,7 +105,7 @@ const testimonials = [
 
     <!-- Section 2: Trust Bar -->
     <section class="bg-white border-b border-gray-100">
-      <div class="max-w-7xl mx-auto px-4 py-8">
+      <div class="max-w-7xl mx-auto px-3 py-8">
         <div class="grid grid-cols-2 md:grid-cols-6 gap-6 md:gap-4">
           <div v-for="item in trustItems" :key="item.label" class="flex items-center gap-3 justify-center">
             <div class="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
@@ -122,7 +122,7 @@ const testimonials = [
 
     <!-- Section 3: Product Categories -->
     <section class="bg-gray-50 py-16 md:py-20">
-      <div class="max-w-7xl mx-auto px-4">
+      <div class="max-w-7xl mx-auto px-3">
         <div class="text-center mb-12">
           <h2 class="text-3xl md:text-4xl font-heading font-bold text-navy mb-3">Sportswear by Category</h2>
           <p class="text-gray-500 max-w-2xl mx-auto">Custom designs for every sport. Click a category to explore our capabilities.</p>
@@ -154,7 +154,7 @@ const testimonials = [
 
     <!-- Section 4: Customization Process -->
     <section class="bg-white py-16 md:py-20">
-      <div class="max-w-7xl mx-auto px-4">
+      <div class="max-w-7xl mx-auto px-3">
         <div class="text-center mb-14">
           <h2 class="text-3xl md:text-4xl font-heading font-bold text-navy mb-3">How Custom Orders Work</h2>
           <p class="text-gray-500 max-w-2xl mx-auto">From your initial idea to final delivery — a streamlined 8-step process designed for efficiency.</p>
@@ -180,7 +180,7 @@ const testimonials = [
 
     <!-- Section 5: Why Choose Us -->
     <section class="bg-navy py-16 md:py-20">
-      <div class="max-w-7xl mx-auto px-4">
+      <div class="max-w-7xl mx-auto px-3">
         <div class="text-center mb-14">
           <h2 class="text-3xl md:text-4xl font-heading font-bold text-white mb-3">Why Choose TontonSports</h2>
           <p class="text-gray-400 max-w-2xl mx-auto">We combine two decades of manufacturing expertise with modern technology to deliver sportswear that exceeds expectations.</p>
@@ -199,7 +199,7 @@ const testimonials = [
 
     <!-- Section 6: Featured Products -->
     <section class="bg-gray-50 py-16 md:py-20">
-      <div class="max-w-7xl mx-auto px-4">
+      <div class="max-w-7xl mx-auto px-3">
         <div class="flex items-end justify-between mb-10">
           <div>
             <h2 class="text-3xl md:text-4xl font-heading font-bold text-navy mb-2">Featured Products</h2>
@@ -239,7 +239,7 @@ const testimonials = [
 
     <!-- Section 7: Testimonials -->
     <section class="bg-white py-16 md:py-20">
-      <div class="max-w-7xl mx-auto px-4">
+      <div class="max-w-7xl mx-auto px-3">
         <div class="text-center mb-12">
           <h2 class="text-3xl md:text-4xl font-heading font-bold text-navy mb-3">What Our Clients Say</h2>
           <p class="text-gray-500 max-w-2xl mx-auto">Trusted by sports brands, teams, and businesses across 60+ countries.</p>

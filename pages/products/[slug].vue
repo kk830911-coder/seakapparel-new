@@ -411,7 +411,7 @@ const handleTouchEnd = (e, next, prev) => {
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto px-4 py-6 sm:py-8">
+  <div class="max-w-7xl mx-auto px-3 py-6 sm:py-8">
     <!-- Breadcrumb -->
     <nav class="text-xs sm:text-sm text-gray-400 mb-4 sm:mb-6">
       <NuxtLink to="/" class="hover:text-brand transition-colors">Home</NuxtLink>

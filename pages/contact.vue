@@ -245,7 +245,7 @@ useHead({
   <div>
     <!-- Hero -->
     <section class="bg-navy-light py-14 md:py-20">
-      <div class="max-w-7xl mx-auto px-4 text-center">
+      <div class="max-w-7xl mx-auto px-3 text-center">
         <h1 class="text-3xl md:text-5xl font-heading font-black text-white mb-4">Let's Start Your Project</h1>
         <p class="text-gray-300 text-lg max-w-2xl mx-auto">Tell us about your custom sportswear needs. We'll respond with a detailed quote within 24 hours.</p>
       </div>
@@ -253,7 +253,7 @@ useHead({
 
     <!-- Quick Contact Bar -->
     <section class="bg-white border-b border-gray-100">
-      <div class="max-w-7xl mx-auto px-4 py-6">
+      <div class="max-w-7xl mx-auto px-3 py-6">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <a href="https://wa.me/8618271971983" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-4 rounded-xl bg-green-50 border border-green-100 hover:shadow-md transition-all group">
             <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 group-hover:bg-green-200 transition-colors">
@@ -288,7 +288,7 @@ useHead({
 
     <!-- Main Content -->
     <section class="py-12 md:py-16 bg-gray-50">
-      <div class="max-w-7xl mx-auto px-4">
+      <div class="max-w-7xl mx-auto px-3">
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
           <!-- Form -->
           <div class="lg:col-span-3">

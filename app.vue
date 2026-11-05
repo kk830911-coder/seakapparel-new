@@ -100,7 +100,7 @@ const openCookieSettings = () => {
   <div class="bg-gray-50 min-h-screen flex flex-col font-body text-[#1A1A2E]">
     <!-- Top Info Bar -->
     <div class="bg-gray-100 text-gray-600 text-xs md:text-sm py-2 hidden md:block">
-      <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+      <div class="max-w-7xl mx-auto px-3 flex justify-between items-center">
         <div class="flex items-center gap-6">
           <span class="flex items-center gap-1.5">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
@@ -128,7 +128,7 @@ const openCookieSettings = () => {
     <div class="sticky top-0 z-50">
     <!-- Logo + Contact Row -->
     <div class="bg-white border-b border-gray-100">
-      <div class="max-w-7xl mx-auto px-4 py-3 md:h-[100px] md:py-0 flex items-center justify-between">
+      <div class="max-w-7xl mx-auto px-3 py-3 md:h-[100px] md:py-0 flex items-center justify-between">
         <NuxtLink to="/" class="flex items-center gap-2 flex-shrink-0">
           <NuxtImg src="/logo.png" alt="TontonSports Logo" class="h-10 w-auto" loading="eager" />
           <div class="flex flex-col justify-center">
@@ -178,7 +178,7 @@ const openCookieSettings = () => {
 
     <!-- Navigation Bar -->
     <header class="bg-navy shadow-md">
-      <div class="max-w-7xl mx-auto px-4 h-12 flex items-center justify-between hidden md:flex">
+      <div class="max-w-7xl mx-auto px-3 h-12 flex items-center justify-between hidden md:flex">
         <nav class="hidden md:flex items-center gap-1 text-sm font-semibold text-white/90">
           <NuxtLink to="/" active-class="!text-white bg-brand" class="px-3 py-1.5 rounded hover:text-white hover:bg-white/10 transition-colors">HOME</NuxtLink>
           <div class="relative" @mouseenter="openDropdown" @mouseleave="closeDropdown">
@@ -291,7 +291,7 @@ const openCookieSettings = () => {
     <footer class="bg-navy-dark text-gray-300 mt-0">
       <!-- CTA Banner -->
       <div class="bg-brand">
-        <div class="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="max-w-7xl mx-auto px-3 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="text-white text-center md:text-left">
             <h3 class="text-xl md:text-2xl font-heading font-bold">Ready to Start Your Custom Sportswear Project?</h3>
             <p class="text-blue-100 mt-1">Get a free mockup and quote within 24 hours.</p>
@@ -304,7 +304,7 @@ const openCookieSettings = () => {
       </div>
 
       <!-- Main Footer -->
-      <div class="max-w-7xl mx-auto px-4 py-12">
+      <div class="max-w-7xl mx-auto px-3 py-12">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10 text-sm">
           <!-- Company -->
           <div>

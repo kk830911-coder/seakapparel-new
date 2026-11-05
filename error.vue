@@ -30,7 +30,7 @@ useHead({
   <div class="min-h-screen flex flex-col bg-gray-50">
     <!-- Header（error.vue 不经过默认布局，导航需自带） -->
     <header class="bg-navy">
-      <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="max-w-7xl mx-auto px-3 h-16 flex items-center justify-between">
         <NuxtLink to="/" class="text-white font-heading font-black text-xl">Tonton<span class="text-brand">Sports</span></NuxtLink>
         <a href="https://wa.me/8618271971983" target="_blank" rel="noopener noreferrer" class="text-sm text-gray-300 hover:text-white transition-colors">WhatsApp Us</a>
       </div>

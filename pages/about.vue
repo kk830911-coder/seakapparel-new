@@ -89,7 +89,7 @@ const overviewPlaying = ref(false)
   <div>
     <!-- Hero -->
     <section class="bg-navy-light py-16 md:py-24">
-      <div class="max-w-7xl mx-auto px-4 text-center">
+      <div class="max-w-7xl mx-auto px-3 text-center">
         <h1 class="text-3xl md:text-5xl font-heading font-black text-white mb-4">Two Decades of<br>Sportswear Excellence</h1>
         <p class="text-gray-300 text-lg max-w-3xl mx-auto">From a small workshop to a 5,000m+ smart factory — our journey has been driven by one mission: helping brands create the best sportswear possible.</p>
       </div>
@@ -97,7 +97,7 @@ const overviewPlaying = ref(false)
 
     <!-- Stats Bar -->
     <section class="bg-white border-b border-gray-100">
-      <div class="max-w-7xl mx-auto px-4 py-10">
+      <div class="max-w-7xl mx-auto px-3 py-10">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
           <div v-for="stat in stats" :key="stat.label" class="text-center">
             <div class="text-3xl md:text-4xl font-heading font-black text-brand mb-1">{{ stat.number }}</div>
@@ -110,7 +110,7 @@ const overviewPlaying = ref(false)
 
     <!-- Our Story -->
     <section class="py-16 md:py-20 bg-white">
-      <div class="max-w-7xl mx-auto px-4">
+      <div class="max-w-7xl mx-auto px-3">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <h2 class="text-3xl md:text-4xl font-heading font-bold text-navy mb-6">Our Story</h2>
@@ -151,7 +151,7 @@ const overviewPlaying = ref(false)
 
     <!-- Group Structure -->
     <section class="py-16 md:py-20 bg-gray-50">
-      <div class="max-w-7xl mx-auto px-4">
+      <div class="max-w-7xl mx-auto px-3">
         <div class="text-center mb-12">
           <h2 class="text-3xl md:text-4xl font-heading font-bold text-navy mb-3">One Group, Three Companies</h2>
           <p class="text-gray-500 max-w-2xl mx-auto">Sales in Shenzhen, manufacturing in Hubei, our own brand out of the same base — so you deal with one team from sampling to shipping.</p>
@@ -213,7 +213,7 @@ const overviewPlaying = ref(false)
 
     <!-- Factory Tour -->
     <section class="py-16 md:py-20 bg-white">
-      <div class="max-w-7xl mx-auto px-4">
+      <div class="max-w-7xl mx-auto px-3">
         <div class="text-center mb-12">
           <h2 class="text-3xl md:text-4xl font-heading font-bold text-navy mb-3">Factory Tour</h2>
           <p class="text-gray-500 max-w-2xl mx-auto">Take a look inside our 5,000m+ production base in Xiantao, Hubei, China.</p>
@@ -241,7 +241,7 @@ const overviewPlaying = ref(false)
 
     <!-- Certifications -->
     <section class="py-16 md:py-20 bg-gray-50">
-      <div class="max-w-7xl mx-auto px-4">
+      <div class="max-w-7xl mx-auto px-3">
         <div class="text-center mb-12">
           <h2 class="text-3xl md:text-4xl font-heading font-bold text-navy mb-3">Certifications & Compliance</h2>
           <p class="text-gray-500 max-w-2xl mx-auto">We maintain the highest standards in quality, social responsibility, and environmental management.</p>
@@ -260,7 +260,7 @@ const overviewPlaying = ref(false)
 
     <!-- Global Reach -->
     <section class="py-16 md:py-20 bg-navy">
-      <div class="max-w-7xl mx-auto px-4 text-center">
+      <div class="max-w-7xl mx-auto px-3 text-center">
         <h2 class="text-3xl md:text-4xl font-heading font-bold text-white mb-4">Trusted Worldwide</h2>
         <p class="text-gray-400 max-w-2xl mx-auto mb-10">We export to 60+ countries across North America, Europe, Australia, South America, and the Middle East.</p>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">

@@ -169,7 +169,7 @@ useHead({
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto px-4 py-6 md:py-12">
+  <div class="max-w-7xl mx-auto px-3 py-6 md:py-12">
     <!-- Breadcrumb & Title -->
     <div class="mb-4">
       <nav class="text-sm text-gray-400 mb-2">
