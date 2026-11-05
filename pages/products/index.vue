@@ -51,12 +51,12 @@ const allProducts = computed(() => responseData.value?.data || [])
 
 const toSlug = (name) => name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 
-// 产品卡图片 alt：优先用后台填写的 Alternative text，没填才回退产品标题
+// 产品卡图片 alt：手动描述 > 产品标题 > 文件名 > 空
 const getProductImageAlt = (item) => {
   const img = item.image || item.attributes?.image
   const first = Array.isArray(img) ? img[0] : img
   const alt = first?.alternativeText || first?.attributes?.alternativeText
-  return alt || `${getTitle(item) || 'Custom Sportswear'} - TontonSports`
+  return pickImageAlt(alt, `${getTitle(item) || 'Custom Sportswear'} - TontonSports`)
 }
 
 // 头部搜索框跳转过来的关键词（?q=）

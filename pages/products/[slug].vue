@@ -65,6 +65,10 @@ const imgPreviewKey = ref(0)
 const activeSkuIndex = ref(-1)
 const sizeChartZoomOpen = ref(false)
 
+// 描述/参数区富文本图片点击放大（zoomable 的 RichTextNode 抛出 image 节点）
+const descZoom = ref(null)
+const openDescZoom = (node) => { if (node?.url) descZoom.value = node }
+
 // 全站共用工厂视频（放前端 public/videos/factory.mp4，走 Vercel 边缘 CDN，点击才加载）
 const FACTORY_VIDEO_SRC = '/videos/factory.mp4'
 const factoryVideoVisible = ref(true)
@@ -100,7 +104,7 @@ const imageAltMap = computed(() => {
   })
   return map
 })
-const altFor = (url, fallback) => imageAltMap.value[url] || fallback
+const altFor = (url, fallback) => pickImageAlt(imageAltMap.value[url], fallback)
 
 // 产品视频（单视频字段，放在图片列表末尾作为一个可选项）
 const videoUrl = computed(() => {
@@ -376,14 +380,15 @@ const inlineTagMap = (node) => {
   if (node.strikethrough) return 's'
   return 'span'
 }
-const renderStrapiRichTextNodes = (nodes) => {
+// imgAltFallback 由调用方传入：产品描述传产品标题，全站区块不能误用产品标题
+const renderStrapiRichTextNodes = (nodes, imgAltFallback = '') => {
   if (!nodes || !Array.isArray(nodes)) return []
   return nodes.map(node => {
     if (node.type === 'image') {
       return {
         type: 'image',
         url: node.image?.url ? getCleanImageUrl(node.image.url, strapiUrl) : null,
-        alt: node.image?.alternativeText || 'Product',
+        alt: pickImageAlt(node.image?.alternativeText, imgAltFallback),
         content: node.text, tag: 'p', children: []
       }
     }
@@ -393,13 +398,20 @@ const renderStrapiRichTextNodes = (nodes) => {
       alt: '',
       content: node.text,
       tag: node.type === 'text' ? inlineTagMap(node) : blockTagMap(node),
-      children: renderStrapiRichTextNodes(node.children || [])
+      children: renderStrapiRichTextNodes(node.children || [], imgAltFallback)
     }
   })
 }
-const descriptionNodes = computed(() => renderStrapiRichTextNodes(product.value?.description || product.value?.attributes?.description))
+const descriptionNodes = computed(() =>
+  renderStrapiRichTextNodes(
+    product.value?.description || product.value?.attributes?.description,
+    getTitle(product.value) || 'Product'
+  )
+)
 // 全站参数区引言（后台 Global Product Blocks 的 specIntro 富文本，显示在参数表上方）
-const specIntroNodes = computed(() => renderStrapiRichTextNodes(globalBlocks.value?.specIntro))
+const specIntroNodes = computed(() =>
+  renderStrapiRichTextNodes(globalBlocks.value?.specIntro, 'Custom sportswear manufacturing')
+)
 const hasDescription = computed(() => descriptionNodes.value.length > 0)
 
 let touchStartX = 0
@@ -494,7 +506,7 @@ const handleTouchEnd = (e, next, prev) => {
               <h3 class="font-heading font-semibold text-navy mb-2">Color / SKU</h3>
               <div class="flex flex-wrap gap-2">
                 <button v-for="(sku, i) in skuImages" :key="i" @click="selectSku(i)" class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg border-2 overflow-hidden transition-colors" :class="activeSkuIndex === i ? 'border-brand' : 'border-gray-200 hover:border-gray-300'" :title="sku.alt || 'Color option'">
-                  <NuxtImg :src="sku.url" width="64" height="64" class="w-full h-full object-cover" :alt="sku.alt || 'Color option'" loading="lazy" />
+                  <NuxtImg :src="sku.url" width="64" height="64" class="w-full h-full object-cover" :alt="pickImageAlt(sku.alt, `${getTitle(product) || 'Product'} color option`)" loading="lazy" />
                 </button>
               </div>
             </div>
@@ -574,7 +586,7 @@ const handleTouchEnd = (e, next, prev) => {
           <!-- 1a. 全站富文本引言：独立卡片、无标题，后台填了才显示 -->
           <section v-if="specIntroNodes.length" id="spec-intro" class="scroll-mt-[170px] bg-white rounded-xl p-2 sm:p-6 md:p-8 shadow-sm border border-gray-100">
             <div class="prose max-w-none text-gray-600 text-sm sm:text-base">
-              <RichTextNode v-for="(node, idx) in specIntroNodes" :key="idx" :node="node" />
+              <RichTextNode v-for="(node, idx) in specIntroNodes" :key="idx" :node="node" zoomable @zoom="openDescZoom" />
             </div>
           </section>
 
@@ -588,7 +600,7 @@ const handleTouchEnd = (e, next, prev) => {
           <section v-if="hasDescription" id="description" class="scroll-mt-[170px] bg-white rounded-xl p-2 sm:p-6 md:p-8 shadow-sm border border-gray-100">
             <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4 sm:mb-6 pb-2 sm:pb-3 border-b border-gray-100">Product Description</h2>
             <div class="prose max-w-none text-gray-600 text-sm sm:text-base">
-              <RichTextNode v-for="(node, idx) in descriptionNodes" :key="idx" :node="node" />
+              <RichTextNode v-for="(node, idx) in descriptionNodes" :key="idx" :node="node" zoomable @zoom="openDescZoom" />
               <!-- 尺码表图片：直接展示，点击放大查看原图 -->
               <div v-if="sizeChartUrl" class="mt-5">
                 <img :src="sizeChartUrl" @click="sizeChartZoomOpen = true" class="w-full rounded-lg border border-gray-100 cursor-zoom-in" alt="Size chart" loading="lazy" />
@@ -605,7 +617,7 @@ const handleTouchEnd = (e, next, prev) => {
                 v-for="shot in detailShots"
                 :key="shot.url"
                 :src="shot.url"
-                :alt="shot.alt || `${getTitle(product)} detail`"
+                :alt="pickImageAlt(shot.alt, `${getTitle(product)} detail`)"
                 class="w-full h-48 sm:h-56 object-cover rounded-xl"
                 loading="lazy"
                 decoding="async"
@@ -659,6 +671,14 @@ const handleTouchEnd = (e, next, prev) => {
     <div v-if="sizeChartZoomOpen" class="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center" @click="sizeChartZoomOpen = false">
       <img :src="sizeChartUrl" class="max-w-[95vw] max-h-[90vh] object-contain" alt="Size chart full size" />
       <button @click.stop="sizeChartZoomOpen = false" class="absolute top-2 sm:top-4 right-2 sm:right-4 text-white text-2xl sm:text-3xl">
+        <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Rich Text Image Zoom：描述/参数区富文本图片点击放大 -->
+    <div v-if="descZoom" class="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center" @click="descZoom = null">
+      <img :src="descZoom.url" :alt="descZoom.alt || 'Product'" class="max-w-[95vw] max-h-[90vh] object-contain" />
+      <button @click.stop="descZoom = null" class="absolute top-2 sm:top-4 right-2 sm:right-4 text-white text-2xl sm:text-3xl" aria-label="Close">
         <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>

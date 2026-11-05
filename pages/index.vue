@@ -29,6 +29,13 @@ const { data: hotProductsData, pending: hotLoading } = await useFetch(`${strapiU
 })
 const hotProducts = computed(() => hotProductsData.value?.data || [])
 
+// 产品卡 alt：手动描述 > 产品标题 > 文件名 > 空
+const getCardAlt = (item) => {
+  const img = Array.isArray(item.image) ? item.image[0] : item.image
+  const alt = img?.alternativeText || item.attributes?.image?.data?.attributes?.alternativeText
+  return pickImageAlt(alt, `${getTitle(item) || 'Custom Sportswear'} - TontonSports`)
+}
+
 
 const trustItems = [
   { icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', number: '20+', label: 'Years Experience' },
@@ -214,7 +221,7 @@ const testimonials = [
         <div v-else class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div v-for="item in hotProducts" :key="item.documentId || item.id" class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 group border border-gray-100">
             <NuxtLink :to="`/products/${getSlug(item)}`" class="aspect-square overflow-hidden block bg-gray-50 relative">
-              <NuxtImg :src="getProductImageUrl(item, strapiUrl)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" :alt="`${getTitle(item) || 'Custom Sportswear'} - TontonSports`" width="600" height="600" loading="lazy" decoding="async" />
+              <NuxtImg :src="getProductImageUrl(item, strapiUrl)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" :alt="getCardAlt(item)" width="600" height="600" loading="lazy" decoding="async" />
             </NuxtLink>
             <div class="p-2 sm:p-4">
               <NuxtLink :to="`/products/${getSlug(item)}`" class="block">

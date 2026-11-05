@@ -65,6 +65,25 @@ export function getTitle(item: any): string {
   return item?.title || item?.attributes?.title || ''
 }
 
+/** alt 是否其实是文件名（如 Basketball-Uniform-Jersey-for-Men_04.jpg），对用户和搜索引擎都无意义 */
+export function isFilenameAlt(alt: string): boolean {
+  return /\.(jpe?g|png|webp|avif|gif|bmp|svg)$/i.test((alt || '').trim())
+}
+
+/**
+ * 全站统一图片 alt 口径：手动精确描述 > 产品标题 > 文件名 > 空
+ * 1. 后台媒体库填了非文件名的 Alternative text → 直接用（最高优先级）
+ * 2. 否则回退产品标题
+ * 3. 标题也没有时才退回原始 alt（文件名），仍好过空
+ */
+export function pickImageAlt(rawAlt: string | null | undefined, title: string | null | undefined): string {
+  const raw = (rawAlt || '').trim()
+  const fallback = (title || '').trim()
+  if (raw && !isFilenameAlt(raw)) return raw
+  if (fallback) return fallback
+  return raw
+}
+
 // 无价格产品使用该默认起订量
 export const DEFAULT_MOQ = 10
 

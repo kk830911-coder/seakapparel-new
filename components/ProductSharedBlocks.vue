@@ -49,7 +49,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
       <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4 sm:mb-6 pb-2 sm:pb-3 border-b border-gray-100">{{ craft.title }}</h2>
       <!-- 分类级富文本：独占全宽（图墙一并隐藏，整块完全替换） -->
       <div v-if="craftBodyNodes?.length" class="prose max-w-none text-sm sm:text-base text-gray-600 leading-relaxed">
-        <RichTextNode v-for="(node, i) in craftBodyNodes" :key="i" :node="node" />
+        <RichTextNode v-for="(node, i) in craftBodyNodes" :key="i" :node="node" zoomable @zoom="openLightbox" />
       </div>
       <!-- 全站回退：文本 + 图墙两栏排布 -->
       <div v-else class="grid gap-5 lg:grid-cols-2 items-start">
@@ -59,7 +59,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
             v-for="img in craft.images"
             :key="img.url"
             :src="img.url"
-            :alt="img.alt || craft.title"
+            :alt="pickImageAlt(img.alt, craft.title)"
             class="w-full h-40 sm:h-48 object-cover rounded-xl"
             loading="lazy"
             decoding="async"
@@ -138,7 +138,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
           <div class="relative">
             <img
               :src="shot.url"
-              :alt="shot.alt || 'Factory production shot'"
+              :alt="pickImageAlt(shot.alt, 'Factory production shot')"
               class="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
               decoding="async"
