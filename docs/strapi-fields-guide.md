@@ -32,8 +32,7 @@
 | 字段 | 作用 | 出现位置 | 覆盖关系 |
 |---|---|---|---|
 | **specRows** (0) | 该分类的默认参数表。0 = 没填（当前状态） | Specifications 参数表 | 覆盖全站 specDefaults，被产品 specRows 覆盖 |
-| **craftTitle** | 分类级工艺标题——篮球服和瑜伽服可写不同介绍 | Craft & Fabric 标题 | 覆盖全站 craftTitle |
-| **craftBody** | 分类级工艺正文 | Craft & Fabric 正文 | 覆盖全站 craftBody |
+| **craftContent** | 分类级工艺**富文本**（文字、标题、列表、图片都能放，图片上传原图即可）。写了就在这里展示该分类自己的工艺介绍 | Craft & Fabric 区块正文（左侧栏） | **整体替换**全站 craftBody 纯文本（标题仍用全站 craftTitle） |
 
 ## 三、产品表（每个产品一条）
 

@@ -142,6 +142,8 @@ const offerRange = computed(() => getOfferRange(product.value))
 // ---------- 详情区数据（参数表继承：产品 → 分类 → 全站默认） ----------
 const specRows = computed(() => resolveSpecRows(product.value, globalBlocks.value))
 const craft = computed(() => resolveCraft(product.value, globalBlocks.value, strapiUrl))
+// 分类级工艺富文本（blocks，可含图片），空则回退到全站纯文本 craft.body
+const craftBodyNodes = computed(() => renderStrapiRichTextNodes(craft.value.bodyBlocks))
 const sizeChartUrl = computed(() => getMediaUrl(product.value?.sizeChart, strapiUrl))
 const detailShots = computed(() => getMediaList(product.value?.detailImages, strapiUrl))
 const tradeTerms = computed(() => globalBlocks.value?.tradeTerms || '')
@@ -183,7 +185,7 @@ const detailFaqs = computed(() =>
 )
 
 const hasSharedBlocks = computed(
-  () => !!craft.value.body || craft.value.images.length > 0 || certifications.value.length > 0 ||
+  () => !!craft.value.body || craftBodyNodes.value.length > 0 || craft.value.images.length > 0 || certifications.value.length > 0 ||
     clients.value.length > 0 || factoryShots.value.length > 0 || infoBlocks.value.length > 0
 )
 
@@ -192,7 +194,7 @@ const anchorSections = computed(() => {
   if (specRows.value.length) list.push({ id: 'specs', label: 'Specifications' })
   if (hasDescription.value) list.push({ id: 'description', label: 'Description' })
   if (detailShots.value.length) list.push({ id: 'gallery', label: 'Close-ups' })
-  if (craft.value.body || craft.value.images.length) list.push({ id: 'craft', label: 'Craft & Fabric' })
+  if (craft.value.body || craftBodyNodes.value.length || craft.value.images.length) list.push({ id: 'craft', label: 'Craft & Fabric' })
   if (certifications.value.length) list.push({ id: 'certifications', label: 'Certifications' })
   if (clients.value.length) list.push({ id: 'clients', label: 'Our Clients' })
   if (factoryShots.value.length) list.push({ id: 'factory', label: 'Factory' })
@@ -615,6 +617,7 @@ const handleTouchEnd = (e, next, prev) => {
           <ProductSharedBlocks
             v-if="hasSharedBlocks"
             :craft="craft"
+            :craft-body-nodes="craftBodyNodes"
             :certifications="certifications"
             :clients="clients"
             :factory-shots="factoryShots"

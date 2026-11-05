@@ -8,14 +8,16 @@ import DetailAccordion from './DetailAccordion.vue'
  * 任何一块在后台没填内容，就自动隐藏，不留空白占位。
  */
 const props = defineProps<{
-  craft: { title: string; body: string; images: { url: string; alt: string }[] }
+  craft: { title: string; body: string; bodyBlocks?: any[]; images: { url: string; alt: string }[] }
+  /** 分类级工艺富文本节点（可含图片）：有则优先于 craft.body 纯文本显示 */
+  craftBodyNodes?: any[]
   certifications: { name: string; desc?: string; issuer?: string; validUntil?: string; image?: string }[]
   clients: { name: string; image?: string }[]
   factoryShots: { url: string; alt: string }[]
   infoBlocks: { title: string; body?: string; images?: { url: string; alt: string }[] }[]
 }>()
 
-const hasCraft = computed(() => !!(props.craft?.body || props.craft?.images?.length))
+const hasCraft = computed(() => !!(props.craft?.body || props.craftBodyNodes?.length || props.craft?.images?.length))
 const hasCerts = computed(() => props.certifications?.length > 0)
 const hasClients = computed(() => props.clients?.length > 0)
 const hasFactory = computed(() => props.factoryShots?.length > 0)
@@ -46,7 +48,12 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
     <section v-if="hasCraft" id="craft" class="scroll-mt-[170px]">
       <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4">{{ craft.title }}</h2>
       <div class="grid gap-5 lg:grid-cols-2 items-start">
-        <p v-if="craft.body" class="text-sm sm:text-base text-gray-600 leading-relaxed whitespace-pre-line">{{ craft.body }}</p>
+        <!-- 分类级富文本（可含图片），优先级最高 -->
+        <div v-if="craftBodyNodes?.length" class="prose max-w-none text-sm sm:text-base text-gray-600 leading-relaxed">
+          <RichTextNode v-for="(node, i) in craftBodyNodes" :key="i" :node="node" />
+        </div>
+        <!-- 全站纯文本回退 -->
+        <p v-else-if="craft.body" class="text-sm sm:text-base text-gray-600 leading-relaxed whitespace-pre-line">{{ craft.body }}</p>
         <div v-if="craft.images?.length" class="grid grid-cols-2 gap-3">
           <img
             v-for="img in craft.images"

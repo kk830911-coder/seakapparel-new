@@ -45,12 +45,20 @@ export function resolveSpecRows(product: any, globalBlocks: any): SpecRow[] {
   return rows
 }
 
-/** 工艺与面料：分类覆盖 → 全站共用（图片取自全站共用块） */
+/**
+ * 工艺与面料：分类富文本（craftContent，可含图片）优先 → 全站纯文本（craftBody）回退。
+ * 分类不再有独立标题字段，标题统一取全站 craftTitle。
+ */
 export function resolveCraft(product: any, globalBlocks: any, strapiUrl: string) {
   const cat = product?.category
+  const blocks = cat?.craftContent
+  const hasBlocks = Array.isArray(blocks) && blocks.length > 0
   return {
-    title: cat?.craftTitle || globalBlocks?.craftTitle || 'Craft & Fabric',
-    body: cat?.craftBody || globalBlocks?.craftBody || '',
+    title: globalBlocks?.craftTitle || 'Craft & Fabric',
+    // 纯文本正文：分类没写富文本时回退到全站纯文本
+    body: hasBlocks ? '' : globalBlocks?.craftBody || '',
+    // 分类富文本节点：有则优先显示（标题也写在富文本里）
+    bodyBlocks: hasBlocks ? blocks : [],
     images: getMediaList(globalBlocks?.craftImages, strapiUrl)
   }
 }
