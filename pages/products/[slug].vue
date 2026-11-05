@@ -570,7 +570,7 @@ const handleTouchEnd = (e, next, prev) => {
           </video>
         </div>
 
-        <div class="space-y-5 sm:space-y-7 pt-6">
+        <div class="space-y-2.5 sm:space-y-3.5 pt-6">
           <!-- 1a. 全站富文本引言：独立卡片、无标题，后台填了才显示 -->
           <section v-if="specIntroNodes.length" id="spec-intro" class="scroll-mt-[170px] bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-gray-100">
             <div class="prose max-w-none text-gray-600 text-sm sm:text-base">
