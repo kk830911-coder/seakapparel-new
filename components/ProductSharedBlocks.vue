@@ -47,15 +47,14 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
     <!-- 工艺与面料 -->
     <section v-if="hasCraft" id="craft" class="scroll-mt-[170px]">
       <h2 class="text-xl sm:text-2xl font-heading font-bold text-navy mb-4">{{ craft.title }}</h2>
-      <div class="grid gap-5 lg:grid-cols-2 items-start">
-        <!-- 分类级富文本（可含图片），优先级最高 -->
-        <div v-if="craftBodyNodes?.length" class="prose max-w-none text-sm sm:text-base text-gray-600 leading-relaxed">
-          <RichTextNode v-for="(node, i) in craftBodyNodes" :key="i" :node="node" />
-        </div>
-        <!-- 全站纯文本回退 -->
-        <p v-else-if="craft.body" class="text-sm sm:text-base text-gray-600 leading-relaxed whitespace-pre-line">{{ craft.body }}</p>
-        <!-- 全站图墙：分类填了富文本时一并隐藏，整块完全替换 -->
-        <div v-if="!craftBodyNodes?.length && craft.images?.length" class="grid grid-cols-2 gap-3">
+      <!-- 分类级富文本：独占全宽（图墙一并隐藏，整块完全替换） -->
+      <div v-if="craftBodyNodes?.length" class="prose max-w-none text-sm sm:text-base text-gray-600 leading-relaxed">
+        <RichTextNode v-for="(node, i) in craftBodyNodes" :key="i" :node="node" />
+      </div>
+      <!-- 全站回退：文本 + 图墙两栏排布 -->
+      <div v-else class="grid gap-5 lg:grid-cols-2 items-start">
+        <p v-if="craft.body" class="text-sm sm:text-base text-gray-600 leading-relaxed whitespace-pre-line">{{ craft.body }}</p>
+        <div v-if="craft.images?.length" class="grid grid-cols-2 gap-3">
           <img
             v-for="img in craft.images"
             :key="img.url"
