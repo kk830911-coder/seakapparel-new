@@ -106,7 +106,7 @@
       <div class="relative">
         <button
           type="button"
-          class="flex flex-col items-center justify-center gap-0.5 h-full text-green-600"
+          class="w-full flex flex-col items-center justify-center gap-0.5 h-full text-green-600"
           aria-label="Show WeChat QR code"
           @click="wechatOpen = !wechatOpen"
         >
