@@ -355,8 +355,9 @@ const prevImage = () => { activeSkuIndex.value = -1; if (galleryItems.value.leng
 const nextPreview = () => { if (imagesList.value.length > 1) { previewIndex.value = (previewIndex.value + 1) % imagesList.value.length; imgPreviewKey.value++ } }
 const prevPreview = () => { if (imagesList.value.length > 1) { previewIndex.value = (previewIndex.value - 1 + imagesList.value.length) % imagesList.value.length; imgPreviewKey.value++ } }
 
-const openPreview = async () => { previewIndex.value = activeImageIndex.value; imgPreviewKey.value++; await nextTick(); previewOpen.value = true }
-const closePreview = async () => { previewOpen.value = false; await nextTick(); imgPreviewKey.value++ }
+// 慢速拖动松手后部分浏览器仍会补发 click，touchSwiped 标记防止"切图+弹窗"同时发生
+const openPreview = async () => { if (touchSwiped) return; previewIndex.value = activeImageIndex.value; imgPreviewKey.value++; await nextTick(); previewOpen.value = true }
+const closePreview = async () => { if (touchSwiped) return; previewOpen.value = false; await nextTick(); imgPreviewKey.value++ }
 
 // Strapi blocks 节点 → 真实 HTML 标签（heading→h1~h6、list→ul/ol、list-item→li、quote→blockquote）
 const blockTagMap = (node) => {
@@ -415,11 +416,25 @@ const specIntroNodes = computed(() =>
 const hasDescription = computed(() => descriptionNodes.value.length > 0)
 
 let touchStartX = 0
-const handleTouchStart = (e) => { touchStartX = e.changedTouches[0].screenX }
-const handleTouchEnd = (e, next, prev) => {
-  const diff = e.changedTouches[0].screenX - touchStartX
-  if (Math.abs(diff) > 50) diff < 0 ? next() : prev()
+let touchStartY = 0
+let touchSwiped = false
+const handleTouchStart = (e) => {
+  touchStartX = e.changedTouches[0].screenX
+  touchStartY = e.changedTouches[0].screenY
+  touchSwiped = false
 }
+const handleTouchEnd = (e, next, prev) => {
+  const dx = e.changedTouches[0].screenX - touchStartX
+  const dy = e.changedTouches[0].screenY - touchStartY
+  // 横向位移 >50px 且明显大于纵向位移才算左右滑动，避免斜向滑动/上下滚动页面时误切图
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+    touchSwiped = true
+    dx < 0 ? next() : prev()
+  }
+}
+// 来电/通知横幅/浏览器手势接管会触发 touchcancel（且不再触发 touchend），
+// 必须重置起点，否则下次 touchend 用残留的旧起点计算位移会误切图
+const handleTouchCancel = () => { touchStartX = 0; touchStartY = 0 }
 </script>
 
 <template>
@@ -449,7 +464,7 @@ const handleTouchEnd = (e, next, prev) => {
       <div class="grid md:grid-cols-2 gap-3 lg:gap-6 items-stretch">
         <!-- Image Gallery -->
         <div class="space-y-2 sm:space-y-3">
-          <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-300 relative group" :class="currentItem.type === 'image' && activeSkuIndex < 0 ? 'cursor-zoom-in' : ''" @touchstart="handleTouchStart" @touchend="e => handleTouchEnd(e, nextImage, prevImage)" @click="currentItem.type === 'image' && activeSkuIndex < 0 && openPreview()">
+          <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-300 relative group touch-pan-y" :class="currentItem.type === 'image' && activeSkuIndex < 0 ? 'cursor-zoom-in' : ''" @touchstart="handleTouchStart" @touchend="e => handleTouchEnd(e, nextImage, prevImage)" @touchcancel="handleTouchCancel" @click="currentItem.type === 'image' && activeSkuIndex < 0 && openPreview()">
             <video v-if="currentItem.type === 'video'" :key="currentItem.url" :src="currentItem.url" :poster="currentItem.poster ? getCleanImageUrl(currentItem.poster, strapiUrl) : undefined" controls playsinline preload="metadata" class="w-full h-full object-contain bg-black"></video>
             <NuxtImg v-else :src="getCleanImageUrl(mainImageUrl, strapiUrl)" class="w-full h-full object-contain" :alt="altFor(mainImageUrl, `${getTitle(product) || 'Product'} - TontonSports`)" width="900" height="900" loading="eager" fetchpriority="high" decoding="async" />
             <button v-if="galleryItems.length > 1" @click.stop="prevImage" class="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 bg-black/40 text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -653,7 +668,7 @@ const handleTouchEnd = (e, next, prev) => {
     </div>
 
     <!-- Fullscreen Preview -->
-    <div v-if="previewOpen" class="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center" @click="closePreview" @touchstart="handleTouchStart" @touchend="e => handleTouchEnd(e, nextPreview, prevPreview)">
+    <div v-if="previewOpen" class="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center touch-pan-y" @click="closePreview" @touchstart="handleTouchStart" @touchend="e => handleTouchEnd(e, nextPreview, prevPreview)" @touchcancel="handleTouchCancel">
       <button @click.stop="prevPreview" class="absolute left-2 sm:left-4 text-white text-3xl sm:text-4xl">
         <svg class="w-8 h-8 sm:w-10 sm:h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
       </button>
