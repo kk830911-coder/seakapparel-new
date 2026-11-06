@@ -25,6 +25,7 @@ const certifications = [
   { name: 'SEDEX SMETA', desc: '4-Pillar audit: Labour Standards, Health & Safety, Environment, Business Ethics', color: 'bg-blue-50 text-blue-700 border-blue-200' },
   { name: 'Benchmarks Audited', desc: 'Audited at our Hubei manufacturing base, April 2025', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
   { name: 'Intertek Tested', desc: 'Third-party fabric & garment test reports on request', color: 'bg-teal-50 text-teal-700 border-teal-200' },
+  { name: 'Verified by SGS Group', desc: 'SGS audited supplier on Alibaba International. SGS No. 485217897_P+T · Valid until 27 Jan 2027', color: 'bg-violet-50 text-violet-700 border-violet-200' },
   { name: 'Verified Entity', desc: 'Contracts signed with Tonton Sports (Shenzhen) Co., Ltd.', color: 'bg-indigo-50 text-indigo-700 border-indigo-200' }
 ]
 
