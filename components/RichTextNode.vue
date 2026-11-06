@@ -13,7 +13,7 @@ const emit = defineEmits(['zoom'])
     v-if="node.type === 'image'"
     :src="node.url"
     :alt="node.alt"
-    class="my-4 sm:my-6 max-w-full rounded-lg"
+    class="my-3 sm:my-4 max-w-full rounded-lg"
     :class="zoomable ? 'cursor-zoom-in' : ''"
     loading="lazy"
     @click="zoomable && node.url && emit('zoom', node)"
