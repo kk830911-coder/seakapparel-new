@@ -84,7 +84,15 @@
 
   <!-- ============ 移动端（<md）：底部固定联系栏 ============ -->
   <nav class="md:hidden fixed bottom-0 inset-x-0 z-[900] bg-white border-t border-gray-200 shadow-[0_-2px_12px_rgba(0,0,0,0.12)]" aria-label="Quick contact">
-    <div class="grid grid-cols-5 h-[60px]">
+    <div class="grid grid-cols-6 h-[60px]">
+      <NuxtLink
+        to="/"
+        class="flex flex-col items-center justify-center gap-0.5 text-navy"
+        aria-label="Back to homepage"
+      >
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06L11.47 3.84z"/><path d="M12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625A1.875 1.875 0 013.75 19.875v-6.198a.66.66 0 01.091-.086L12 5.43z"/></svg>
+        <span class="text-[10px] font-medium">Home</span>
+      </NuxtLink>
       <a
         href="https://wa.me/8618271971983"
         target="_blank"
