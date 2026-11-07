@@ -101,15 +101,36 @@ const openCookieSettings = () => {
     <!-- Top Info Bar -->
     <div class="bg-gray-100 text-gray-600 text-xs md:text-sm py-2 hidden md:block">
       <div class="max-w-7xl mx-auto px-3 flex justify-between items-center">
-        <div class="flex items-center gap-6">
-          <span class="flex items-center gap-1.5">
+        <div class="flex items-center gap-4 lg:gap-6">
+          <span class="flex items-center gap-1.5 whitespace-nowrap">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-            20+ Years Professional Sportswear Manufacturer
+            <span class="hidden lg:inline">20+ Years Professional Sportswear Manufacturer</span>
+            <span class="lg:hidden">20+ Years OEM/ODM</span>
           </span>
-          <span class="flex items-center gap-1.5">
+          <a
+            href="/certification/smeta-4pillar-audit-report-2025.pdf"
+            download
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-1.5 whitespace-nowrap hover:text-brand transition-colors"
+            title="Download SEDEX SMETA 4-Pillar audit report (PDF)"
+          >
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             SEDEX SMETA 4-Pillar Audited
-          </span>
+            <svg class="w-3 h-3 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
+          </a>
+          <a
+            href="/certification/sgs-supplier-assessment-report.pdf"
+            download
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-1.5 whitespace-nowrap hover:text-brand transition-colors"
+            title="Download SGS supplier assessment report (PDF)"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            SGS Verified Supplier
+            <svg class="w-3 h-3 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
+          </a>
         </div>
         <div class="flex items-center gap-5">
           <a href="mailto:Marc@tutesports.com" class="flex items-center gap-1.5 hover:text-brand transition-colors">

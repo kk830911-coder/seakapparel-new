@@ -21,11 +21,12 @@ const stats = [
 ]
 
 // 只展示当前可核验的合规事实：过期证书与无编号的认证一律不写
+// file: 可点击下载的官方报告 PDF（public/certification/ 下）
 const certifications = [
-  { name: 'SEDEX SMETA', desc: '4-Pillar audit: Labour Standards, Health & Safety, Environment, Business Ethics', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+  { name: 'SEDEX SMETA', desc: '4-Pillar audit: Labour Standards, Health & Safety, Environment, Business Ethics', color: 'bg-blue-50 text-blue-700 border-blue-200', file: '/certification/smeta-4pillar-audit-report-2025.pdf' },
   { name: 'Benchmarks Audited', desc: 'Audited at our Hubei manufacturing base, April 2025', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
   { name: 'Intertek Tested', desc: 'Third-party fabric & garment test reports on request', color: 'bg-teal-50 text-teal-700 border-teal-200' },
-  { name: 'Verified by SGS Group', desc: 'SGS audited supplier on Alibaba International. SGS No. 485217897_P+T · Valid until 27 Jan 2027', color: 'bg-violet-50 text-violet-700 border-violet-200' },
+  { name: 'Verified by SGS Group', desc: 'SGS audited supplier on Alibaba International. SGS No. 485217897_P+T · Valid until 27 Jan 2027', color: 'bg-violet-50 text-violet-700 border-violet-200', file: '/certification/sgs-supplier-assessment-report.pdf' },
   { name: 'Verified Entity', desc: 'Contracts signed with Tonton Sports (Shenzhen) Co., Ltd.', color: 'bg-indigo-50 text-indigo-700 border-indigo-200' }
 ]
 
@@ -248,13 +249,28 @@ const overviewPlaying = ref(false)
           <p class="text-gray-500 max-w-2xl mx-auto">We maintain the highest standards in quality, social responsibility, and environmental management.</p>
         </div>
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <div v-for="cert in certifications" :key="cert.name" class="bg-white rounded-xl p-6 text-center border border-gray-100 shadow-sm hover:shadow-md transition-all">
+          <component
+            :is="cert.file ? 'a' : 'div'"
+            v-for="cert in certifications"
+            :key="cert.name"
+            :href="cert.file || undefined"
+            :download="cert.file ? true : undefined"
+            :target="cert.file ? '_blank' : undefined"
+            :rel="cert.file ? 'noopener noreferrer' : undefined"
+            :title="cert.file ? `Download ${cert.name} report (PDF)` : undefined"
+            class="block bg-white rounded-xl p-6 text-center border border-gray-100 shadow-sm hover:shadow-md transition-all"
+            :class="cert.file ? 'cursor-pointer hover:border-brand/40' : ''"
+          >
             <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center border-2" :class="cert.color">
               <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
             </div>
             <h3 class="font-heading font-bold text-navy text-lg">{{ cert.name }}</h3>
             <p class="text-gray-500 text-xs mt-1">{{ cert.desc }}</p>
-          </div>
+            <p v-if="cert.file" class="text-brand text-xs mt-3 inline-flex items-center gap-1 font-medium">
+              Download Report
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
+            </p>
+          </component>
         </div>
       </div>
     </section>
