@@ -123,6 +123,41 @@ const overviewPlaying = ref(false)
             </div>
           </div>
           <div class="relative">
+            <!-- 认证徽章：置于工厂视频上方，点击可下载官方报告 -->
+            <div class="flex flex-col sm:flex-row gap-2.5 mb-3 sm:mb-4">
+              <a
+                href="/certification/smeta-4pillar-audit-report-2025.pdf"
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex flex-1 items-center gap-2.5 bg-white rounded-lg border border-gray-200 shadow-sm px-3 py-2.5 hover:border-brand/40 hover:shadow-md transition-all"
+                title="Download SEDEX SMETA 4-Pillar audit report (PDF)"
+              >
+                <span class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                </span>
+                <span class="min-w-0">
+                  <span class="block text-xs font-bold text-navy leading-tight">SEDEX SMETA</span>
+                  <span class="block text-[10px] text-gray-500 leading-tight mt-0.5">4-Pillar Audited · 2025</span>
+                </span>
+              </a>
+              <a
+                href="/certification/sgs-supplier-assessment-report.pdf"
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex flex-1 items-center gap-2.5 bg-white rounded-lg border border-gray-200 shadow-sm px-3 py-2.5 hover:border-brand/40 hover:shadow-md transition-all"
+                title="Download SGS supplier assessment report (PDF)"
+              >
+                <span class="w-8 h-8 rounded-full bg-violet-50 text-violet-600 border border-violet-100 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                </span>
+                <span class="min-w-0">
+                  <span class="block text-xs font-bold text-navy leading-tight">SGS Verified Supplier</span>
+                  <span class="block text-[10px] text-gray-500 leading-tight mt-0.5">Audited · Valid to Jan 2027</span>
+                </span>
+              </a>
+            </div>
             <!-- 集团工厂概览视频：封面 + 播放按钮，点击后才加载视频源 -->
             <video
               v-if="overviewPlaying"
