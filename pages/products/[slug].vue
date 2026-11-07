@@ -130,7 +130,41 @@ const mainImageUrl = computed(() => {
   return currentItem.value.url
 })
 const selectSku = (i) => { activeSkuIndex.value = activeSkuIndex.value === i ? -1 : i }
-const selectGalleryItem = (i) => { activeImageIndex.value = i; activeSkuIndex.value = -1 }
+
+// ===== 缩略图横向轨道：隐藏原生滚动条，用两侧箭头滚动，选中项自动居中 =====
+const thumbTrack = ref(null)
+const thumbsCanLeft = ref(false)
+const thumbsCanRight = ref(false)
+
+const updateThumbsArrows = () => {
+  const track = thumbTrack.value
+  if (!track) return
+  thumbsCanLeft.value = track.scrollLeft > 4
+  thumbsCanRight.value = track.scrollLeft + track.clientWidth < track.scrollWidth - 4
+}
+
+const scrollThumbsBy = (dir) => {
+  const track = thumbTrack.value
+  if (!track) return
+  track.scrollBy({ left: dir * Math.max(track.clientWidth * 0.7, 120), behavior: 'smooth' })
+}
+
+const scrollThumbIntoCenter = (i) => {
+  const track = thumbTrack.value
+  const el = track?.children?.[i]
+  if (!track || !el) return
+  const target = el.offsetLeft - (track.clientWidth - el.offsetWidth) / 2
+  track.scrollTo({ left: Math.max(0, target), behavior: 'smooth' })
+}
+
+const selectGalleryItem = (i) => { activeImageIndex.value = i; activeSkuIndex.value = -1; scrollThumbIntoCenter(i) }
+
+onMounted(() => {
+  nextTick(updateThumbsArrows)
+  window.addEventListener('resize', updateThumbsArrows)
+})
+onBeforeUnmount(() => window.removeEventListener('resize', updateThumbsArrows))
+watch(() => galleryItems.value.length, () => nextTick(updateThumbsArrows))
 
 const previewImageUrl = computed(() => imagesList.value[previewIndex.value] || '')
 
@@ -463,7 +497,7 @@ const handleTouchCancel = () => { touchStartX = 0; touchStartY = 0 }
       <!-- Product Info -->
       <div class="grid md:grid-cols-2 gap-3 lg:gap-6 items-stretch">
         <!-- Image Gallery -->
-        <div class="space-y-2 sm:space-y-3">
+        <div class="min-w-0 space-y-2 sm:space-y-3">
           <div class="rounded-xl overflow-hidden shadow-sm bg-gray-50 aspect-square border border-gray-300 relative group touch-pan-y" :class="currentItem.type === 'image' && activeSkuIndex < 0 ? 'cursor-zoom-in' : ''" @touchstart="handleTouchStart" @touchend="e => handleTouchEnd(e, nextImage, prevImage)" @touchcancel="handleTouchCancel" @click="currentItem.type === 'image' && activeSkuIndex < 0 && openPreview()">
             <video v-if="currentItem.type === 'video'" :key="currentItem.url" :src="currentItem.url" :poster="currentItem.poster ? getCleanImageUrl(currentItem.poster, strapiUrl) : undefined" controls playsinline preload="metadata" class="w-full h-full object-contain bg-black"></video>
             <NuxtImg v-else :src="getCleanImageUrl(mainImageUrl, strapiUrl)" class="w-full h-full object-contain" :alt="altFor(mainImageUrl, `${getTitle(product) || 'Product'} - TontonSports`)" width="900" height="900" loading="eager" fetchpriority="high" decoding="async" />
@@ -475,18 +509,39 @@ const handleTouchCancel = () => { touchStartX = 0; touchStartY = 0 }
             </button>
             <div class="absolute bottom-2 sm:bottom-3 right-2 sm:right-3 bg-black/60 text-white px-2 sm:px-3 py-1 text-xs rounded-full">{{ activeImageIndex + 1 }} / {{ galleryItems.length }}</div>
           </div>
-          <div class="flex gap-1.5 sm:gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-            <button v-for="(item, i) in galleryItems" :key="i" @click="selectGalleryItem(i)" class="relative w-12 h-12 sm:w-16 sm:h-16 rounded-lg border-2 flex-shrink-0 overflow-hidden transition-colors" :class="activeSkuIndex < 0 && activeImageIndex === i ? 'border-brand' : 'border-gray-200 hover:border-gray-300'">
-              <NuxtImg :src="getCleanImageUrl(item.type === 'video' ? item.poster : item.url, strapiUrl)" width="64" height="64" class="w-full h-full object-contain bg-gray-50" :alt="altFor(item.type === 'video' ? item.poster : item.url, `${getTitle(product) || 'Product'} thumbnail ${i + 1}`)" loading="lazy" />
-              <span v-if="item.type === 'video'" class="absolute inset-0 flex items-center justify-center bg-black/30">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white drop-shadow" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-              </span>
+          <!-- 缩略图轨道：无原生滚动条，两侧箭头滚动，选中项自动居中 -->
+          <div class="relative">
+            <button
+              v-if="thumbsCanLeft"
+              type="button"
+              class="thumb-arrow left-0"
+              aria-label="Previous thumbnails"
+              @click.stop="scrollThumbsBy(-1)"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <div ref="thumbTrack" class="thumb-track flex gap-1.5 sm:gap-2 overflow-x-auto pb-1 -mx-1 px-1" @scroll.passive="updateThumbsArrows">
+              <button v-for="(item, i) in galleryItems" :key="i" @click="selectGalleryItem(i)" class="relative w-12 h-12 sm:w-16 sm:h-16 rounded-lg border-2 flex-shrink-0 overflow-hidden transition-colors" :class="activeSkuIndex < 0 && activeImageIndex === i ? 'border-brand' : 'border-gray-200 hover:border-gray-300'">
+                <NuxtImg :src="getCleanImageUrl(item.type === 'video' ? item.poster : item.url, strapiUrl)" width="64" height="64" class="w-full h-full object-contain bg-gray-50" :alt="altFor(item.type === 'video' ? item.poster : item.url, `${getTitle(product) || 'Product'} thumbnail ${i + 1}`)" loading="lazy" />
+                <span v-if="item.type === 'video'" class="absolute inset-0 flex items-center justify-center bg-black/30">
+                  <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white drop-shadow" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </span>
+              </button>
+            </div>
+            <button
+              v-if="thumbsCanRight"
+              type="button"
+              class="thumb-arrow right-0"
+              aria-label="Next thumbnails"
+              @click.stop="scrollThumbsBy(1)"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </button>
           </div>
         </div>
 
         <!-- Product Info -->
-        <div class="flex flex-col">
+        <div class="flex flex-col min-w-0">
           <!-- 产品信息大卡片：标题 / 价格 / SKU / 定制信息，横线分割（类国际站样式） -->
           <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm mb-2 sm:mb-3 flex-1">
             <h1 class="text-lg font-bold text-[#222222]">{{ getTitle(product) }}</h1>
@@ -713,4 +768,27 @@ const handleTouchCancel = () => { touchStartX = 0; touchStartY = 0 }
 .prose :deep(strong) { font-weight: 700; color: #111827; }
 .prose :deep(pre) { background: #f3f4f6; border-radius: 0.5rem; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
 .prose :deep(code) { font-family: ui-monospace, monospace; font-size: 0.9em; }
+
+/* 缩略图轨道：隐藏原生滚动条（滚动改由两侧箭头 + 点击居中控制） */
+.thumb-track { scrollbar-width: none; -ms-overflow-style: none; }
+.thumb-track::-webkit-scrollbar { display: none; }
+
+/* 缩略图轨道两侧箭头 */
+.thumb-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  color: #0A1628;
+}
+.thumb-arrow:hover { background: #f3f4f6; }
 </style>
