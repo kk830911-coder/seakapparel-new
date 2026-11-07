@@ -83,7 +83,7 @@
   </div>
 
   <!-- ============ 移动端（<md）：底部固定联系栏 ============ -->
-  <nav class="md:hidden fixed bottom-0 inset-x-0 z-[900] bg-white border-t border-gray-200 shadow-[0_-2px_12px_rgba(0,0,0,0.12)]" aria-label="Quick contact">
+  <nav class="md:hidden fixed bottom-0 inset-x-0 z-[900] bg-white border-t border-gray-200 shadow-[0_-2px_12px_rgba(0,0,0,0.12)] touch-manipulation pb-[env(safe-area-inset-bottom)]" aria-label="Quick contact">
     <div class="grid grid-cols-6 h-[60px]">
       <NuxtLink
         to="/"
@@ -176,7 +176,7 @@
   >
     <div
       v-if="wechatCopied"
-      class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-navy text-white text-xs px-4 py-2 rounded-full shadow-lg z-[950] whitespace-nowrap"
+      class="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 bg-navy text-white text-xs px-4 py-2 rounded-full shadow-lg z-[950] whitespace-nowrap"
       role="status"
     >
       WeChat ID copied: 182 7197 1983

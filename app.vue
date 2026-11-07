@@ -396,7 +396,7 @@ const openCookieSettings = () => {
     </footer>
 
     <!-- 移动端底部安全占位：底部固定联系栏不遮住页脚版权 -->
-    <div class="h-[64px] md:hidden" aria-hidden="true"></div>
+    <div class="h-[calc(64px+env(safe-area-inset-bottom))] md:hidden" aria-hidden="true"></div>
 
     <!-- 全站悬浮联系：桌面右侧竖排卡 / 移动底部固定栏（components/FloatingContact.vue） -->
     <FloatingContact :show-cookie-banner="showCookieBanner" />
@@ -410,7 +410,7 @@ const openCookieSettings = () => {
       leave-from-class="translate-y-0 opacity-100"
       leave-to-class="translate-y-full opacity-0"
     >
-      <div v-if="showCookieBanner" class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-2xl z-[1000] py-4 px-6">
+      <div v-if="showCookieBanner" class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-2xl z-[1000] py-4 px-6 pb-[calc(1rem+env(safe-area-inset-bottom))]">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="text-sm text-gray-600 max-w-4xl text-center md:text-left leading-relaxed">
             We use cookies to improve your experience and support our marketing efforts. By clicking "Accept", you agree to our use of cookies. Learn more in our <NuxtLink to="/privacy-policy" class="text-brand hover:underline font-medium">Privacy Policy</NuxtLink>.

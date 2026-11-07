@@ -36,7 +36,7 @@ export default defineNuxtConfig({
       titleTemplate: '%s | TontonSports',
       meta: [
         { charset: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
         { name: 'description', content: "TontonSports — 20+ years professional custom sportswear manufacturer. OEM/ODM activewear, gym wear, team uniforms. Low MOQ from 1 piece. SEDEX SMETA 4-Pillar audited factory. Global shipping." },
         { name: 'keywords', content: 'custom sportswear manufacturer, activewear OEM, gym wear supplier, custom athletic clothing, private label sportswear, wholesale activewear, team uniform manufacturer, OEM sportswear China' },
         { name: 'author', content: 'TontonSports - Tonton Sports (Shenzhen) Co., Ltd.' },
