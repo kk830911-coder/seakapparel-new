@@ -5,9 +5,10 @@ export default defineEventHandler(async () => {
   try {
     const [productsResponse, blogsResponse, faqsResponse] = await Promise.all([
       // 顺带带上 category，用于生成分类落地页 URL（不额外多打一次接口）
-      $fetch(`${STRAPI_BASE_URL}/api/products?fields[0]=slug&fields[1]=updatedAt&fields[2]=publishedAt&populate[category]=true`),
-      $fetch(`${STRAPI_BASE_URL}/api/blogs?fields[0]=slug&fields[1]=updatedAt&fields[2]=publishedAt`),
-      $fetch(`${STRAPI_BASE_URL}/api/faqs?fields[0]=slug&fields[1]=updatedAt&fields[2]=publishedAt`)
+      // pagination[pageSize]=1000：Strapi v5 默认每页只返回 25 条，不加这个参数产品超过 25 个后 sitemap 会漏掉旧产品
+      $fetch(`${STRAPI_BASE_URL}/api/products?fields[0]=slug&fields[1]=updatedAt&fields[2]=publishedAt&populate[category]=true&pagination[pageSize]=1000`),
+      $fetch(`${STRAPI_BASE_URL}/api/blogs?fields[0]=slug&fields[1]=updatedAt&fields[2]=publishedAt&pagination[pageSize]=1000`),
+      $fetch(`${STRAPI_BASE_URL}/api/faqs?fields[0]=slug&fields[1]=updatedAt&fields[2]=publishedAt&pagination[pageSize]=1000`)
     ])
 
     const routes = []
